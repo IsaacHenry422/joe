@@ -28,5 +28,6 @@ export const adminFields = [
   "adminCustomId",
   "profilePicture",
   "accountType",
+  "adminType",
   "isAdmin",
 ];

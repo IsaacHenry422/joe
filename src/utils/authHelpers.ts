@@ -21,7 +21,7 @@ const generateAuthToken = async (
     let payload, accessToken, refreshToken;
 
     if (accountType === "User") {
-      payload = { buyerId: accountDetails._id };
+      payload = { userId: accountDetails._id };
       accessToken = jwt.sign(payload, process.env.JWT_SEC!, {
         expiresIn: "24h",
       });

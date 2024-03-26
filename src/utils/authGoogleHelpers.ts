@@ -49,6 +49,7 @@ class GoogleService {
   async userGoogleSignup(
     code: string,
     client: Auth.OAuth2Client,
+    userCustomId: string,
     payload?: any
   ): Promise<IUser | null> {
     let tokenId: string;
@@ -62,17 +63,18 @@ class GoogleService {
 
     try {
       const createdUser = await User.create({
-        firstName: payload.given_name,
-        lastName: payload.family_name,
+        firstname: payload.given_name,
+        lastname: payload.family_name,
         email: payload.email,
         authMethod: "Google",
-        accountType: "user",
+        accountType: "User",
+        userCustomId,
         authType: {
           googleUuid: payload.sub,
         },
         profilePicture:
           payload.picture ||
-          "https://res.cloudinary.com/dsffatdpd/image/upload/v1685691602/baca/logo_aqssg3.jpg",
+          "https://res.cloudinary.com/duzrrmfci/image/upload/v1703842924/logo.jpg",
         address: payload.address || "",
         phoneNumber: payload.phone_number || "",
       });

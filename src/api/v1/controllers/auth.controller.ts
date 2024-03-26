@@ -5,6 +5,7 @@ import * as bcrypt from "bcrypt";
 import _ from "lodash";
 import * as moment from "moment-timezone";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   BadRequest,
@@ -27,7 +28,7 @@ import {
 import { userFields, adminFields } from "../../../utils/fieldHelpers";
 import {
   welcomeNotification,
-  // resetPasswordEmail,
+  resetPasswordEmail,
 } from "../../../services/email.service";
 
 const PASSWORD_TOKEN_EXPIRY = 10; // 10 minutes
@@ -53,7 +54,7 @@ class AuthController {
     const hash = await bcrypt.hash(password, 10);
 
     // Generate custom user ID
-    const userCustomId = await GeneratorService.generateUserId();
+    const userCustomId = await GeneratorService.generateUserCustomId();
 
     const user = await User.create({
       firstname,
@@ -186,12 +187,16 @@ class AuthController {
 
     //create new account if it doesn't exist but sign if it exist
     if (!account) {
+      const userCustomId = await GeneratorService.generateUserCustomId();
+
       account = await googleHelpers.userGoogleSignup(
         code,
         googleClient,
+        userCustomId,
         payload
       );
-      // await welcomeNotification(account.email, account.firstname);
+
+      await welcomeNotification(account!.email, account!.firstname);
 
       authProcessType = "signup";
     } else {
@@ -233,7 +238,7 @@ class AuthController {
   async adminRegister(req: Request, res: Response) {
     const { error, data } = validators.createAdminValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
-    const { firstname, lastname, email, password } = data;
+    const { firstname, lastname, email, password, adminType } = data;
 
     const emailExists = await Admin.findOne({ email });
     if (emailExists) {
@@ -245,6 +250,8 @@ class AuthController {
     }
     const accountType = "Admin";
     const hash = await bcrypt.hash(password, 10);
+    const adminCustomId = await GeneratorService.generateAdminCustomId();
+    console.log(adminCustomId);
 
     const admin = await Admin.create({
       firstname,
@@ -253,6 +260,8 @@ class AuthController {
       password: hash,
       isAdmin: true,
       accountType: "Admin",
+      adminType,
+      adminCustomId,
     });
 
     const { accessToken, refreshToken } = await generateAuthToken(
@@ -325,12 +334,15 @@ class AuthController {
 
     const user = await User.findOne({ email });
     if (!user) {
-      throw new ResourceNotFound("User not found", "RESOURCE_NOT_FOUND");
+      throw new ResourceNotFound(
+        "Your associated account with the email not found",
+        "RESOURCE_NOT_FOUND"
+      );
     }
 
     if (user.authType.password === undefined || user.authMethod !== "Form") {
       throw new BadRequest(
-        "Cannot reset password for non-Form login account, continue with another option",
+        "Cannot reset password for non-Form login account, continue with another option like Google",
         "INVALID_REQUEST_PARAMETERS"
       );
     }
@@ -352,11 +364,7 @@ class AuthController {
     const otp = user.passwordRecovery.passwordRecoveryOtp;
 
     if (otp && user.firstname && email) {
-      // await resetPasswordEmail(
-      //   email: user.email,
-      //   firstname: user.firstname,
-      //   otp: otp,
-      // );
+      await resetPasswordEmail(user.email, user.firstname, otp);
     }
 
     res.ok({ message: `New reset password Otp sent to ${email}` });
@@ -435,48 +443,38 @@ class AuthController {
         passwordRecoveryOtpExpiresAt: undefined,
       };
       await user.save();
-      res.ok({ message: "Password changed successfully" });
+      res.ok({ message: "Your Password has been changed successfully" });
     }
   }
 
   async resetadminPassword(req: Request, res: Response) {
-    const { error, data } = validators.verifyUserOtpAndChangePasswordValidator(
-      req.body
-    );
+    const { error, data } = validators.resetTokenValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
-    const { otp, newPassword } = data;
+    let { email } = data;
 
-    const user = await User.findOne({
-      "passwordRecovery.passwordRecoveryOtp": otp,
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      throw new ResourceNotFound(
+        "Admin associated account with the email not found",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+    const randomBytes = uuidv4().split("-")[0];
+    const password = `Admin@${randomBytes}`;
+    const hash = await bcrypt.hash(password, 10);
+
+    const updatedAdmin = await Admin.findByIdAndUpdate(admin._id, {
+      password: hash,
+      updatedAt: new Date(),
     });
 
-    if (!user)
-      throw new BadRequest("Invalid OTP", "INVALID_REQUEST_PARAMETERS");
+    const formattedAdmin = _.pick(updatedAdmin, adminFields);
 
-    const userTimezone = moment.tz.guess();
-    const now = moment.tz(userTimezone);
-    const otpExpired = now.isAfter(
-      user?.passwordRecovery?.passwordRecoveryOtpExpiresAt
-    );
-
-    // Handle expired OTP
-    if (otpExpired) {
-      user.passwordRecovery = {
-        passwordRecoveryOtp: undefined,
-        passwordRecoveryOtpExpiresAt: undefined,
-      };
-      await user.save();
-      return res.error(400, "OTP Expired, request a new one", "EXPIRED_TOKEN");
-    } else {
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      user.authType.password = hashedPassword;
-      user.passwordRecovery = {
-        passwordRecoveryOtp: undefined,
-        passwordRecoveryOtpExpiresAt: undefined,
-      };
-      await user.save();
-      res.ok({ message: "Password changed successfully" });
-    }
+    res.ok({
+      admin: formattedAdmin,
+      newPassword: password,
+      message: "Admin password updated successfully",
+    });
   }
 
   //General Refresh Token and Logout for users and Admin

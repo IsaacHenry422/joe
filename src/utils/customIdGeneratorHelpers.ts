@@ -1,8 +1,10 @@
 import User from "../db/models/user.model";
+import Admin from "../db/models/admin.model";
+
 import { BadRequest } from "../errors/httpErrors";
 
 class GeneratorService {
-  async generateUserId(): Promise<string> {
+  async generateUserCustomId(): Promise<string> {
     try {
       // Find the last user saved in the database
       const lastUser = await User.findOne({}, {}, { sort: { createdAt: -1 } });
@@ -19,6 +21,35 @@ class GeneratorService {
 
       // Format the next ID with leading zeros
       const formattedId = `UR${nextId.toString().padStart(paddingLength, "0")}`;
+
+      return formattedId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      throw new BadRequest(error.message, "INVALID_REQUEST_PARAMETERS");
+    }
+  }
+
+  async generateAdminCustomId(): Promise<string> {
+    try {
+      // Find the last admin saved in the database
+      const lastAdmin = await Admin.findOne(
+        {},
+        {},
+        { sort: { createdAt: -1 } }
+      );
+
+      let nextId = 1;
+      if (lastAdmin) {
+        // Extract the ID of the last admin and increment it
+        const lastId = parseInt(lastAdmin.adminCustomId.substring(3), 10);
+        nextId = lastId + 1;
+      }
+
+      // Calculate the padding length based on the range of the next ID
+      const paddingLength = calculatePaddingLength(nextId);
+
+      // Format the next ID with leading zeros
+      const formattedId = `ADM${nextId.toString().padStart(paddingLength, "0")}`;
 
       return formattedId;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

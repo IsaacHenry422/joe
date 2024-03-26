@@ -26,7 +26,11 @@ authRouter.post(
   "/resetpassword/change-password",
   controller.verifyUserOtpAndChangePassword
 );
-authRouter.post("/resetpassword/admin", controller.resetadminPassword);
+authRouter.post(
+  "/resetpassword/admin",
+  auth({ accountType: ["admin"], adminType: ["Super-Admin"] }),
+  controller.resetadminPassword
+);
 
 // Auth admin
 authRouter.post("/admin/register", controller.adminRegister);

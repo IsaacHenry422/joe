@@ -69,6 +69,9 @@ export const createAdminValidator = (payload: any) => {
         required_error: "email is required",
       })
       .min(8, "Password must be minimum of 8 characters."),
+    adminType: z.enum(["Super-Admin", "Sub-Admin"], {
+      required_error: "Admin Type is required.",
+    }),
   });
 
   return validateRequestBody(schema, payload);

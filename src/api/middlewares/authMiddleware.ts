@@ -9,7 +9,11 @@ dotenv.config();
 
 interface AuthOptions {
   accountType?: string[];
+  adminType?: string[];
   isAdmin?: boolean;
+}
+function isAdmin(loggedInAccount: LoggedInAccount): loggedInAccount is IAdmin {
+  return loggedInAccount.accountType.toLowerCase() === "admin";
 }
 
 type LoggedInAccount = IUser | IAdmin;
@@ -86,6 +90,19 @@ function handleAuthOptions(
 
     if (!hasAccess) {
       const message = `${loggedInAccount.accountType} ${loggedInAccount._id} does not have permission to this resource`;
+      throw new Forbidden(message, "INSUFFICIENT_PERMISSIONS");
+    }
+  }
+  // Check for 'adminType' only if it exists on 'loggedInAccount'
+  if (options.adminType && isAdmin(loggedInAccount)) {
+    if (!Array.isArray(options.adminType)) return;
+
+    const adminTypes = options.adminType.map((adminType) =>
+      adminType.toLowerCase()
+    );
+
+    if (!adminTypes.includes(loggedInAccount.adminType?.toLowerCase())) {
+      const message = `${loggedInAccount.adminType} ${loggedInAccount._id} does not have permission to this resource`;
       throw new Forbidden(message, "INSUFFICIENT_PERMISSIONS");
     }
   }

@@ -23,7 +23,7 @@ async function welcomeNotification(
 async function resetPasswordEmail(
   email: string,
   firstname: string,
-  otp: number
+  otp: string
 ): Promise<void> {
   const options: EmailOptions = {
     to: email,
