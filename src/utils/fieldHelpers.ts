@@ -3,16 +3,20 @@
 // user field
 export const userFields = [
   "_id",
-  "firstName",
-  "lastName",
+  "firstname",
+  "lastname",
   "email",
+  "userCustomId",
   "profilePicture",
   "authMethod",
   "accountType",
   "finishTourGuide",
   "isAdmin",
-  "address",
   "phoneNumber",
+  "dateOfBirth",
+  "country",
+  "city",
+  "address",
 ];
 
 // admin field
@@ -21,6 +25,7 @@ export const adminFields = [
   "firstname",
   "lastname",
   "email",
+  "adminCustomId",
   "profilePicture",
   "accountType",
   "isAdmin",

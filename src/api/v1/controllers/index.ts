@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 class IndexController {
   welcomeHandler(req: Request, res: Response) {
     const payload = {
-      message: "Welcome to QR Scanner API",
+      message: "Welcome to VAAD API",
     };
 
     res.ok(payload);

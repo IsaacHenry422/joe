@@ -1,6 +1,7 @@
 import mongoose, { Document, Model } from "mongoose";
 
 type AccountType = "Admin" | "User";
+type AdminType = "Super-Admin" | "Sub-Admin";
 
 export interface IAdmin extends Document {
   firstname: string;
@@ -10,6 +11,8 @@ export interface IAdmin extends Document {
   password: string;
   phoneNumber: string;
   accountType: AccountType;
+  adminType: AdminType;
+
   profilePicture?: string;
   isAdmin: boolean;
   refreshToken?: string;
@@ -47,6 +50,11 @@ const AdminSchema = new mongoose.Schema<IAdmin>(
       type: String,
       required: true,
       enum: ["Admin", "User"],
+    },
+    adminType: {
+      type: String,
+      required: true,
+      enum: ["Super-Admin", "Sub-Admin"],
     },
     profilePicture: {
       type: String,

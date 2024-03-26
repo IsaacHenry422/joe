@@ -18,6 +18,8 @@ import Admin from "../../../db/models/admin.model";
 import User, { IUser } from "../../../db/models/user.model";
 import * as validators from "../validators/auth.validator";
 import googleHelpers from "../../../utils/authGoogleHelpers";
+import GeneratorService from "../../../utils/customIdGeneratorHelpers";
+
 import {
   generateAuthToken,
   verifyRefreshToken,
@@ -36,7 +38,8 @@ class AuthController {
   async userFormRegister(req: Request, res: Response) {
     const { error, data } = validators.createUserValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
-    const { firstName, lastName, email, password } = data;
+
+    const { firstname, lastname, email, password } = data;
 
     const emailExists = await User.findOne({ email });
     if (emailExists) {
@@ -49,10 +52,14 @@ class AuthController {
     const accountType = "User";
     const hash = await bcrypt.hash(password, 10);
 
+    // Generate custom user ID
+    const userCustomId = await GeneratorService.generateUserId();
+
     const user = await User.create({
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       email,
+      userCustomId,
       accountType,
       authMethod: "Form",
       authType: {

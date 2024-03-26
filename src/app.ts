@@ -6,6 +6,7 @@ import morgan from "morgan";
 import * as errorMiddlewares from "./api/middlewares/errorMiddlewares";
 import responseUtilities from "./api/middlewares/responseUtilities";
 import v1Router from "./api/v1/routes";
+import { conditionalMiddleware } from "./utils/expressHelpers";
 // import { agenda } from "./config/agenda.config";
 
 const app = express();
@@ -18,6 +19,13 @@ const whitelist = [
 // Middlewares
 app.use(responseUtilities);
 app.use(cors({ origin: whitelist, exposedHeaders: ["X-API-TOKEN"] }));
+
+app.use(
+  conditionalMiddleware(
+    express.json(),
+    () => true // Always apply express.json() middleware
+  )
+);
 
 app.use(morgan("dev"));
 // API route

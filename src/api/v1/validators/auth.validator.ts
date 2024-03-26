@@ -5,10 +5,10 @@ import { validateRequestBody } from "../../../utils/zodHelpers";
 // eslint-disable-next-line
 export const createUserValidator = (payload: any) => {
   const schema = z.object({
-    firstName: z.string({
+    firstname: z.string({
       required_error: "First name is required.",
     }),
-    lastName: z.string({
+    lastname: z.string({
       required_error: "Last name is required.",
     }),
     email: z

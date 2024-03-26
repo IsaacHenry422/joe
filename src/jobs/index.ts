@@ -11,7 +11,7 @@ const jobs: Job[] = [
   // Every 1 minute
   {
     name: "payment-sub-ended",
-    cron: "*/1 * * * *",
+    cron: "*/5 * * * *",
     handler: paymentSubEnded,
   },
 ];

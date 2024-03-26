@@ -70,7 +70,7 @@ const UserSchema = new mongoose.Schema<IUser>(
     accountType: {
       type: String,
       required: true,
-      enum: ["Admin", "Buyer", "Business"],
+      enum: ["Admin", "User"],
     },
     profilePicture: {
       type: String,
