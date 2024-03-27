@@ -19,7 +19,7 @@ class GoogleService {
   ];
 
   generateClient() {
-    const redirectUrl = `${baseUrl}/auth/callback/googleAuth`;
+    const redirectUrl = `${baseUrl}/auth/googleAuth`;
     const client = new google.auth.OAuth2(clientId, clientSecret, redirectUrl);
     return client;
   }

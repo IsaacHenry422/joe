@@ -12,9 +12,11 @@ userRouter.get("/", auth({ accountType: ["admin"] }), controller.getUsers);
 // users and admin route
 userRouter.get(
   "/:userId",
-  auth({ accountType: ["user", "admin"] }),
+  auth({ accountType: ["admin"] }),
   controller.getUserById
 );
+
+userRouter.patch("/", auth({ accountType: ["admin"] }), controller.blockUser);
 
 // users route
 userRouter.put("/", auth({ accountType: ["user"] }), controller.updateUser);
@@ -31,7 +33,5 @@ userRouter.patch(
   auth({ accountType: ["user"] }),
   controller.formUserUpdatePassword
 );
-
-userRouter.delete("/", auth({ accountType: ["user"] }), controller.deleteUser);
 
 export default userRouter;

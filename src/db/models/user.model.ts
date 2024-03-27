@@ -31,7 +31,7 @@ export interface IUser extends Document {
     passwordRecoveryOtpExpiresAt?: Date;
   };
   refreshToken?: string;
-  deletedAt?: Date | null;
+  deletedAt?: boolean;
 }
 
 const UserSchema = new mongoose.Schema<IUser>(
@@ -115,8 +115,7 @@ const UserSchema = new mongoose.Schema<IUser>(
       type: String,
     },
     deletedAt: {
-      type: Date,
-      default: null,
+      type: Boolean,
     },
   },
   { timestamps: true }

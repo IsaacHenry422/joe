@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import dotenv from "dotenv";
+dotenv.config();
 
 import {
   BadRequest,
@@ -27,6 +29,8 @@ type QueryParams = {
   limit?: string;
   page?: string;
 };
+
+const awsBaseUrl = process.env.AWS_BASEURL;
 
 class UserController {
   // Get all users
@@ -78,37 +82,49 @@ class UserController {
 
     const { error, data } = validators.updateUserValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
-    const { firstName, lastName, address, phoneNumber } = data;
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { firstName, lastName, address, phoneNumber, updatedAt: new Date() },
+      { ...data, updatedAt: new Date() },
       { new: true }
     ).select(userFields.join(" "));
 
     if (!user) {
-      throw new ResourceNotFound(
-        `User ${userId} not found.`,
-        "RESOURCE_NOT_FOUND"
+      throw new BadRequest(
+        `User ${user!.userCustomId} not updated.`,
+        "INVALID_REQUEST_PARAMETERS"
       );
     }
 
     res.ok({
       updated: user,
-      message: "Your details updated successfully.",
+      message: "Your details are updated successfully.",
     });
   }
 
-  // Delete a User by ID
-  async deleteUser(req: Request, res: Response) {
-    const userId = req.loggedInAccount._id;
+  // block a User by ID
+  async blockUser(req: Request, res: Response) {
+    const { error, data } = validators.blockUserValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
+    const { userId, blockDecision } = data;
 
-    await User.findByIdAndUpdate(userId, {
-      deletedAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    res.noContent();
+    if (blockDecision == true) {
+      await User.findByIdAndUpdate(userId, {
+        deletedAt: blockDecision,
+        updatedAt: new Date(),
+      });
+      return res.ok({
+        message: "User has been blacklisted, and wont be able to login again",
+      });
+    } else {
+      await User.findByIdAndUpdate(userId, {
+        deletedAt: blockDecision,
+        updatedAt: new Date(),
+      });
+      return res.ok({
+        message: "Blacklist restriction removed, User access restored",
+      });
+    }
   }
 
   //update User password
@@ -179,7 +195,7 @@ class UserController {
     );
     await fsPromises.unlink(uploadedFile.path);
 
-    const key = `https://vaad-media.nyc3.digitaloceanspaces.com/${profilePictureKey}`;
+    const key = `${awsBaseUrl}/${profilePictureKey}`;
     const user = await User.findByIdAndUpdate(
       userId,
       { profilePicture: key, updatedAt: new Date() },
