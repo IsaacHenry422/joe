@@ -5,43 +5,41 @@ import { validateRequestBody } from "../../../utils/zodHelpers";
 // Define the validation schema for creating a MediaApplication
 export const createMediaApplicationValidator = (payload: any) => {
   const schema = z.object({
-    productName: z.string({
-      required_error: "Product name is required.",
+    mediaCustomId: z.string({
+      required_error: "Product customId is required.",
     }),
-    // productSlug: z.string({
-    //   required_error: "Product slug is required.",
-    // }),
-    // productQrCode: z.string({
-    //   required_error: "Product QR code is required.",
-    // }),
-    // businessId: z.string({
-    //   required_error: "Business ID is required.",
-    // }),
-    productDescription: z.string({
-      required_error: "Product description is required.",
+    description: z.string({
+      required_error: "Product Description is required.",
     }),
-    productCategory: z.string({
-      required_error: "Product Category is required.",
+    mediaType: z.enum(["Static","Led Billboard","BRT Buses","Lampost Billboard"],{
+      required_error: "Producy media type is required.",
     }),
-    productAmountInStock: z.number({
-      required_error: "Product amount in stock is required.",
+    status: z.enum(["Available","Unavailbale"]).default("Available"),
+    state: z.string({
+      required_error: "state is required.",
     }),
-    productPrice: z.number({
+    dimension: z.string({
+      required_error: "Product dimension is required.",
+    }),
+    price: z.string({
       required_error: "Product price is required.",
+    }), 
+    createdByAdmin: z.string({
+      required_error: "product creator id is required "
     }),
-    productKeyFeatures: z.string().optional(),
-    productSize: z.array(z.string()),
-    productColors: z.array(z.string()),
-    productKeySpecifications: z.string().optional(),
-    productImages: z.array(z.string()),
-    productAdditionalInformation: z.string({
-      required_error: "Product additional information is required.",
-    }),
-    productDiscountCode: z.string().optional(),
-    productDiscountPercentage: z.number().optional(),
-    isAvailable: z.boolean().default(true),
+    pictures: z.array(z.string({
+      required_error: "pictures of product is required"
+    })),
+    address: z.string().optional(),
+    cityLga: z.string().optional(),
+    googleStreetLink: z.string().optional(),
+    route: z.string().optional(),
+    brtType: z.string().optional(),
+    listingTitle: z.string().optional(),
+    landmark: z.string().optional(),
+    nextAvailable: z.string().optional(),
+    amountAvailable: z.string().optional()
   });
-
   return validateRequestBody(schema, payload);
 };
 
