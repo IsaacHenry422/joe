@@ -2,6 +2,8 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 type MediaType = "BRT Buses" | "LED Billboard" | "Lampost";
 
+type PaymentStatus = "Pending" | "Paid" 
+
 export interface Invoice extends Document {
   customerName: string;
   customerMail: string;
@@ -15,6 +17,7 @@ export interface Invoice extends Document {
   total: string;
   tax: string;
   dueDate: string;
+  paymentStatus: PaymentStatus;
   invoiceNote: string;
   deletedAt?: Date | null;
 }
@@ -69,13 +72,19 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
       type: String,
       required: true,
     },
+    paymentStatus: {
+      type: String,
+      enum:["Pending","Paid" ],
+      default: "Pending",
+      required: true,
+    },
     invoiceNote: {
       type: String,
       required: true,
     },
     deletedAt: {
-      type: Date,
-      default: null,
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

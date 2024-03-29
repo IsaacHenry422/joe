@@ -20,6 +20,7 @@ async function welcomeNotification(
   await sendMail(options);
 }
 
+
 async function resetPasswordEmail(
   email: string,
   firstname: string,
@@ -68,9 +69,28 @@ async function subscriptionExpiredNotification(user: {
   await sendMail(options);
 }
 
+async function sendInvoiceNotification(
+  email: string,
+  firstname: string,
+  link: string
+): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "Invoice notification statement",
+    template: "Invoice",
+    variables: {
+      firstname,
+      link
+    },
+  };
+
+  await sendMail(options);
+}
+
 export {
   welcomeNotification,
   resetPasswordEmail,
   subscriptionNotification,
   subscriptionExpiredNotification,
+  sendInvoiceNotification
 };
