@@ -19,8 +19,6 @@ type QueryParams = {
   page?: string;
 };
 
-
-
 type CreateInvoiceBody = {
   customerName: string;
   customerMail: string;
@@ -31,7 +29,7 @@ type CreateInvoiceBody = {
   period: string;
   quantity: number;
   unitPrice: number;
-  total: number,
+  total: number;
   tax: string;
   dueDate: string;
   invoiceNote: string;
@@ -57,7 +55,7 @@ class InvoiceController {
       total: calculateTotal,
       tax: body.tax,
       dueDate: body.dueDate,
-      invoiceNote: body.invoiceNote
+      invoiceNote: body.invoiceNote,
     };
 
     // Create the invoice
@@ -72,31 +70,32 @@ class InvoiceController {
     };
 
     // Call PaystackService to initiate payment
-    const response = await PaystackService.payWithPaystack(email, amount, metadata);
+    const response = await PaystackService.payWithPaystack(
+      email,
+      amount,
+      metadata
+    );
 
     // Send invoice notification with authorization URL
     await sendInvoiceNotification(
       body.customerMail,
       body.customerName,
       response
-    )
+    );
 
-    res.created(
-      {
-        newInvoice,
-        authorizationurl: response,
-      });
+    res.created({
+      newInvoice,
+      authorizationurl: response,
+    });
   }
 
   // Update an invoice by ID
   async updateInvoice(req: Request, res: Response) {
     const { invoiceId } = req.params;
     const { body } = req;
-    const updatedInvoice = await Invoice.findByIdAndUpdate(
-      invoiceId,
-      body,
-      { new: true }
-    );
+    const updatedInvoice = await Invoice.findByIdAndUpdate(invoiceId, body, {
+      new: true,
+    });
     if (!updatedInvoice) {
       throw new ResourceNotFound(
         `Invoice with ID ${invoiceId} not found.`,
@@ -125,10 +124,7 @@ class InvoiceController {
 
     const invoices = await query.select(invoiceField.join(" "));
 
-    res.ok(
-      { invoices, totalInvoices },
-      { page, limit, startDate, endDate }
-    );
+    res.ok({ invoices, totalInvoices }, { page, limit, startDate, endDate });
   }
 
   // Get an invoice by ID
@@ -138,7 +134,9 @@ class InvoiceController {
       throw new ResourceNotFound("invoiceId is missing.", "RESOURCE_NOT_FOUND");
     }
 
-    const invoice = await Invoice.findById(invoiceId).select(invoiceField.join(" "));
+    const invoice = await Invoice.findById(invoiceId).select(
+      invoiceField.join(" ")
+    );
     if (!invoice) {
       throw new ResourceNotFound(
         `Invoice with ID ${invoiceId} not found.`,
@@ -148,8 +146,6 @@ class InvoiceController {
 
     res.ok(invoice);
   }
-
-
 }
 
 export default new InvoiceController();
