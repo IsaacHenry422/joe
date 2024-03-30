@@ -5,9 +5,6 @@ import { validateRequestBody } from "../../../utils/zodHelpers";
 // Define the validation schema for creating a MediaApplication
 export const createMediaApplicationValidator = (payload: any) => {
   const schema = z.object({
-    mediaCustomId: z.string({
-      required_error: "Product customId is required.",
-    }),
     description: z.string({
       required_error: "Product Description is required.",
     }),
@@ -24,21 +21,24 @@ export const createMediaApplicationValidator = (payload: any) => {
     price: z.string({
       required_error: "Product price is required.",
     }), 
-    createdByAdmin: z.string({
-      required_error: "product creator id is required "
+    cityLga: z.string({
+      required_error: "Product city / lga is required"
     }),
-    pictures: z.array(z.string({
-      required_error: "pictures of product is required"
-    })),
+    nextAvailable: z.string({
+      required_error: "Product next available date is required"
+    }),
+    
     address: z.string().optional(),
-    cityLga: z.string().optional(),
-    googleStreetLink: z.string().optional(),
-    route: z.string().optional(),
-    brtType: z.string().optional(),
+    googleStreetlink: z.string().optional(),
     listingTitle: z.string().optional(),
     landmark: z.string().optional(),
-    nextAvailable: z.string().optional(),
-    amountAvailable: z.string().optional()
+    
+    brtType: z.string().optional(),
+    route: z.string().optional(),
+    amountAvailable: z.string().optional(),
+    
+    createdByAdmin: z.string().optional(),
+    mediaCustomId: z.string().optional(),
   });
   return validateRequestBody(schema, payload);
 };

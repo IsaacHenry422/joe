@@ -1,9 +1,10 @@
 import mongoose, { Document, Model } from "mongoose";
+import { string } from "zod";
 
 // Define the interface for the Media Application document
 export interface IBillboardMediaApplication extends Document {
   // define others here
-  mediaType: "Static" | "Led Billboard"| "BRT Buses" | "Lampost Billboard",
+  mediaType: "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard",
   status: "Available" | "Unavailable",
   mediaCustomId: String,
   listingTitle: String,
@@ -16,7 +17,7 @@ export interface IBillboardMediaApplication extends Document {
   landmark: String,
   price: String,
   googleStreetlink: String,
-  pictures: String,
+  pictures: Array<Object>,
   dimension: String,
   nextAvailable: Date,
   createdByAdmin: String,
@@ -44,10 +45,6 @@ const billboardMediaApplicationSchema = new mongoose.Schema<IBillboardMediaAppli
       type: String,
       required: true
     },
-    listingTitle: {
-      type: String,
-      required: true
-    },
     description: {
       type: String,
       required: true
@@ -56,29 +53,47 @@ const billboardMediaApplicationSchema = new mongoose.Schema<IBillboardMediaAppli
       type: Date,
       required: true
     },
-    pictures: {
-      type:[String],
-      required:true,
+    price:{
+      type: String,
+      required: true
     },
-    brtType: String,
-    route: String,
-    address: String,
-    state: String,
-    cityLga: String,
-    landmark: String,
-    price: String,
-    googleStreetlink: String,
-    dimension: String,
-    amountAvailable: String,
-    //define others here
+    cityLga:{
+      type: String,
+      required: true
+    },
+    dimension:{
+      type: String,
+      required: true
+    },
+    state:{
+      type: String,
+      required: true
+    },
     createdByAdmin: {
       type: String,
       required: true
     },
+    pictures: [{
+      id: String,
+      url: String 
+    }],
+
+    // brt media type fields
+    brtType: String,
+    route: String,
+    amountAvailable: String,
+
+    // other media type fields
+    address: String,
+    landmark: String,
+    listingTitle: String,
+    googleStreetlink: String,
+
+    //define others here
     deletedAt: {
       type: Date,
       default: null,
-    }, 
+    },
   }
 );
 
