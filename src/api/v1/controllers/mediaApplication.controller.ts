@@ -1,6 +1,10 @@
 /* eslint-disable no-constant-condition */
 import { Request, Response } from "express";
 import slugify from "slugify";
+import dotenv from "dotenv";
+import { v4 as uuidv4 } from 'uuid';
+dotenv.config();
+
 import { BadRequest, ResourceNotFound } from "../../../errors/httpErrors";
 import billboardMediaApplication from "../../../db/models/mediaApplication.model"; // IMediaApplication,
 import Admin from "../../../db/models/admin.model"; // Admin,
@@ -28,86 +32,151 @@ type QueryParams = {
   endDate?: Date;
   limit?: string;
   page?: string;
+  brtType?: string;
+  mediaType?: string;
+  status?: string;
+  listingTitle?: String,
+  route?: String,
+  state?: String,
+  cityLga?: String,
+  landmark?: String,
+  price?: String,
+  dimension?: String,
+  nextAvailable?: Date,
+  amountAvailable?: String,
+  minPrice?: string;
+  maxPrice?: string;
 };
+
+const awsBaseUrl = process.env.AWS_BASEURL;
 
 class applicationMediaController {
   // // Create a new media application
   async createMediaApplication(req: Request, res: Response) {
     const adminId = req.loggedInAccount._id;
-    
+
     const { error, data } = validators.createMediaApplicationValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
     const { mediaType } = data;
-    if (mediaType === "BRT Buses"){
-      if(!data.route || !data.brtType || !data.amountAvailable){
-        throw new BadRequest("please provide route, brt type and amount available","INVALID_REQUEST_PARAMETERS");
+    if (mediaType === "BRT Buses") {
+      if (!data.route || !data.brtType || !data.amountAvailable) {
+        throw new BadRequest("please provide route, brt type and amount available", "INVALID_REQUEST_PARAMETERS");
       }
-      if(data.googleStreetLink || data.landmark || data.listingTitle || data.address){
-        throw new BadRequest("Brt buses cannot have googleStreetlink, landmark, listing title or address","INVALID_REQUEST_PARAMETERS");
+      if (data.googleStreetlink || data.landmark || data.listingTitle || data.address) {
+        throw new BadRequest("Brt buses cannot have googleStreetlink, landmark, listing title or address", "INVALID_REQUEST_PARAMETERS");
       }
-    }else{
-      if(data.route || data.brtType || data.amountAvailable){
-        throw new BadRequest(`${mediaType} cannot have route, brt type or amount available`,"INVALID_REQUEST_PARAMETERS");
+    } else {
+      if (data.route || data.brtType || data.amountAvailable) {
+        throw new BadRequest(`${mediaType} cannot have route, brt type or amount available`, "INVALID_REQUEST_PARAMETERS");
       }
-      if(!data.googleStreetLink || !data.landmark || !data.listingTitle || !data.address){
-        throw new BadRequest(`${mediaType} require google street link, landmark, listing title, and address`,"INVALID_REQUEST_PARAMETERS");
+      if (!data.googleStreetlink || !data.landmark || !data.listingTitle || !data.address) {
+        throw new BadRequest(`${mediaType} require google street link, landmark, listing title, and address`, "INVALID_REQUEST_PARAMETERS");
       }
     }
-    // // Create a unique slug for the productName
-    // const baseSlug = slugify(productName, { lower: true });
-    // let productSlug = baseSlug;
-    // let slugSuffix = "";
-    // // Check if the productSlug already exists and keep appending random characters until it's unique
-    // while (true) {
-    //   const existingProduct = await MediaApplication.findOne({
-    //     mediaSlug,
-    //     adminId,
-    //   });
-    //   if (!existingProduct) {
-    //     // Slug is unique, break the loop
-    //     break;
-    //   }
-    //   // Generate a random string
-    //   slugSuffix = generateRandomString();
-    //   // Append the random string to the baseSlug
-    //   productSlug = `${baseSlug}-${slugSuffix}`;
-    // }
+    function generateShortUUID() {
+      // Generate UUID v4
+      const uuid = uuidv4();
+
+      // Remove hyphens and extract the first 8 characters to create a shorter UUID
+      const shortUUID = uuid.replace(/-/g, '').substring(0, 10);
+
+      return shortUUID;
+    }
+
+    const mediaCustomId = generateShortUUID();
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
     // const businessSlug = business?.businessSlug;
     const product = new billboardMediaApplication({
       ...data,
       createdByAdmin,
+      mediaCustomId,
     });
     await product.save();
     res.created(product);
   }
-  
-  // Get all media applications - General
-  async getGeneralMediaApplications(req: Request, res: Response) {
 
+  // Get all media applications - General
+
+  async getGeneralMediaApplications(req: Request, res: Response) {
     const queryParams: QueryParams = req.query;
     const startDate = getStartDate(queryParams.startDate);
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
 
-    const products = await billboardMediaApplication.find({})
+    // Construct the filter based on query parameters
+    const filter: any = {};
+    if (startDate && endDate) {
+      filter.createdAt = { $gte: startDate, $lte: endDate };
+    }
+    // Dynamic filter based on multiple characteristics
+    const orConditions = [];
+    if (queryParams.mediaType) {
+      orConditions.push({ mediaType: queryParams.mediaType });
+    }
+    if (queryParams.status) {
+      orConditions.push({ status: queryParams.status });
+    }
+    if (queryParams.brtType) {
+      orConditions.push({ brtType: queryParams.brtType });
+    }
+    if (queryParams.amountAvailable) {
+      orConditions.push({ amountAvailable: queryParams.amountAvailable });
+    }
+    if (queryParams.cityLga) {
+      orConditions.push({ cityLga: queryParams.cityLga });
+    }
+    if (queryParams.dimension) {
+      orConditions.push({ dimension: queryParams.dimension });
+    }
+    if (queryParams.landmark) {
+      orConditions.push({ landmark: queryParams.landmark });
+    }
+    if (queryParams.listingTitle) {
+      orConditions.push({ listingTitle: queryParams.listingTitle });
+    }
+    if (queryParams.nextAvailable) {
+      orConditions.push({ nextAvailable: queryParams.nextAvailable });
+    }
+    if (queryParams.price) {
+      orConditions.push({ price: queryParams.price });
+    } else if (queryParams.minPrice && queryParams.maxPrice) {
+      orConditions.push({ price: { $gte: queryParams.minPrice, $lte: queryParams.maxPrice } });
+    } else if (queryParams.minPrice) {
+      orConditions.push({ price: { $gte: queryParams.minPrice } });
+    } else if (queryParams.maxPrice) {
+      orConditions.push({ price: { $lte: queryParams.maxPrice } });
+    }
+    if (queryParams.route) {
+      orConditions.push({ route: queryParams.route });
+    }
+    if (queryParams.state) {
+      orConditions.push({ state: queryParams.state });
+    }
+    if (orConditions.length > 0) {
+      filter.$or = orConditions;
+    }
+
+    // Query the database with the constructed filter
+    const products = await billboardMediaApplication
+      .find(filter)
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
-      
-      res.ok(
-        {     
-          products,
-        },
-        { page, limit, startDate, endDate }
+
+    // Send the response
+    res.ok(
+      {
+        products,
+      },
+      { page, limit, startDate, endDate }
     );
+
   }
 
-
-  
   async uploadMediaImages(req: Request, res: Response) {
+    const { mediaCustomId } = req.params;
     let uploadedImages: Express.Multer.File[] = [];
     if (!req.files) {
       throw new BadRequest("No images provided.", "MISSING_REQUIRED_FIELD");
@@ -126,26 +195,38 @@ class applicationMediaController {
     if (!uploadedImages || uploadedImages.length === 0) {
       throw new BadRequest("No images provided.", "MISSING_REQUIRED_FIELD");
     }
-    const uploadedUrls = [];
-    for (const uploadedFile of uploadedImages) {
+    const product = await billboardMediaApplication.findOne({ mediaCustomId })
+    if (!product) throw new BadRequest(`Product with custom id ${mediaCustomId} does not exist`, "INVALID_REQUEST_PARAMETERS");
+
+    await Promise.all(uploadedImages.map(async (uploadedFile) => {
+      const id = uuidv4();
       const productPictureExtension = path.extname(uploadedFile.originalname);
-      // Resize the image before uploading
       const resizedImagePath = await reduceImageSize(uploadedFile.path);
       const productPictureKey = await uploadPicture(
         resizedImagePath,
         "billboard-images",
         productPictureExtension
       );
-      // Delete the resized image from the server
       await fsPromises.unlink(resizedImagePath);
-      const key = `https://qrconnect-files.s3.amazonaws.com/${productPictureKey}`;
-      uploadedUrls.push(key);
-    }
+      const key = `${awsBaseUrl}/${productPictureKey}`;
+      console.log(key);
+
+      const picture = {
+        key:key
+      };
+      product.pictures.push(picture);
+      console.log(product.pictures);
+      
+    }));
+    await product.save();
+
+
     res.ok({
       message: "Product images uploaded successfully.",
-      imageUrls: uploadedUrls,
+      imageUrls: product.pictures,
     });
   }
+
   // // Get all media - Admin
   // async getProducts(req: Request, res: Response) {
   //   const queryParams: QueryParams = req.query;
@@ -447,72 +528,72 @@ class applicationMediaController {
 
   // Upload Product Images
   // // Delete single media
-//   async deleteSingleMedia(req: Request, res: Response) {
-//     const { error, data } = validators.deleteMediaProductValidator(req.query);
-//     if (error) throw new BadRequest(error.message, error.code);
-//     const { imageId, productId } = data;
-//     // Find the product by ID
-//     const product = await Product.findById(productId);
-//     if (!product) {
-//       throw new BadRequest(
-//         `Product with ID ${productId} not found.`,
-//         "INVALID_REQUEST_PARAMETERS"
-//       );
-//     }
-//     // Find the index of the mediaImage with the given imageId
-//     const imageIndex = product.productImages.findIndex(
-//       (img: string) => img === imageId
-//     );
-//     if (imageIndex === -1) {
-//       throw new BadRequest(
-//         `Image with ${imageId} not found in product.`,
-//         "INVALID_REQUEST_PARAMETERS"
-//       );
-//     }
-//   //   // Get the image URL (or key) to delete from AWS
-//   //   const imageKey = product.productImages[imageIndex];
-//   //   // Delete the image from AWS (replace with your actual deletion logic)
-//   //   await deleteImage(imageKey);
-//   //   // Remove the mediaImage from the product's productImages array
-//   //   product.productImages.splice(imageIndex, 1);
-//   //   // Update the product record in the database
-//   //   const updateProduct = await product.save();
-//   //   if (!updateProduct) {
-//   //     throw new BadRequest(
-//   //       "Product update failed.",
-//   //       "INVALID_REQUEST_PARAMETERS"
-//   //     );
-//   //   }
-//   //   return res.ok({
-//   //     product: updateProduct,
-//   //     message: `Image with ${imageId} deleted successfully`,
-//   //   });
-//   // }
-//   // // Delete a product by ID
-//   // async deleteProduct(req: Request, res: Response) {
-//   //   const { productId } = req.params;
-//   //   if (!productId) {
-//   //     throw new ResourceNotFound(
-//   //       "Product ID is missing.",
-//   //       "RESOURCE_NOT_FOUND"
-//   //     );
-//   //   }
-//   //   const product: IProduct | null = await Product.findById(productId);
-//   //   if (!product) {
-//   //     throw new ResourceNotFound(
-//   //       `Product with ID ${productId} not found.`,
-//   //       "RESOURCE_NOT_FOUND"
-//   //     );
-//   //   }
-//   //   // Check if the product has images
-//   //   if (product.productImages && product.productImages.length > 0) {
-//   //     // Delete all images associated with the product from AWS
-//   //     await deleteImagesFromAWS(product.productImages);
-//   //   }
-//   //   // Delete the product from the database
-//   //   await Product.findByIdAndDelete(productId);
-//   //   res.noContent();
-//   // }
+  //   async deleteSingleMedia(req: Request, res: Response) {
+  //     const { error, data } = validators.deleteMediaProductValidator(req.query);
+  //     if (error) throw new BadRequest(error.message, error.code);
+  //     const { imageId, productId } = data;
+  //     // Find the product by ID
+  //     const product = await Product.findById(productId);
+  //     if (!product) {
+  //       throw new BadRequest(
+  //         `Product with ID ${productId} not found.`,
+  //         "INVALID_REQUEST_PARAMETERS"
+  //       );
+  //     }
+  //     // Find the index of the mediaImage with the given imageId
+  //     const imageIndex = product.productImages.findIndex(
+  //       (img: string) => img === imageId
+  //     );
+  //     if (imageIndex === -1) {
+  //       throw new BadRequest(
+  //         `Image with ${imageId} not found in product.`,
+  //         "INVALID_REQUEST_PARAMETERS"
+  //       );
+  //     }
+  //   //   // Get the image URL (or key) to delete from AWS
+  //   //   const imageKey = product.productImages[imageIndex];
+  //   //   // Delete the image from AWS (replace with your actual deletion logic)
+  //   //   await deleteImage(imageKey);
+  //   //   // Remove the mediaImage from the product's productImages array
+  //   //   product.productImages.splice(imageIndex, 1);
+  //   //   // Update the product record in the database
+  //   //   const updateProduct = await product.save();
+  //   //   if (!updateProduct) {
+  //   //     throw new BadRequest(
+  //   //       "Product update failed.",
+  //   //       "INVALID_REQUEST_PARAMETERS"
+  //   //     );
+  //   //   }
+  //   //   return res.ok({
+  //   //     product: updateProduct,
+  //   //     message: `Image with ${imageId} deleted successfully`,
+  //   //   });
+  //   // }
+  //   // // Delete a product by ID
+  //   // async deleteProduct(req: Request, res: Response) {
+  //   //   const { productId } = req.params;
+  //   //   if (!productId) {
+  //   //     throw new ResourceNotFound(
+  //   //       "Product ID is missing.",
+  //   //       "RESOURCE_NOT_FOUND"
+  //   //     );
+  //   //   }
+  //   //   const product: IProduct | null = await Product.findById(productId);
+  //   //   if (!product) {
+  //   //     throw new ResourceNotFound(
+  //   //       `Product with ID ${productId} not found.`,
+  //   //       "RESOURCE_NOT_FOUND"
+  //   //     );
+  //   //   }
+  //   //   // Check if the product has images
+  //   //   if (product.productImages && product.productImages.length > 0) {
+  //   //     // Delete all images associated with the product from AWS
+  //   //     await deleteImagesFromAWS(product.productImages);
+  //   //   }
+  //   //   // Delete the product from the database
+  //   //   await Product.findByIdAndDelete(productId);
+  //   //   res.noContent();
+  //   // }
 }
 
 export default new applicationMediaController();
