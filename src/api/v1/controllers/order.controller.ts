@@ -6,15 +6,26 @@ import Order, { IOrder } from "../../../db/models/order.model";
 //   IMediaApplication,
 // } from "../../../db/models/mediaApplication.model";
 import PaystackService from "../../../services/payment.service";
+import {
+  getLimit,
+  getPage,
+  getStartDate,
+  getEndDate,
+} from "../../../utils/dataFilters";
 
 import {
   BadRequest,
   ResourceNotFound,
-  // ResourceNotFound,
   ServerError,
 } from "../../../errors/httpErrors";
 
 import * as validators from "../validators/order.validator";
+type QueryParams = {
+  startDate?: Date;
+  endDate?: Date;
+  limit?: string;
+  page?: string;
+};
 
 class OrderController {
   async payLaterOrder(req: Request, res: Response) {
@@ -253,6 +264,33 @@ class OrderController {
       message: "Payment link generated successfully.",
     });
   }
+
+  async GetAllOrdersAdmin(req: Request, res: Response) {
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
+
+    const orders = Order.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .sort({ createdAt: 1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    const totalOrders = await Order.countDocuments(orders);
+
+    res.ok({ orders, totalOrders }, { page, limit, startDate, endDate });
+  }
+
+  // GetOrderByQueryParamsAdmin
+  // TrackOrderById
+  // UpdateOrderStatusById
+
+  // GetAllOrdersUser
+  // GetUserOrderById
+  // TrackOrderById
 }
 
 export default new OrderController();
