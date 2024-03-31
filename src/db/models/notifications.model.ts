@@ -29,7 +29,7 @@ const notificationSchema = new Schema<INotification>(
 );
 
 const NotificationModel: Model<INotification> = mongoose.model<INotification>(
-  "Notifications",
+  "Notification",
   notificationSchema
 );
 

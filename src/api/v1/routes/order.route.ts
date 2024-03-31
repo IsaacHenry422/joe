@@ -6,9 +6,21 @@ const orderRouter = express.Router();
 
 // Create a new order
 orderRouter.post(
-  "/create",
+  "/create/paynowpaystack",
   auth({ accountType: ["user"] }),
-  orderController.createOrder
+  orderController.payNowOrderwithPaystack
+);
+
+orderRouter.post(
+  "/create/paylater",
+  auth({ accountType: ["user"] }),
+  orderController.payLaterOrder
+);
+
+orderRouter.get(
+  "/generate/:orderId",
+  auth({ accountType: ["user"] }),
+  orderController.generatePaymentLinkForOrderwithPaystack
 );
 
 export default orderRouter;

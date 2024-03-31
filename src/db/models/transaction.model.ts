@@ -1,14 +1,15 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface ITransaction extends Document {
-  userId: mongoose.Types.ObjectId;
-  orderId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
+  orderId?: mongoose.Types.ObjectId;
   invoiceId: mongoose.Types.ObjectId;
   transactionCustomId: string;
   transactionType: "Order" | "Invoice";
   amount: number;
   status: "Pending" | "Success" | "Failed";
   paymentMethod: "Paystack";
+  paymentComment: string;
 }
 
 const transactionSchema = new Schema<ITransaction>(
@@ -48,6 +49,10 @@ const transactionSchema = new Schema<ITransaction>(
     paymentMethod: {
       type: String,
       enum: ["Paystack"],
+      required: true,
+    },
+    paymentComment: {
+      type: String,
       required: true,
     },
   },
