@@ -10,7 +10,7 @@ import {
 import { invoiceField } from "../../../utils/fieldHelpers";
 import PaystackService from "../../../services/payment.service";
 
-import { sendInvoiceNotification } from "../../../services/email.service";
+import { invoiceNotification } from "../../../services/email.service";
 
 type QueryParams = {
   startDate?: Date;
@@ -77,11 +77,7 @@ class InvoiceController {
     );
 
     // Send invoice notification with authorization URL
-    await sendInvoiceNotification(
-      body.customerMail,
-      body.customerName,
-      response
-    );
+    await invoiceNotification(body.customerMail);
 
     res.created({
       newInvoice,

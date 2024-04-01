@@ -32,8 +32,10 @@ class PaystackService {
       payload
     );
 
-    return response.data.data;
+    return response.data.data.authorization_url;
   }
 }
 
 export default new PaystackService();
+
+// https://ravebooking.onrender.com/api/v1/webhooks/paystackwebhook

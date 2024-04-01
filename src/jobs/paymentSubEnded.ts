@@ -1,18 +1,17 @@
-// jobs/cron.ts
-import Order, { IOrder } from "../db/models/order.model";
+import OrderModel, { IOrder } from "../db/models/order.model";
 
 export default async (): Promise<void> => {
   try {
-    // Find orders where the expiry date has passed the current date
-    const expiredOrders = await Order.find({
-      expiryDate: { $lte: new Date() },
-      status: { $ne: "Expired" }, // Only process orders that are not already expired
+    // Find orders where the end date has passed the current date
+    const expiredOrders = await OrderModel.find({
+      "orderItem.duration.endDate": { $lte: new Date() },
+      orderStatus: { $ne: "Expired" }, // Only process orders that are not already expired
     });
 
     // Update the status of expired orders to "Expired"
     await Promise.allSettled(
       expiredOrders.map(async (order: IOrder) => {
-        order.status = "Expired";
+        order.orderStatus = "Expired";
         await order.save();
       })
     );

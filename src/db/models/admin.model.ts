@@ -12,11 +12,12 @@ export interface IAdmin extends Document {
   phoneNumber: string;
   accountType: AccountType;
   adminType: AdminType;
+  role?: string;
 
   profilePicture?: string;
   isAdmin: boolean;
   refreshToken?: string;
-  deletedAt?: Date | null;
+  deletedAt?: boolean;
 }
 
 const AdminSchema = new mongoose.Schema<IAdmin>(
@@ -56,6 +57,9 @@ const AdminSchema = new mongoose.Schema<IAdmin>(
       required: true,
       enum: ["Super-Admin", "Sub-Admin"],
     },
+    role: {
+      type: String,
+    },
     profilePicture: {
       type: String,
       default:
@@ -69,8 +73,7 @@ const AdminSchema = new mongoose.Schema<IAdmin>(
       type: String,
     },
     deletedAt: {
-      type: Date,
-      default: null,
+      type: Boolean,
     },
   },
   { timestamps: true }

@@ -7,19 +7,43 @@ import upload from "../../middlewares/multerMiddleware";
 const adminRouter = express.Router();
 
 //admin route
-adminRouter.get("/",
+adminRouter.get("/", auth({ accountType: ["admin"] }), controller.getAdmins);
+
+adminRouter.get(
+  "/:adminId",
   auth({ accountType: ["admin"] }),
-  controller.getAdmins);
+  controller.getAdminById
+);
+adminRouter.get(
+  "/admin/:adminCustomId",
+  auth({ accountType: ["admin"] }),
+  controller.getAdminByCustomId
+);
+adminRouter.get(
+  "/user/:userCustomId",
+  auth({ accountType: ["admin"] }),
+  controller.getUserByCustomId
+);
 
-// admins and admin route
-adminRouter.get("/:adminId",
-  auth({ accountType: ["admin", "admin"] }),
-  controller.getAdminById);
+adminRouter.put("/", auth({ accountType: ["admin"] }), controller.updateAdmin);
 
-adminRouter.patch("/dp", auth({ accountType: ["admin"] }), upload.single("profilePicture"),  controller.updateAdminDp);
+adminRouter.patch(
+  "/dp",
+  auth({ accountType: ["admin"] }),
+  upload.single("profilePicture"),
+  controller.updateAdminDp
+);
 
-adminRouter.patch("/password", auth({ accountType: ["admin"] }), controller.formAdminUpdatePassword);
+adminRouter.patch(
+  "/password",
+  auth({ accountType: ["admin"] }),
+  controller.formAdminUpdatePassword
+);
 
-adminRouter.delete("/", auth({ accountType: ["admin"] }), controller.deleteAdmin);
+adminRouter.patch(
+  "/",
+  auth({ accountType: ["admin"], adminType: ["Super-Admin"] }),
+  controller.blockAdmin
+);
 
 export default adminRouter;

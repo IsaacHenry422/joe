@@ -160,10 +160,25 @@ export const tokenValidator = (payload: any) => {
 //profile
 export const updateUserValidator = (payload: any) => {
   const schema = z.object({
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-    address: z.string().optional(),
+    firstname: z.string().optional(),
+    lastname: z.string().optional(),
     phoneNumber: z.string().optional(),
+    dateOfBirth: z.string().optional(),
+    country: z.string().optional(),
+    city: z.string().optional(),
+    address: z.string().optional(),
+    finishTourGuide: z.boolean().optional(),
+  });
+
+  return validateRequestBody(schema, payload);
+};
+
+export const updateAdminValidator = (payload: any) => {
+  const schema = z.object({
+    firstname: z.string().optional(),
+    lastname: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    role: z.string().optional(),
   });
 
   return validateRequestBody(schema, payload);
@@ -176,6 +191,32 @@ export const changePasswordValidator = (payload: any) => {
     }),
     newPassword: z.string({
       required_error: "new Password is required.",
+    }),
+  });
+
+  return validateRequestBody(schema, payload);
+};
+
+export const blockUserValidator = (payload: any) => {
+  const schema = z.object({
+    userId: z.string({
+      required_error: "User id is required.",
+    }),
+    blockDecision: z.boolean({
+      required_error: "Block decision is required.",
+    }),
+  });
+
+  return validateRequestBody(schema, payload);
+};
+
+export const blockAdminValidator = (payload: any) => {
+  const schema = z.object({
+    adminId: z.string({
+      required_error: "Admin id is required.",
+    }),
+    blockDecision: z.boolean({
+      required_error: "Block decision is required.",
     }),
   });
 

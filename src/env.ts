@@ -21,6 +21,7 @@ export const envSchema = z.object({
   SPACES_KEY: z.string(),
   SPACES_SECRET: z.string(),
   SPACES_S3_BUCKET: z.string(),
+  AWS_BASEURL: z.string(),
 });
 
 try {

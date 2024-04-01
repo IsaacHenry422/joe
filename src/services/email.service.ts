@@ -20,7 +20,6 @@ async function welcomeNotification(
   await sendMail(options);
 }
 
-
 async function resetPasswordEmail(
   email: string,
   firstname: string,
@@ -38,7 +37,24 @@ async function resetPasswordEmail(
   await sendMail(options);
 }
 
-async function subscriptionNotification({
+async function successChangedPasswordEmail(
+  email: string,
+  firstname: string,
+  otp: string
+): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "Password changed Successfully",
+    template: "changed-password",
+    variables: {
+      firstname,
+      otp,
+    },
+  };
+  await sendMail(options);
+}
+
+async function successOrderNotification({
   email,
   ...variables
 }: {
@@ -47,41 +63,77 @@ async function subscriptionNotification({
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Subscription Confirmation",
-    template: "subscription-confirmation",
+    subject: "Your order was a success",
+    template: "sucesss-order",
     variables,
   };
 
   await sendMail(options);
 }
 
-async function subscriptionExpiredNotification(user: {
+async function failedOrderNotification({
+  email,
+  ...variables
+}: {
   email: string;
-  firstName: string;
+  [key: string]: any;
 }): Promise<void> {
   const options: EmailOptions = {
-    to: user.email,
-    subject: "Your Subscription Has Expired",
-    template: "subscription-ended",
-    variables: { firstName: user.firstName },
+    to: email,
+    subject: "Your order payment Failed",
+    template: "failed-order",
+    variables,
   };
 
   await sendMail(options);
 }
 
-async function sendInvoiceNotification(
-  email: string,
-  firstname: string,
-  link: string
-): Promise<void> {
+async function expiredOrderNotification({
+  email,
+  ...variables
+}: {
+  email: string;
+  [key: string]: any;
+}): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Invoice notification statement",
-    template: "Invoice",
-    variables: {
-      firstname,
-      link
-    },
+    subject: "Your order will expire in 48 hours",
+    template: "expired-order",
+    variables,
+  };
+
+  await sendMail(options);
+}
+
+async function invoiceNotification({
+  email,
+  ...variables
+}: {
+  email: string;
+  [key: string]: any;
+}): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "Your Invoice is ready, pay now!",
+    template: "new-invoice",
+    variables,
+  };
+
+  await sendMail(options);
+}
+
+async function successInvoiceNotification({
+  email,
+  ...variables
+}: {
+  email: string;
+  [key: string]: any;
+}): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "Your Invoice payment is successful",
+    template: "success-invoice",
+    variables,
   };
 
   await sendMail(options);
@@ -90,7 +142,10 @@ async function sendInvoiceNotification(
 export {
   welcomeNotification,
   resetPasswordEmail,
-  subscriptionNotification,
-  subscriptionExpiredNotification,
-  sendInvoiceNotification
+  successChangedPasswordEmail,
+  successOrderNotification,
+  failedOrderNotification,
+  expiredOrderNotification,
+  invoiceNotification,
+  successInvoiceNotification,
 };
