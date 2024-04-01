@@ -20,7 +20,7 @@ invoiceRouter.get(
 
 // Create a new invoice route
 invoiceRouter.post(
-  "/",
+  "/create",
   // auth({ accountType: ["admin"] }),
   controller.createInvoice
 );

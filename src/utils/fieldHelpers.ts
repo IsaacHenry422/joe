@@ -31,3 +31,20 @@ export const adminFields = [
   "adminType",
   "isAdmin",
 ];
+
+export const invoiceField = [
+  "_id",
+  "customerName",
+  "customerMail",
+  "phoneNumber",
+  "mediaType",
+  "state",
+  "BRTtypes",
+  "period",
+  "quantity",
+  "unitPrice",
+  "total",
+  "tax",
+  "dueDate",
+  "invoiceNote",
+];
