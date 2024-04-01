@@ -1,27 +1,26 @@
 import mongoose, { Document, Model } from "mongoose";
-import { string } from "zod";
 
 // Define the interface for the Media Application document
 export interface IBillboardMediaApplication extends Document {
   // define others here
   mediaType: "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard";
   status: "Available" | "Unavailable";
-  mediaCustomId: String;
-  listingTitle: String;
-  description: String;
-  brtType: String;
-  route: String;
-  address: String;
-  state: String;
-  cityLga: String;
-  landmark: String;
-  price: String;
-  googleStreetlink: String;
-  pictures: Array<Object>;
-  dimension: String;
+  mediaCustomId: string;
+  listingTitle: string;
+  description: string;
+  brtType: string;
+  route: string;
+  address: string;
+  state: string;
+  cityLga: string;
+  landmark: string;
+  price: string;
+  googleStreetlink: string;
+  pictures: Array<object>;
+  dimension: string;
   nextAvailable: Date;
-  createdByAdmin: String;
-  amountAvailable: String;
+  createdByAdmin: string;
+  amountAvailable: string;
 
   deletedAt?: Date | null;
   createdAt: Date;
@@ -75,8 +74,9 @@ const billboardMediaApplicationSchema =
     },
     pictures: [
       {
-        id: String,
         url: String,
+        id: String,
+        _id: false,
       },
     ],
 
@@ -97,6 +97,9 @@ const billboardMediaApplicationSchema =
       default: null,
     },
   });
+
+// Define compound text index on all fields
+billboardMediaApplicationSchema.index({ "$**": "text" });
 
 // Define the MediaApplication model
 const billboardMediaApplicationModel: Model<IBillboardMediaApplication> =

@@ -56,7 +56,7 @@ async function deleteImage(key: string): Promise<void> {
 // Define the function to delete images from S3 (replace with your implementation)
 async function deleteImagesFromStorage(imageUrls: string[]) {
   for (const imageUrl of imageUrls) {
-    // Parse the URL to get the pathname, which represents the object key
+    // Parse the URL to get the pathname, which represents the object key 
     const parsedUrl = url.parse(imageUrl);
     const objectKey = parsedUrl.pathname?.substring(1); // Remove the leading slash
     if (objectKey) {
