@@ -23,4 +23,10 @@ orderRouter.get(
   orderController.generatePaymentLinkForOrderwithPaystack
 );
 
+orderRouter.get(
+  "/admin",
+  auth({ accountType: ["admin"] }),
+  orderController.GetAllOrdersAdmin
+);
+
 export default orderRouter;

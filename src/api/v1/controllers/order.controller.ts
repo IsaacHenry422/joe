@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
 import Order, { IOrder } from "../../../db/models/order.model";
-// import MediaApplication, {
-//   IMediaApplication,
-// } from "../../../db/models/mediaApplication.model";
+import User from "../../../db/models/user.model";
+
+import MediaApplication from "../../../db/models/mediaApplication.model";
 import PaystackService from "../../../services/payment.service";
 import {
   getLimit,
@@ -25,9 +25,13 @@ type QueryParams = {
   endDate?: Date;
   limit?: string;
   page?: string;
+  orderStatus?: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
 };
 
 class OrderController {
+  //pay now
   async payLaterOrder(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
     const { error, data } = validators.createOrderValidator(req.body);
@@ -112,6 +116,7 @@ class OrderController {
     });
   }
 
+  //pay later
   async payNowOrderwithPaystack(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
     const email = req.loggedInAccount.email;
@@ -221,6 +226,7 @@ class OrderController {
     });
   }
 
+  //generate link for payment
   async generatePaymentLinkForOrderwithPaystack(req: Request, res: Response) {
     const email = req.loggedInAccount.email;
 
@@ -265,27 +271,110 @@ class OrderController {
     });
   }
 
+  // Get all orders by admin
   async GetAllOrdersAdmin(req: Request, res: Response) {
     const queryParams: QueryParams = req.query;
     const startDate = getStartDate(queryParams.startDate);
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
+    const orderStatus = queryParams.orderStatus;
+    const paymentStatus = queryParams.paymentStatus;
+    const paymentMethod = queryParams.paymentMethod;
 
-    const orders = Order.find({
+    // Construct the query object based on the provided parameters
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = {
       createdAt: { $gte: startDate, $lte: endDate },
-    })
+    };
+
+    if (orderStatus) {
+      query.orderStatus = orderStatus;
+    }
+
+    if (paymentStatus) {
+      query.paymentStatus = paymentStatus;
+    }
+
+    if (paymentMethod) {
+      query.paymentMethod = paymentMethod;
+    }
+
+    // Find orders based on the constructed query
+    const orders = await Order.find(query)
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
 
-    const totalOrders = await Order.countDocuments(orders);
+    // Fetch customer details and media details for each order
+    for (const order of orders) {
+      // Fetch user details from the User model using userId
+      const user = await User.findById(order.userId);
+
+      if (user) {
+        // Construct the customer object
+        const customer = {
+          _id: user._id,
+          userCustomId: user.userCustomId,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+        };
+
+        // Add the customer object to the order
+        order.customer = customer;
+      }
+
+      // Iterate through orderItem array and fetch media details if mediaId is available
+      for (const item of order.orderItem) {
+        if (item.mediaId) {
+          // Fetch media details from the MediaApplication model using mediaId
+          const media = await MediaApplication.findById(item.mediaId);
+
+          if (media) {
+            // Construct the media object
+            const mediaDetails = {
+              _id: media._id,
+              mediaCustomId: media.mediaCustomId,
+              listingTitle: media.listingTitle,
+              pictures: media.pictures,
+              description: media.description,
+              address: media.address,
+            };
+
+            // Add the media object to the orderItem
+            item.media = mediaDetails;
+          }
+        }
+      }
+    }
+
+    const totalOrders = await Order.countDocuments(query);
 
     res.ok({ orders, totalOrders }, { page, limit, startDate, endDate });
   }
 
   // GetOrderByQueryParamsAdmin
-  // TrackOrderById
+  // async GetOrderByQueryParamsAdmin(req: Request, res: Response) {
+  //   const queryParams: QueryParams = req.query;
+  //   const startDate = getStartDate(queryParams.startDate);
+  //   const endDate = getEndDate(queryParams.endDate);
+  //   const limit = getLimit(queryParams.limit);
+  //   const page = getPage(queryParams.page);
+
+  //   const orders = Order.find({
+  //     createdAt: { $gte: startDate, $lte: endDate },
+  //   })
+  //     .sort({ createdAt: 1 })
+  //     .limit(limit)
+  //     .skip(limit * (page - 1));
+
+  //   const totalOrders = await Order.countDocuments(orders);
+
+  //   res.ok({ orders, totalOrders }, { page, limit, startDate, endDate });
+  // }
+
   // UpdateOrderStatusById
 
   // GetAllOrdersUser
