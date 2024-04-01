@@ -3,24 +3,24 @@ import mongoose, { Document, Model } from "mongoose";
 // Define the interface for the Media Application document
 export interface IBillboardMediaApplication extends Document {
   // define others here
-  mediaType: "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard",
-  status: "Available" | "Unavailable",
-  mediaCustomId: string,
-  listingTitle: string,
-  description: string,
-  brtType: string,
-  route: string,
-  address: string,
-  state: string,
-  cityLga: string,
-  landmark: string,
-  price: string,
-  googleStreetlink: string,
-  pictures: Array<object>,
-  dimension: string,
-  nextAvailable: Date,
-  createdByAdmin: string,
-  amountAvailable: string,
+  mediaType: "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard";
+  status: "Available" | "Unavailable";
+  mediaCustomId: string;
+  listingTitle: string;
+  description: string;
+  brtType: string;
+  route: string;
+  address: string;
+  state: string;
+  cityLga: string;
+  landmark: string;
+  price: string;
+  googleStreetlink: string;
+  pictures: Array<object>;
+  dimension: string;
+  nextAvailable: Date;
+  createdByAdmin: string;
+  amountAvailable: string;
 
   deletedAt?: Date | null;
   createdAt: Date;
@@ -72,11 +72,13 @@ const billboardMediaApplicationSchema =
       type: String,
       required: true,
     },
-    pictures: [{
-      url: String,
-      id: String,
-      _id: false
-    }],
+    pictures: [
+      {
+        url: String,
+        id: String,
+        _id: false,
+      },
+    ],
 
     // brt media type fields
     brtType: String,
@@ -94,8 +96,7 @@ const billboardMediaApplicationSchema =
       type: Date,
       default: null,
     },
-  }
-);
+  });
 
 // Define compound text index on all fields
 billboardMediaApplicationSchema.index({ "$**": "text" });

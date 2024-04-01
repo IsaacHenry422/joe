@@ -345,7 +345,7 @@ class applicationMediaController {
 
     const numberOfProducts = toInteger(queryParams.numberOfProducts);
     const randomProducts = await billboardMediaApplication.aggregate([
-      { $match: filter }, // Apply filters
+      { $match: filter },
       { $sample: { size: numberOfProducts } },
     ]);
 
@@ -436,22 +436,6 @@ class applicationMediaController {
   //         NX: true,
   //       }
   //     );
-  //     const totalSearchedProducts = searchedProducts.length;
-  //     if (totalSearchedProducts === 0) {
-  //       return res.ok({
-  //         message: "No products found matching the search criteria.",
-  //       });
-  //     }
-  //     return res.ok({ searchedProducts, totalSearchedProducts });
-  //   } else {
-  //     // If neither productName nor productCategory is provided, return an error message
-  //     return res.error(
-  //       400,
-  //       "Please provide a search query (productName or productCategory).",
-  //       "INVALID_REQUEST_PARAMETERS"
-  //     );
-  //   }
-  // }
 }
 
 export default new applicationMediaController();
