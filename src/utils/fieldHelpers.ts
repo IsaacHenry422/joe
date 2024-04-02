@@ -49,3 +49,11 @@ export const invoiceField = [
   "dueDate",
   "invoiceNote",
 ];
+
+export const blogFields = [
+  "_id",
+  "billboardType",
+  "billboardImage",
+  "billboardTitle",
+  "billboardBody",
+];

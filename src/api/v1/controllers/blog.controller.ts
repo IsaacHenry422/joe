@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { ResourceNotFound } from "../../../errors/httpErrors";
+import { ResourceNotFound, BadRequest } from "../../../errors/httpErrors";
+import { promises as fsPromises } from "fs";
+import path from "path";
+import { uploadPicture } from "../../../services/file.service";
 import {
   getLimit,
   getPage,
@@ -7,6 +10,9 @@ import {
   getEndDate,
 } from "../../../utils/dataFilters";
 import Blog from "../../../db/models/blog.model";
+import { blogFields } from "../../../utils/fieldHelpers";
+
+const awsBaseUrl = process.env.AWS_BASEURL;
 
 type QueryParams = {
   startDate?: Date;
@@ -20,7 +26,6 @@ class BlogController {
 
     const newBlogData = {
       billboardType: body.billboardType,
-      billboardImage: body.billboardImage,
       billboardTitle: body.billboardTitle,
       billboardBody: body.billboardBody,
     };
@@ -29,6 +34,46 @@ class BlogController {
     const newBlog = await Blog.create(newBlogData);
 
     res.created(newBlog);
+  }
+
+  async addBlogImage(req: Request, res: Response) {
+    const blogImage = req.file;
+
+    const blogId = req.params;
+    if (!blogImage) {
+      throw new BadRequest("No blog image provided.", "MISSING_REQUIRED_FIELD");
+    }
+
+    const uploadedFile = blogImage as Express.Multer.File;
+
+    const blogImageExtension = path.extname(uploadedFile.originalname);
+    const blogImageKey = await uploadPicture(
+      uploadedFile.path,
+      "blog-image",
+      blogImageExtension
+    );
+    await fsPromises.unlink(uploadedFile.path);
+
+    console.log("newcss", blogImageKey);
+
+    const key = `${awsBaseUrl}/${blogImageKey}`;
+    const blog = await Blog.findByIdAndUpdate(
+      blogId,
+      { blogImage: key, updatedAt: new Date() },
+      { new: true }
+    ).select(blogFields.join(" "));
+
+    if (!blog) {
+      throw new ResourceNotFound(
+        `Blog ${blogId} not found.`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok({
+      updated: blog,
+      message: "blog image uploaded successfully.",
+    });
   }
 
   async updateBlog(req: Request, res: Response) {
@@ -82,6 +127,23 @@ class BlogController {
     }
 
     res.ok(blog);
+  }
+
+  async deleteBlogById(req: Request, res: Response) {
+    const { blogId } = req.params;
+    if (!blogId) {
+      throw new BadRequest("blogId is missing.", "MISSING_REQUIRED_FIELD");
+    }
+
+    const deletedBlog = await Blog.findByIdAndDelete(blogId);
+    if (!deletedBlog) {
+      throw new ResourceNotFound(
+        `Blog with ID ${blogId} not found.`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.noContent();
   }
 }
 

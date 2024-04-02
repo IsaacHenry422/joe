@@ -9,6 +9,7 @@ import mediaApplicationRouter from "./mediaApplication.route";
 import orderRouter from "./order.route";
 import webhookRouter from "./webhook.route";
 import invoiceRouter from "./invoice.route";
+import blogRouter from "./blog.route";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use("/admins", adminRouter);
 router.use("/mediaApplications", mediaApplicationRouter);
 router.use("/orders", orderRouter);
 router.use("/invoice", invoiceRouter);
+router.use("/blogs", blogRouter);
 router.use("/webhooks", webhookRouter);
 
 router.use("/", sharedRouter);

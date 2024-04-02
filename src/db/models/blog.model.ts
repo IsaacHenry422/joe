@@ -4,7 +4,7 @@ import mongoose, { Schema, Document } from "mongoose";
 // Define the interface for the blog model
 interface IBlog extends Document {
   billboardType: string;
-  billboardImage: string;
+  billboardImage?: string;
   billboardTitle: string;
   billboardBody: string;
 }
@@ -13,7 +13,11 @@ interface IBlog extends Document {
 const BlogSchema: Schema = new Schema(
   {
     billboardType: { type: String, required: true },
-    billboardImage: { type: String, required: true },
+    billboardImage: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/duzrrmfci/image/upload/v1703842924/logo.jpg",
+    },
     billboardTitle: { type: String, required: true },
     billboardBody: { type: String, required: true },
   },
