@@ -14,7 +14,7 @@ mediaApplicationRouter.post(
 
 //  uplaod media Application pictures
 mediaApplicationRouter.patch(
-  "/admin/upload-images/:mediaCustomId",
+  "/admin/upload-images/:productId",
   auth({ accountType: ["admin"] }),
   upload.array("images", 3),
   applicationMediaController.uploadMediaImages
@@ -29,14 +29,14 @@ mediaApplicationRouter.get(
 
 // update a media mediaApplication
 mediaApplicationRouter.patch(
-  "/admin/:mediaCustomId",
+  "/admin/:productId",
   auth({ accountType: ["admin"] }),
   applicationMediaController.updateMediaApplication
 );
 
 // delete mediaApplication
 mediaApplicationRouter.delete(
-  "/admin/:mediaCustomId",
+  "/admin/:productId",
   auth({ accountType: ["admin"] }),
   applicationMediaController.deleteMediaApplication
 );
@@ -54,7 +54,7 @@ mediaApplicationRouter.get(
 
 // Get a media application
 mediaApplicationRouter.get(
-  "/one/:mediaCustomId", applicationMediaController.getMediaApplication
+  "/one/:productId", applicationMediaController.getMediaApplication
 );
 
 export default mediaApplicationRouter;
