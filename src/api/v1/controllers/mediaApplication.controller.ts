@@ -149,7 +149,7 @@ class applicationMediaController {
   }
 
   async uploadMediaImages(req: Request, res: Response) {
-    const { mediaCustomId } = req.params;
+    const { productId } = req.params;
     let uploadedImages: Express.Multer.File[] = [];
     if (!req.files) {
       throw new BadRequest("No images provided.", "MISSING_REQUIRED_FIELD");
@@ -168,10 +168,10 @@ class applicationMediaController {
     if (!uploadedImages || uploadedImages.length === 0) {
       throw new BadRequest("No images provided.", "MISSING_REQUIRED_FIELD");
     }
-    const product = await billboardMediaApplication.findOne({ mediaCustomId });
+    const product = await billboardMediaApplication.findOne({ _id:productId });
     if (!product)
       throw new ResourceNotFound(
-        `Product with custom id ${mediaCustomId} does not exist`,
+        `Product with custom id ${productId} does not exist`,
         "RESOURCE_NOT_FOUND"
       );
     const picArray: object[] = [];
@@ -193,7 +193,7 @@ class applicationMediaController {
       })
     );
     await billboardMediaApplication.findOneAndUpdate(
-      { mediaCustomId },
+      { _id:productId },
       { pictures: picArray },
       { new: true, runValidators: true }
     );
@@ -205,7 +205,7 @@ class applicationMediaController {
   }
 
   async updateMediaApplication(req: Request, res: Response) {
-    const { mediaCustomId } = req.params;
+    const { productId } = req.params;
     const {
       status,
       listingTitle,
@@ -222,7 +222,7 @@ class applicationMediaController {
       nextAvailable,
       amountAvailable,
     } = req.body;
-    if (!mediaCustomId)
+    if (!productId)
       throw new BadRequest(
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
@@ -265,13 +265,13 @@ class applicationMediaController {
       amountAvailable,
     };
     const product = await billboardMediaApplication.findOneAndUpdate(
-      { mediaCustomId },
+      { _id:productId },
       updateFields,
       { new: true, runValidators: true }
     );
     if (!product)
       throw new ResourceNotFound(
-        `product with id:${mediaCustomId} not found`,
+        `product with id:${productId} not found`,
         "RESOURCE_NOT_FOUND"
       );
     res.ok({
@@ -281,16 +281,16 @@ class applicationMediaController {
   }
 
   async deleteMediaApplication(req: Request, res: Response) {
-    const { mediaCustomId } = req.params;
-    if (!mediaCustomId)
+    const { productId } = req.params;
+    if (!productId)
       throw new BadRequest(
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
       );
-    const product = await billboardMediaApplication.findOne({ mediaCustomId });
+    const product = await billboardMediaApplication.findOne({ _id:productId });
     if (!product)
       throw new ResourceNotFound(
-        `product with id:${mediaCustomId} not found`,
+        `product with id:${productId} not found`,
         "RESOURCE_NOT_FOUND"
       );
     const pictureUrls: string[] = [];
@@ -303,21 +303,21 @@ class applicationMediaController {
     console.log(pictureUrls);
 
     await deleteImagesFromStorage(pictureUrls);
-    await billboardMediaApplication.findOneAndDelete({ mediaCustomId });
+    await billboardMediaApplication.findOneAndDelete({ _id:productId });
     res.noContent();
   }
 
   async getMediaApplication(req: Request, res: Response) {
-    const { mediaCustomId } = req.params;
-    if (!mediaCustomId)
+    const { productId } = req.params;
+    if (!productId)
       throw new BadRequest(
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
       );
-    const product = await billboardMediaApplication.findOne({ mediaCustomId });
+    const product = await billboardMediaApplication.findOne({ _id:productId });
     if (!product)
       throw new ResourceNotFound(
-        `product with id:${mediaCustomId} not found`,
+        `product with id:${productId} not found`,
         "RESOURCE_NOT_FOUND"
       );
     res.ok({
@@ -332,6 +332,7 @@ class applicationMediaController {
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
+    let randomSkip: number;
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
@@ -342,12 +343,20 @@ class applicationMediaController {
     if (orConditions.length > 0) {
       filter.$or = orConditions;
     }
+    const count = await billboardMediaApplication.countDocuments();
+    if (!queryParams.limit) {
+      randomSkip = Math.floor(Math.random() * toInteger(count));
+    }
+    else{
+      randomSkip = limit * (page-1);
+    }
+    console.log(randomSkip);
+    
 
-    const numberOfProducts = toInteger(queryParams.numberOfProducts);
-    const randomProducts = await billboardMediaApplication.aggregate([
-      { $match: filter },
-      { $sample: { size: numberOfProducts } },
-    ]);
+    const randomProducts = await billboardMediaApplication
+      .find(filter)
+      .limit(limit)
+      .skip(randomSkip);
 
     res.ok(
       {
