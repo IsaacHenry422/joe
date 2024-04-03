@@ -11,9 +11,9 @@ async function welcomeNotification(
   const options: EmailOptions = {
     to: email,
     subject: "Welcome to Vaad Media",
-    template: "welcome",
+    template: "user-welcome",
     variables: {
-      firstname,
+      name: firstname,
     },
   };
 
@@ -30,8 +30,8 @@ async function resetPasswordEmail(
     subject: "Reset Password",
     template: "forgot-password",
     variables: {
-      firstname,
-      otp,
+      name: firstname,
+      link: otp,
     },
   };
   await sendMail(options);

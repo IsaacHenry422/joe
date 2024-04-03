@@ -8,24 +8,25 @@ dotenv.config();
 const domain: string = process.env.MAILGUN_DOMAIN!;
 const sender: string = `Vaad Media <${process.env.MAILGUN_SENDER_EMAIL}>`;
 
-export interface EmailMessage {
-  from: string;
-  to: string;
-  subject: string;
-  template: string;
-  "t:variables"?: string;
-  "o:deliverytime"?: string;
-  html?: string; // Make html optional
-  text?: string;
-}
-
 export interface EmailOptions {
   to: string;
-  template: string;
   subject: string;
+  template: string;
   variables?: Record<string, any>;
   time?: Date;
 }
+
+type MailgunMessageData = {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+  "t:variables"?: string;
+  "o:deliverytime"?: string;
+
+  template: string;
+};
 
 //send Mail
 async function sendMail({
@@ -34,19 +35,19 @@ async function sendMail({
   subject,
   variables = {},
 }: EmailOptions): Promise<any> {
-  const messageData: EmailMessage = {
+  const messageData: MailgunMessageData = {
     from: sender,
     to,
     subject,
     template,
+    html: "", // Provide a default value for html
     "t:variables": JSON.stringify(variables),
-    html: "",
   };
 
-  // return mailgunClient.messages.create(domain, messageData);
+  return mailgunClient.messages.create(domain, messageData);
 }
 
-//schedule Mail
+// //schedule Mail
 async function scheduleMail({
   to,
   template,
@@ -54,7 +55,7 @@ async function scheduleMail({
   variables = {},
   time,
 }: EmailOptions): Promise<any> {
-  const messageData: EmailMessage = {
+  const messageData: MailgunMessageData = {
     from: sender,
     to,
     subject,
@@ -64,7 +65,7 @@ async function scheduleMail({
     html: "",
   };
 
-  // return mailgunClient.messages.create(domain, messageData);
+  return mailgunClient.messages.create(domain, messageData);
 }
 
 export { sendMail, scheduleMail };
