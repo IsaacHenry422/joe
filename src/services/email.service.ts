@@ -107,15 +107,18 @@ async function expiredOrderNotification({
 
 async function invoiceNotification({
   email,
+  link,
   ...variables
 }: {
   email: string;
+  link: string;
   [key: string]: any;
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice is ready, pay now!",
     template: "new-invoice",
+    link,
     variables,
   };
 

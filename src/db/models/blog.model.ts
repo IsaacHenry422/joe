@@ -1,8 +1,7 @@
-// Import necessary modules and dependencies
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
 
 // Define the interface for the blog model
-interface IBlog extends Document {
+export interface IBlog extends Document {
   billboardType: string;
   billboardImage?: string;
   billboardTitle: string;
@@ -10,7 +9,7 @@ interface IBlog extends Document {
 }
 
 // Define the schema for the blog model
-const BlogSchema: Schema = new Schema(
+const BlogSchema = new mongoose.Schema<IBlog>(
   {
     billboardType: { type: String, required: true },
     billboardImage: {
@@ -24,7 +23,6 @@ const BlogSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Create and export the blog model
-const BlogModel = mongoose.model<IBlog>("Blog", BlogSchema);
+const BlogModel: Model<IBlog> = mongoose.model<IBlog>("Blog", BlogSchema);
 
 export default BlogModel;

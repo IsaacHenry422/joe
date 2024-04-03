@@ -2,15 +2,16 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 type MediaType = "BRT Buses" | "LED Billboard" | "Lampost";
 
-type PaymentStatus = "Pending" | "Paid" 
+type PaymentStatus = "Pending" | "Paid";
 
 export interface Invoice extends Document {
+  userId: mongoose.Types.ObjectId;
   customerName: string;
   customerMail: string;
   phoneNumber: string;
   mediaType: MediaType;
   state: string;
-  BRTtypes?: string; 
+  BRTtypes?: string;
   period: string;
   quantity: number;
   unitPrice: string;
@@ -24,6 +25,11 @@ export interface Invoice extends Document {
 
 const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to the user schema
+      required: true,
+    },
     customerName: {
       type: String,
       required: true,
@@ -74,7 +80,7 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
     },
     paymentStatus: {
       type: String,
-      enum:["Pending","Paid" ],
+      enum: ["Pending", "Paid"],
       default: "Pending",
       required: true,
     },
@@ -90,6 +96,9 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
   { timestamps: true }
 );
 
-const InvoiceModel: Model<Invoice> = mongoose.model<Invoice>("Invoice", InvoiceSchema);
+const InvoiceModel: Model<Invoice> = mongoose.model<Invoice>(
+  "Invoice",
+  InvoiceSchema
+);
 
 export default InvoiceModel;

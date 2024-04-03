@@ -15,6 +15,7 @@ export interface EmailMessage {
   template: string;
   "t:variables"?: string;
   "o:deliverytime"?: string;
+  link?: string;
   html?: string; // Make html optional
   text?: string;
 }
@@ -24,6 +25,7 @@ export interface EmailOptions {
   template: string;
   subject: string;
   variables?: Record<string, any>;
+  link?: string;
   time?: Date;
 }
 
@@ -32,14 +34,17 @@ async function sendMail({
   to,
   template,
   subject,
+  link,
   variables = {},
 }: EmailOptions): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const messageData: EmailMessage = {
     from: sender,
     to,
     subject,
     template,
     "t:variables": JSON.stringify(variables),
+    link,
     html: "",
   };
 

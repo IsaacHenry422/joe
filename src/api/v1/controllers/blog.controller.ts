@@ -39,7 +39,8 @@ class BlogController {
   async addBlogImage(req: Request, res: Response) {
     const blogImage = req.file;
 
-    const blogId = req.params;
+    const { blogId } = req.params;
+
     if (!blogImage) {
       throw new BadRequest("No blog image provided.", "MISSING_REQUIRED_FIELD");
     }
@@ -54,12 +55,15 @@ class BlogController {
     );
     await fsPromises.unlink(uploadedFile.path);
 
-    console.log("newcss", blogImageKey);
+    // console.log("newcss", blogImageKey);
 
     const key = `${awsBaseUrl}/${blogImageKey}`;
+
+    console.log(key);
+
     const blog = await Blog.findByIdAndUpdate(
       blogId,
-      { blogImage: key, updatedAt: new Date() },
+      { billboardImage: key, updatedAt: new Date() },
       { new: true }
     ).select(blogFields.join(" "));
 
@@ -74,6 +78,19 @@ class BlogController {
       updated: blog,
       message: "blog image uploaded successfully.",
     });
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
+
+    const query = await Blog.find({});
+
+    // const totalInvoices = await Blog.countDocuments(query);
+
+    // const invoices = await query.select(blogFields.join(" "));
+
+    res.ok({ query }, { page, limit, startDate, endDate });
   }
 
   async updateBlog(req: Request, res: Response) {
@@ -98,18 +115,18 @@ class BlogController {
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
 
-    const query = Blog.find({
+    const query = await Blog.find({
       createdAt: { $gte: startDate, $lte: endDate },
     })
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
 
-    const totalInvoices = await Blog.countDocuments(query);
+    // const totalInvoices = await Blog.countDocuments(query);
 
-    // const invoices = await query.select(invoiceField.join(" "));
+    // const invoices = await query.select(blogFields.join(" "));
 
-    res.ok({ totalInvoices }, { page, limit, startDate, endDate });
+    res.ok({ query }, { page, limit, startDate, endDate });
   }
 
   async getBlogById(req: Request, res: Response) {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ResourceNotFound } from "../../../errors/httpErrors";
+import { ResourceNotFound, ServerError } from "../../../errors/httpErrors";
 import Invoice from "../../../db/models/invoice.model";
 import {
   getLimit,
@@ -20,6 +20,7 @@ type QueryParams = {
 };
 
 type CreateInvoiceBody = {
+  userId: string;
   customerName: string;
   customerMail: string;
   phoneNumber: string;
@@ -37,12 +38,14 @@ type CreateInvoiceBody = {
 
 class InvoiceController {
   async createInvoice(req: Request, res: Response) {
+    const userId = req.loggedInAccount._id;
     const { body } = req;
 
     // Calculate total based on unitPrice and quantity
     const calculateTotal = Number(body.unitPrice) * Number(body.quantity);
 
     const newInvoiceData: CreateInvoiceBody = {
+      userId,
       customerName: body.customerName,
       customerMail: body.customerMail,
       phoneNumber: body.phoneNumber,
@@ -59,14 +62,14 @@ class InvoiceController {
     };
 
     // Create the invoice
-    const newInvoice = await Invoice.create(newInvoiceData);
+    const savedOrder = await Invoice.create(newInvoiceData);
 
     // Prepare payload for payment service
     const email = body.customerMail;
     const amount = calculateTotal;
     const metadata = {
-      phoneNumber: body.phoneNumber,
-      state: body.state,
+      paymentType: "Invoice",
+      savedOrder,
     };
 
     // Call PaystackService to initiate payment
@@ -76,14 +79,69 @@ class InvoiceController {
       metadata
     );
 
+    if (!response) {
+      throw new ServerError(
+        "Initiate payment failed",
+        "THIRD_PARTY_API_FAILURE"
+      );
+    }
+
     // Send invoice notification with authorization URL
-    await invoiceNotification(body.customerMail);
+    await invoiceNotification({ email: body.customerMail, link: response });
 
     res.created({
-      newInvoice,
+      invoice: savedOrder,
       authorizationurl: response,
+      messageLink: "Invoice payment link created.",
+      messageInvoice:
+        "Invoice created successfully, pay within 1-3 hours to avoid order being cancelled.",
     });
   }
+
+  // async generatePaymentLinkForInvoicewithPaystack(req: Request, res: Response) {
+  //   const email = req.loggedInAccount.email;
+
+  //   // Extract invoice _id from request parameters
+  //   const invoiceId = req.params.invoiceId;
+  //   if (!invoiceId) {
+  //     throw new ResourceNotFound("Invoice ID not found", "RESOURCE_NOT_FOUND");
+  //   }
+
+  //   // Retrieve invoice details from the database
+  //   const invoice = await Invoice.findById(invoiceId);
+  //   if (!invoice) {
+  //     throw new ResourceNotFound("Invoice not found", "RESOURCE_NOT_FOUND");
+  //   }
+
+  //   if (invoice.paymentStatus === "Success") {
+  //     throw new BadRequest(
+  //       "Invoice has already been paid for",
+  //       "INVALID_REQUEST_PARAMETERS"
+  //     );
+  //   }
+
+  //   const invoicePaystack = {
+  //     email,
+  //     amount: invoice.total,
+  //     metadata: {
+  //       paymentType: "Invoice",
+  //       savedInvoice: invoice,
+  //     },
+  //   };
+
+  //   // Generate Paystack payment link
+  //   const paymentLink = await PaystackService.payWithPaystack(
+  //     invoicePaystack.email,
+  //     invoicePaystack.amount,
+  //     invoicePaystack.metadata
+  //   );
+
+  //   // Return the payment link to the user
+  //   return res.ok({
+  //     paymentLink,
+  //     message: "Payment link generated successfully.",
+  //   });
+  // }
 
   // Update an invoice by ID
   async updateInvoice(req: Request, res: Response) {

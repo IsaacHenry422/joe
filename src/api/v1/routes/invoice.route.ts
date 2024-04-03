@@ -1,6 +1,6 @@
 import express from "express";
 import controller from "../controllers/invoice.controller";
-//import { auth } from "../../middlewares/authMiddleware";
+import { auth } from "../../middlewares/authMiddleware";
 
 const invoiceRouter = express.Router();
 
@@ -21,7 +21,7 @@ invoiceRouter.get(
 // Create a new invoice route
 invoiceRouter.post(
   "/create",
-  // auth({ accountType: ["admin"] }),
+  auth({ accountType: ["user"] }),
   controller.createInvoice
 );
 

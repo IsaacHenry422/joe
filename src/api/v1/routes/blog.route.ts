@@ -14,7 +14,7 @@ blogRouter.get("/:blogId", controller.getBlogById);
 blogRouter.post("/create", controller.createBlog);
 
 blogRouter.patch(
-  "/upload/image",
+  "/upload/image/:blogId",
   upload.single("blogImage"),
   controller.addBlogImage
 );
