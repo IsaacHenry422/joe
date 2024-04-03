@@ -25,6 +25,12 @@ invoiceRouter.post(
   controller.createInvoice
 );
 
+// invoiceRouter.get(
+//   "/generate/:invoiceId",
+//   auth({ accountType: ["user"] }),
+//   controller.generatePaymentLinkForInvoicewithPaystack
+// );
+
 // Update an invoice by ID route
 invoiceRouter.patch(
   "/:invoiceId",

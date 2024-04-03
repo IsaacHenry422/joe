@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { ResourceNotFound, ServerError } from "../../../errors/httpErrors";
+import {
+  ResourceNotFound,
+  ServerError,
+  //BadRequest,
+} from "../../../errors/httpErrors";
 import Invoice from "../../../db/models/invoice.model";
 import {
   getLimit,
@@ -98,7 +102,7 @@ class InvoiceController {
     });
   }
 
-  // async generatePaymentLinkForInvoicewithPaystack(req: Request, res: Response) {
+  // async function generatePaymentLinkForInvoicewithPaystack(req: Request, res: Response) {
   //   const email = req.loggedInAccount.email;
 
   //   // Extract invoice _id from request parameters
@@ -131,8 +135,8 @@ class InvoiceController {
 
   //   // Generate Paystack payment link
   //   const paymentLink = await PaystackService.payWithPaystack(
-  //     invoicePaystack.email,
-  //     invoicePaystack.amount,
+  //     email,
+  //     invoice.total,
   //     invoicePaystack.metadata
   //   );
 
