@@ -113,12 +113,9 @@ class BlogController {
       .skip(limit * (page - 1))
       .select(blogFields.join(" "));
 
-    const totalInvoices = await Blog.countDocuments(query);
+    const totalBlogs = await Blog.countDocuments(query);
 
-    res.ok(
-      { total: query, totalInvoices },
-      { page, limit, startDate, endDate }
-    );
+    res.ok({ total: query, totalBlogs }, { page, limit, startDate, endDate });
   }
 
   async getBlogById(req: Request, res: Response) {

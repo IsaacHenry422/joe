@@ -15,7 +15,7 @@ const BlogSchema = new mongoose.Schema<IBlog>(
     blogImage: {
       type: String,
       default:
-        "https://res.cloudinary.com/duzrrmfci/image/upload/v1703842924/logo.jpg",
+        "https://res.cloudinary.com/dsub8fyhz/image/upload/v1712179488/andrew-neel-cckf4TsHAuw-unsplash_fpav9r.jpg",
     },
     blogTitle: { type: String, required: true },
     blogBody: { type: String, required: true },

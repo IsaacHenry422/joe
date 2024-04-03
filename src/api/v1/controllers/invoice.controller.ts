@@ -27,7 +27,6 @@ type QueryParams = {
 class InvoiceController {
   async createInvoice(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
-    const { body } = req;
 
     // Create the invoice
     const { error, data } = validators.createInvoiceValidator(req.body);
@@ -95,7 +94,7 @@ class InvoiceController {
     }
 
     // Send invoice notification with authorization URL
-    await invoiceNotification({ email: body.customerMail, link: response });
+    await invoiceNotification({ email: customerMail, link: response });
 
     res.created({
       invoice: savedOrder,
