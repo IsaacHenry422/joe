@@ -1,8 +1,8 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-type MediaType = "BRT Buses" | "LED Billboard" | "Lampost";
+type MediaType = "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard";
 
-type PaymentStatus = "Pending" | "Paid";
+type PaymentStatus = "Pending" | "Failed" | "Success";
 
 export interface Invoice extends Document {
   userId: mongoose.Types.ObjectId;
@@ -14,7 +14,7 @@ export interface Invoice extends Document {
   BRTtypes?: string;
   period: string;
   quantity: number;
-  unitPrice: string;
+  unitPrice: number;
   total: string;
   tax: string;
   dueDate: string;
@@ -44,7 +44,7 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
     },
     mediaType: {
       type: String,
-      enum: ["BRT Buses", "LED Billboard", "Lampost"],
+      enum: ["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"],
       required: true,
     },
     state: {
@@ -63,7 +63,7 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
       required: true,
     },
     unitPrice: {
-      type: String,
+      type: Number,
       required: true,
     },
     total: {
@@ -80,7 +80,7 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
     },
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Paid"],
+      enum: ["Pending", "Failed", "Success"],
       default: "Pending",
       required: true,
     },

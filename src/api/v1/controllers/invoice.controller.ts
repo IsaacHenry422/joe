@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {
   ResourceNotFound,
   ServerError,
-  //BadRequest,
+  BadRequest,
 } from "../../../errors/httpErrors";
 import Invoice from "../../../db/models/invoice.model";
 import {
@@ -15,6 +15,7 @@ import { invoiceField } from "../../../utils/fieldHelpers";
 import PaystackService from "../../../services/payment.service";
 
 import { invoiceNotification } from "../../../services/email.service";
+import * as validators from "../validators/invoice.validator";
 
 type QueryParams = {
   startDate?: Date;
@@ -23,53 +24,56 @@ type QueryParams = {
   page?: string;
 };
 
-type CreateInvoiceBody = {
-  userId: string;
-  customerName: string;
-  customerMail: string;
-  phoneNumber: string;
-  mediaType: string;
-  state: string;
-  BRTtypes?: string;
-  period: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-  tax: string;
-  dueDate: string;
-  invoiceNote: string;
-};
-
 class InvoiceController {
   async createInvoice(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
     const { body } = req;
 
-    // Calculate total based on unitPrice and quantity
-    const calculateTotal = Number(body.unitPrice) * Number(body.quantity);
+    // Create the invoice
+    const { error, data } = validators.createInvoiceValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
 
-    const newInvoiceData: CreateInvoiceBody = {
-      userId,
-      customerName: body.customerName,
-      customerMail: body.customerMail,
-      phoneNumber: body.phoneNumber,
-      mediaType: body.mediaType,
-      state: body.state,
-      BRTtypes: body.BRTtypes,
-      period: body.period,
-      quantity: body.quantity,
-      unitPrice: body.unitPrice,
-      total: calculateTotal,
-      tax: body.tax,
-      dueDate: body.dueDate,
-      invoiceNote: body.invoiceNote,
-    };
+    const {
+      customerName,
+      customerMail,
+      phoneNumber,
+      mediaType,
+      state,
+      BRTtypes,
+      period,
+      quantity,
+      unitPrice,
+      tax,
+      dueDate,
+      invoiceNote,
+    } = data;
+
+    // Calculate total based on unitPrice and quantity
+    const calculateTotal = unitPrice * quantity;
 
     // Create the invoice
-    const savedOrder = await Invoice.create(newInvoiceData);
+    const invoice = new Invoice({
+      userId,
+      customerName,
+      customerMail,
+      phoneNumber,
+      mediaType,
+      state,
+      BRTtypes,
+      period,
+      quantity,
+      unitPrice,
+      total: calculateTotal,
+      tax,
+      dueDate,
+      invoiceNote,
+    });
+
+    // Save the order
+    const savedOrder = await invoice.save();
 
     // Prepare payload for payment service
-    const email = body.customerMail;
+    const email = customerMail;
     const amount = calculateTotal;
     const metadata = {
       paymentType: "Invoice",
@@ -101,51 +105,6 @@ class InvoiceController {
         "Invoice created successfully, pay within 1-3 hours to avoid order being cancelled.",
     });
   }
-
-  // async function generatePaymentLinkForInvoicewithPaystack(req: Request, res: Response) {
-  //   const email = req.loggedInAccount.email;
-
-  //   // Extract invoice _id from request parameters
-  //   const invoiceId = req.params.invoiceId;
-  //   if (!invoiceId) {
-  //     throw new ResourceNotFound("Invoice ID not found", "RESOURCE_NOT_FOUND");
-  //   }
-
-  //   // Retrieve invoice details from the database
-  //   const invoice = await Invoice.findById(invoiceId);
-  //   if (!invoice) {
-  //     throw new ResourceNotFound("Invoice not found", "RESOURCE_NOT_FOUND");
-  //   }
-
-  //   if (invoice.paymentStatus === "Success") {
-  //     throw new BadRequest(
-  //       "Invoice has already been paid for",
-  //       "INVALID_REQUEST_PARAMETERS"
-  //     );
-  //   }
-
-  //   const invoicePaystack = {
-  //     email,
-  //     amount: invoice.total,
-  //     metadata: {
-  //       paymentType: "Invoice",
-  //       savedInvoice: invoice,
-  //     },
-  //   };
-
-  //   // Generate Paystack payment link
-  //   const paymentLink = await PaystackService.payWithPaystack(
-  //     email,
-  //     invoice.total,
-  //     invoicePaystack.metadata
-  //   );
-
-  //   // Return the payment link to the user
-  //   return res.ok({
-  //     paymentLink,
-  //     message: "Payment link generated successfully.",
-  //   });
-  // }
 
   // Update an invoice by ID
   async updateInvoice(req: Request, res: Response) {

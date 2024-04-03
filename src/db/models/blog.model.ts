@@ -2,23 +2,23 @@ import mongoose, { Document, Model } from "mongoose";
 
 // Define the interface for the blog model
 export interface IBlog extends Document {
-  billboardType: string;
-  billboardImage?: string;
-  billboardTitle: string;
-  billboardBody: string;
+  blogType: string;
+  blogImage?: string;
+  blogTitle: string;
+  blogBody: string;
 }
 
 // Define the schema for the blog model
 const BlogSchema = new mongoose.Schema<IBlog>(
   {
-    billboardType: { type: String, required: true },
-    billboardImage: {
+    blogType: { type: String, required: true },
+    blogImage: {
       type: String,
       default:
         "https://res.cloudinary.com/duzrrmfci/image/upload/v1703842924/logo.jpg",
     },
-    billboardTitle: { type: String, required: true },
-    billboardBody: { type: String, required: true },
+    blogTitle: { type: String, required: true },
+    blogBody: { type: String, required: true },
   },
   { timestamps: true }
 );

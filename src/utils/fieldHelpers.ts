@@ -52,8 +52,8 @@ export const invoiceField = [
 
 export const blogFields = [
   "_id",
-  "billboardType",
-  "billboardImage",
-  "billboardTitle",
-  "billboardBody",
+  "blogType",
+  "blogImage",
+  "blogTitle",
+  "blogBody",
 ];

@@ -11,6 +11,7 @@ import {
 } from "../../../utils/dataFilters";
 import Blog from "../../../db/models/blog.model";
 import { blogFields } from "../../../utils/fieldHelpers";
+import * as validators from "../validators/blog.validator";
 
 const awsBaseUrl = process.env.AWS_BASEURL;
 
@@ -22,16 +23,20 @@ type QueryParams = {
 };
 class BlogController {
   async createBlog(req: Request, res: Response) {
-    const { body } = req;
+    // Create the invoice
+    const { error, data } = validators.createBlogValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
 
-    const newBlogData = {
-      billboardType: body.billboardType,
-      billboardTitle: body.billboardTitle,
-      billboardBody: body.billboardBody,
-    };
+    const { blogType, blogTitle, blogBody } = data;
 
     // Create the blog
-    const newBlog = await Blog.create(newBlogData);
+    const blog = new Blog({
+      blogType,
+      blogTitle,
+      blogBody,
+    });
+
+    const newBlog = await blog.save();
 
     res.created(newBlog);
   }
@@ -55,15 +60,13 @@ class BlogController {
     );
     await fsPromises.unlink(uploadedFile.path);
 
-    // console.log("newcss", blogImageKey);
-
     const key = `${awsBaseUrl}/${blogImageKey}`;
 
     console.log(key);
 
     const blog = await Blog.findByIdAndUpdate(
       blogId,
-      { billboardImage: key, updatedAt: new Date() },
+      { blogImage: key, updatedAt: new Date() },
       { new: true }
     ).select(blogFields.join(" "));
 
@@ -78,19 +81,6 @@ class BlogController {
       updated: blog,
       message: "blog image uploaded successfully.",
     });
-    const queryParams: QueryParams = req.query;
-    const startDate = getStartDate(queryParams.startDate);
-    const endDate = getEndDate(queryParams.endDate);
-    const limit = getLimit(queryParams.limit);
-    const page = getPage(queryParams.page);
-
-    const query = await Blog.find({});
-
-    // const totalInvoices = await Blog.countDocuments(query);
-
-    // const invoices = await query.select(blogFields.join(" "));
-
-    res.ok({ query }, { page, limit, startDate, endDate });
   }
 
   async updateBlog(req: Request, res: Response) {
@@ -120,13 +110,15 @@ class BlogController {
     })
       .sort({ createdAt: 1 })
       .limit(limit)
-      .skip(limit * (page - 1));
+      .skip(limit * (page - 1))
+      .select(blogFields.join(" "));
 
-    // const totalInvoices = await Blog.countDocuments(query);
+    const totalInvoices = await Blog.countDocuments(query);
 
-    // const invoices = await query.select(blogFields.join(" "));
-
-    res.ok({ query }, { page, limit, startDate, endDate });
+    res.ok(
+      { total: query, totalInvoices },
+      { page, limit, startDate, endDate }
+    );
   }
 
   async getBlogById(req: Request, res: Response) {
@@ -135,7 +127,7 @@ class BlogController {
       throw new ResourceNotFound("blogId is missing.", "RESOURCE_NOT_FOUND");
     }
 
-    const blog = await Blog.findById(blogId);
+    const blog = await Blog.findById(blogId).select(blogFields.join(" "));
     if (!blog) {
       throw new ResourceNotFound(
         `Blog with ID ${blogId} not found.`,

@@ -1,6 +1,7 @@
 import express from "express";
 import controller from "../controllers/blog.controller";
 import upload from "../../middlewares/multerMiddleware";
+import { auth } from "../../middlewares/authMiddleware";
 
 const blogRouter = express.Router();
 
@@ -8,18 +9,31 @@ const blogRouter = express.Router();
 blogRouter.get("/", controller.getBlogs);
 
 // Get a specific blog by ID route
-blogRouter.get("/:blogId", controller.getBlogById);
+blogRouter.get(
+  "/:blogId",
+  auth({ accountType: ["user"] }),
+  controller.getBlogById
+);
 
 // Create a new blog route
-blogRouter.post("/create", controller.createBlog);
+blogRouter.post(
+  "/create",
+  auth({ accountType: ["user"] }),
+  controller.createBlog
+);
 
 blogRouter.patch(
   "/upload/image/:blogId",
   upload.single("blogImage"),
+  auth({ accountType: ["user"] }),
   controller.addBlogImage
 );
 
-blogRouter.patch("/details/:blogId", controller.updateBlog);
+blogRouter.patch(
+  "/details/:blogId",
+  auth({ accountType: ["user"] }),
+  controller.updateBlog
+);
 
 // Delete a blog by ID route
 blogRouter.delete("/:blogId", controller.deleteBlogById);
