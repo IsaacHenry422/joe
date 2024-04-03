@@ -28,9 +28,29 @@ export interface IOrder extends Document {
       endDate: Date;
       totalDuration: number;
     };
+    // media property to the order interface
+    media?: {
+      _id: mongoose.Types.ObjectId;
+      mediaCustomId: string;
+      listingTitle: string;
+      price: string;
+      pictures: Array<object>;
+      description?: string;
+      address?: string;
+    };
   }[];
   createdAt: Date;
   updatedAt: Date;
+  __v: number;
+  // customer property to the order interface
+  customer: {
+    _id: mongoose.Types.ObjectId;
+    userCustomId: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    phoneNumber?: string;
+  };
 }
 
 // Define the order schema

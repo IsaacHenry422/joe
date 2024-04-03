@@ -5,24 +5,56 @@ import upload from "../../middlewares/multerMiddleware";
 
 const mediaApplicationRouter = express.Router();
 
-// Create a new mediaApplication
+// Create a new media Application
 mediaApplicationRouter.post(
-  "/",
+  "/admin",
   auth({ accountType: ["admin"] }),
   applicationMediaController.createMediaApplication
 );
 
-// Get general media applications
-mediaApplicationRouter.get(
-  "/", applicationMediaController.getGeneralMediaApplications
-);
-
-// picture uplaod
+//  uplaod media Application pictures
 mediaApplicationRouter.patch(
-  "/upload-images/:mediaCustomId",
+  "/admin/upload-images/:productId",
   auth({ accountType: ["admin"] }),
   upload.array("images", 3),
   applicationMediaController.uploadMediaImages
+);
+
+// get all media Application
+mediaApplicationRouter.get(
+  "/admin",
+  auth({ accountType: ["admin"] }),
+  applicationMediaController.getGeneralMediaApplications
+);
+
+// update a media mediaApplication
+mediaApplicationRouter.patch(
+  "/admin/:productId",
+  auth({ accountType: ["admin"] }),
+  applicationMediaController.updateMediaApplication
+);
+
+// delete mediaApplication
+mediaApplicationRouter.delete(
+  "/admin/:productId",
+  auth({ accountType: ["admin"] }),
+  applicationMediaController.deleteMediaApplication
+);
+
+// Get general media applications
+mediaApplicationRouter.get(
+  "/", applicationMediaController.getMediaApplicationsLandingPage
+);
+
+// search mediaApplication by keyword
+mediaApplicationRouter.get(
+  "/search",
+  applicationMediaController.searchMediaApplicationByKeyword
+);
+
+// Get a media application
+mediaApplicationRouter.get(
+  "/one/:productId", applicationMediaController.getMediaApplication
 );
 
 export default mediaApplicationRouter;

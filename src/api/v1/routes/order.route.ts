@@ -23,4 +23,53 @@ orderRouter.get(
   orderController.generatePaymentLinkForOrderwithPaystack
 );
 
+orderRouter.get(
+  "/admin/all",
+  auth({ accountType: ["admin"] }),
+  orderController.getAllOrdersAdmin
+);
+orderRouter.get(
+  "/admin/one/:orderId",
+  auth({ accountType: ["admin"] }),
+  orderController.GetOrderByIdAdmin
+);
+
+orderRouter.get(
+  "/admin/custom/:orderCustomId",
+  auth({ accountType: ["admin"] }),
+  orderController.GetOrderByCustomAdmin
+);
+
+orderRouter.get(
+  "/user/all",
+  auth({ accountType: ["user"] }),
+  orderController.getAllOrdersUser
+);
+
+orderRouter.get(
+  "/user/one/:orderId",
+  auth({ accountType: ["user"] }),
+  orderController.getOrderByIdUser
+);
+
+//update
+orderRouter.patch(
+  "/:orderId/details",
+  auth({ accountType: ["admin"] }),
+  orderController.updateOrderdetailsById
+);
+
+orderRouter.patch(
+  "/:orderId/status",
+  auth({ accountType: ["admin"] }),
+  orderController.updateOrderStatusById
+);
+
+//delete
+orderRouter.delete(
+  "/:orderId",
+  auth({ accountType: ["admin"], adminType: ["Super-Admin"] }),
+  orderController.deleteOrderById
+);
+
 export default orderRouter;
