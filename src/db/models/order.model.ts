@@ -33,6 +33,7 @@ export interface IOrder extends Document {
       _id: mongoose.Types.ObjectId;
       mediaCustomId: string;
       listingTitle: string;
+      price: string;
       pictures: Array<object>;
       description?: string;
       address?: string;

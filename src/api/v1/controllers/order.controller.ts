@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
 import Order, { IOrder } from "../../../db/models/order.model";
-import User from "../../../db/models/user.model";
+// import User from "../../../db/models/user.model";
 
-import MediaApplication from "../../../db/models/mediaApplication.model";
+// import MediaApplication from "../../../db/models/mediaApplication.model";
 import PaystackService from "../../../services/payment.service";
 import {
   getLimit,
@@ -271,8 +271,7 @@ class OrderController {
     });
   }
 
-  // Get all orders by admin
-  async GetAllOrdersAdmin(req: Request, res: Response) {
+  async getAllOrdersAdmin(req: Request, res: Response) {
     const queryParams: QueryParams = req.query;
     const startDate = getStartDate(queryParams.startDate);
     const endDate = getEndDate(queryParams.endDate);
@@ -302,84 +301,261 @@ class OrderController {
 
     // Find orders based on the constructed query
     const orders = await Order.find(query)
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 }) // Descending order by createdAt
       .limit(limit)
-      .skip(limit * (page - 1));
-
-    // Fetch customer details and media details for each order
-    for (const order of orders) {
-      // Fetch user details from the User model using userId
-      const user = await User.findById(order.userId);
-
-      if (user) {
-        // Construct the customer object
-        const customer = {
-          _id: user._id,
-          userCustomId: user.userCustomId,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-        };
-
-        // Add the customer object to the order
-        order.customer = customer;
-      }
-
-      // Iterate through orderItem array and fetch media details if mediaId is available
-      for (const item of order.orderItem) {
-        if (item.mediaId) {
-          // Fetch media details from the MediaApplication model using mediaId
-          const media = await MediaApplication.findById(item.mediaId);
-
-          if (media) {
-            // Construct the media object
-            const mediaDetails = {
-              _id: media._id,
-              mediaCustomId: media.mediaCustomId,
-              listingTitle: media.listingTitle,
-              pictures: media.pictures,
-              description: media.description,
-              address: media.address,
-            };
-
-            // Add the media object to the orderItem
-            item.media = mediaDetails;
-          }
-        }
-      }
-    }
+      .skip(limit * (page - 1))
+      .populate({
+        path: "userId",
+        select: "userCustomId firstname lastname email phoneNumber", // Specify fields to populate
+      }) // Populate user details
+      .populate({
+        path: "orderItem.mediaId",
+        model: "billboardMediaApplication", // Populate billboard if media is available.
+      });
+    // .populate({
+    //   path: "orderItem.printId",
+    //   model: "printMediaApplication", // Populate print
+    // });
 
     const totalOrders = await Order.countDocuments(query);
 
     res.ok({ orders, totalOrders }, { page, limit, startDate, endDate });
   }
 
-  // GetOrderByQueryParamsAdmin
-  // async GetOrderByQueryParamsAdmin(req: Request, res: Response) {
-  //   const queryParams: QueryParams = req.query;
-  //   const startDate = getStartDate(queryParams.startDate);
-  //   const endDate = getEndDate(queryParams.endDate);
-  //   const limit = getLimit(queryParams.limit);
-  //   const page = getPage(queryParams.page);
+  // Get All Orders by User
+  async getAllOrdersUser(req: Request, res: Response) {
+    const userId = req.loggedInAccount._id;
 
-  //   const orders = Order.find({
-  //     createdAt: { $gte: startDate, $lte: endDate },
-  //   })
-  //     .sort({ createdAt: 1 })
-  //     .limit(limit)
-  //     .skip(limit * (page - 1));
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
+    const orderStatus = queryParams.orderStatus;
+    const paymentStatus = queryParams.paymentStatus;
+    const paymentMethod = queryParams.paymentMethod;
 
-  //   const totalOrders = await Order.countDocuments(orders);
+    // Construct the query object based on the provided parameters
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      userId,
+    };
 
-  //   res.ok({ orders, totalOrders }, { page, limit, startDate, endDate });
-  // }
+    if (orderStatus) {
+      query.orderStatus = orderStatus;
+    }
 
-  // UpdateOrderStatusById
+    if (paymentStatus) {
+      query.paymentStatus = paymentStatus;
+    }
 
-  // GetAllOrdersUser
-  // GetUserOrderById
-  // TrackOrderById
+    if (paymentMethod) {
+      query.paymentMethod = paymentMethod;
+    }
+
+    // Find orders based on the constructed query
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 }) // Descending order by createdAt
+      .limit(limit)
+      .skip(limit * (page - 1))
+      .populate({
+        path: "userId",
+        select: "userCustomId firstname lastname email phoneNumber", // Specify fields to populate
+      }) // Populate user details
+      .populate({
+        path: "orderItem.mediaId",
+        model: "billboardMediaApplication", // Populate billboard if media is available.
+      });
+    // .populate({
+    //   path: "orderItem.printId",
+    //   model: "printMediaApplication", // Populate print
+    // });
+
+    const totalOrders = await Order.countDocuments(query);
+
+    res.ok({ orders, totalOrders }, { page, limit, startDate, endDate });
+  }
+
+  // Get User Order By Id
+  async getOrderByIdUser(req: Request, res: Response) {
+    const userId = req.loggedInAccount._id;
+
+    const { orderId } = req.params;
+    if (!orderId) {
+      throw new ResourceNotFound("orderId is missing.", "RESOURCE_NOT_FOUND");
+    }
+
+    const order = await Order.findOne({
+      _id: orderId,
+      userId,
+    })
+      .populate({
+        path: "userId",
+        select: "userCustomId firstname lastname email phoneNumber", // Specify fields to populate
+      }) // Populate user details
+      .populate({
+        path: "orderItem.mediaId",
+        model: "billboardMediaApplication", // Populate billboard if media is available.
+      });
+    // .populate({
+    //   path: "orderItem.printId",
+    //   model: "printMediaApplication", // Populate print
+    // });
+
+    if (!order) {
+      throw new ResourceNotFound(
+        "Order not found or not associated with your account.",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    if (order.userId._id.toString() !== userId.toString()) {
+      throw new BadRequest(
+        "You can not access order you didn't create.",
+        "INVALID_REQUEST_PARAMETERS"
+      );
+    }
+
+    res.ok(order);
+  }
+  // Get Admin Order By Id
+  async GetOrderByIdAdmin(req: Request, res: Response) {
+    const { orderId } = req.params;
+    if (!orderId) {
+      throw new ResourceNotFound("orderId is missing.", "RESOURCE_NOT_FOUND");
+    }
+
+    const order = await Order.findById(orderId)
+      .populate({
+        path: "userId",
+        select: "userCustomId firstname lastname email phoneNumber", // Specify fields to populate
+      }) // Populate user details
+      .populate({
+        path: "orderItem.mediaId",
+        model: "billboardMediaApplication", // Populate billboard if media is available.
+      });
+    // .populate({
+    //   path: "orderItem.printId",
+    //   model: "printMediaApplication", // Populate print
+    // });
+
+    if (!order) {
+      throw new ResourceNotFound(
+        `Order with ID ${orderId} not found.`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok(order);
+  }
+
+  // // Get a Order by CustomId
+  async GetOrderByCustomAdmin(req: Request, res: Response) {
+    const { orderCustomId } = req.params;
+    if (!orderCustomId) {
+      throw new ResourceNotFound(
+        "order CustomId is missing.",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    const order = await Order.findOne({ orderCustomId })
+      .populate({
+        path: "userId",
+        select: "userCustomId firstname lastname email phoneNumber", // Specify fields to populate
+      }) // Populate user details
+      .populate({
+        path: "orderItem.mediaId",
+        model: "billboardMediaApplication", // Populate billboard if media is available.
+      });
+    // .populate({
+    //   path: "orderItem.printId",
+    //   model: "printMediaApplication", // Populate print
+    // });
+    if (!order) {
+      throw new ResourceNotFound(
+        `Order with ID ${orderCustomId} not found.`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok(order);
+  }
+
+  // update Order details By Id: only(payment status)
+  async updateOrderdetailsById(req: Request, res: Response) {
+    const { orderId } = req.params;
+    if (!orderId) {
+      throw new ResourceNotFound("orderId is missing.", "RESOURCE_NOT_FOUND");
+    }
+    const { error, data } = validators.updateOrderValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { ...data },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      throw new BadRequest(
+        "order details can not be updated, try again later.",
+        "INVALID_REQUEST_PARAMETERS"
+      );
+    }
+
+    return res.ok({
+      message: "Order updated successfully",
+      updatedOrder,
+    });
+  }
+
+  // Update Order Status By Id
+  async updateOrderStatusById(req: Request, res: Response) {
+    const { orderId } = req.params;
+    if (!orderId) {
+      throw new ResourceNotFound("orderId is missing.", "RESOURCE_NOT_FOUND");
+    }
+    const { error, data } = validators.updateOrderStatusValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { orderStatus: data.orderStatus },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      throw new BadRequest(
+        "order status can not be updated, try again later.",
+        "INVALID_REQUEST_PARAMETERS"
+      );
+    }
+
+    return res.ok({
+      message: "Order status updated successfully",
+      updatedOrder,
+    });
+  }
+
+  // Delete Order By Id
+  async deleteOrderById(req: Request, res: Response) {
+    const { orderId } = req.params;
+    if (!orderId) {
+      throw new ResourceNotFound("orderId is missing.", "RESOURCE_NOT_FOUND");
+    }
+
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+    if (!deletedOrder) {
+      throw new ResourceNotFound("order not found.", "RESOURCE_NOT_FOUND");
+    }
+
+    return res.ok({
+      message: "Order deleted successfully",
+    });
+  }
 }
 
 export default new OrderController();
