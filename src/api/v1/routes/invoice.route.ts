@@ -7,28 +7,28 @@ const invoiceRouter = express.Router();
 // Get all invoices route
 invoiceRouter.get(
   "/",
-  //auth({ accountType: ["admin"] }),
+  auth({ accountType: ["admin"] }),
   controller.getInvoices
 );
 
 // Get a specific invoice by ID route
 invoiceRouter.get(
   "/:invoiceId",
-  //auth({ accountType: ["admin"] }),
+  auth({ accountType: ["admin"] }),
   controller.getInvoiceById
 );
 
 // Create a new invoice route
 invoiceRouter.post(
   "/create",
-  auth({ accountType: ["user"] }),
+  auth({ accountType: ["admin"] }),
   controller.createInvoice
 );
 
 // Update an invoice by ID route
 invoiceRouter.patch(
   "/:invoiceId",
-  //auth({ accountType: ["admin"] }),
+  auth({ accountType: ["admin"] }),
   controller.updateInvoice
 );
 

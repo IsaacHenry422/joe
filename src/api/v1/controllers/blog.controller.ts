@@ -85,8 +85,11 @@ class BlogController {
 
   async updateBlog(req: Request, res: Response) {
     const { blogId } = req.params;
-    const { body } = req;
-    const updatedBlog = await Blog.findByIdAndUpdate(blogId, body, {
+
+    const { error, data } = validators.updateBlogValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
+
+    const updatedBlog = await Blog.findByIdAndUpdate(blogId, data, {
       new: true,
     });
     if (!updatedBlog) {

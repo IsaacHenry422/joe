@@ -11,9 +11,9 @@ async function welcomeNotification(
   const options: EmailOptions = {
     to: email,
     subject: "Welcome to Vaad Media",
-    template: "user-welcome",
+    template: "welcome",
     variables: {
-      name: firstname,
+      firstname,
     },
   };
 
@@ -30,8 +30,8 @@ async function resetPasswordEmail(
     subject: "Reset Password",
     template: "forgot-password",
     variables: {
-      name: firstname,
-      link: otp,
+      firstname,
+      otp,
     },
   };
   await sendMail(options);
@@ -107,45 +107,16 @@ async function expiredOrderNotification({
 
 async function invoiceNotification({
   email,
-  link,
-  mediaType,
-  state,
-  BRTtypes,
-  period,
-  quantity,
-  unitPrice,
-  tax,
-  dueDate,
   ...variables
 }: {
   email: string;
-  link: string;
-  mediaType: string;
-  state: string;
-  BRTtypes?: string;
-  period: string;
-  quantity: number;
-  unitPrice: number;
-  tax: string;
-  dueDate: string;
   [key: string]: any;
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice is ready, pay now!",
     template: "new-invoice",
-    link,
-    variables: {
-      ...variables,
-      mediaType,
-      state,
-      BRTtypes,
-      period,
-      quantity,
-      unitPrice,
-      tax,
-      dueDate,
-    },
+    variables,
   };
 
   await sendMail(options);
@@ -153,30 +124,16 @@ async function invoiceNotification({
 
 async function successInvoiceNotification({
   email,
-  period,
-  quantity,
-  unitPrice,
-  tax,
   ...variables
 }: {
   email: string;
-  period: string;
-  quantity: number;
-  unitPrice: number;
-  tax: string;
   [key: string]: any;
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice payment is successful",
     template: "success-invoice",
-    variables: {
-      ...variables,
-      period,
-      quantity,
-      unitPrice,
-      tax,
-    },
+    variables,
   };
 
   await sendMail(options);

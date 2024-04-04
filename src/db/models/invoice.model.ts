@@ -5,7 +5,7 @@ type MediaType = "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard";
 type PaymentStatus = "Pending" | "Failed" | "Success";
 
 export interface Invoice extends Document {
-  userId: mongoose.Types.ObjectId;
+  adminId: mongoose.Types.ObjectId;
   customerName: string;
   customerMail: string;
   phoneNumber: string;
@@ -25,9 +25,9 @@ export interface Invoice extends Document {
 
 const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
   {
-    userId: {
+    adminId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the user schema
+      ref: "Admin", // Reference to the admin schema
       required: true,
     },
     customerName: {

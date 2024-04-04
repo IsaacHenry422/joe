@@ -26,7 +26,7 @@ type QueryParams = {
 
 class InvoiceController {
   async createInvoice(req: Request, res: Response) {
-    const userId = req.loggedInAccount._id;
+    const adminId = req.loggedInAccount._id;
 
     // Create the invoice
     const { error, data } = validators.createInvoiceValidator(req.body);
@@ -52,7 +52,7 @@ class InvoiceController {
 
     // Create the invoice
     const invoice = new Invoice({
-      userId,
+      adminId,
       customerName,
       customerMail,
       phoneNumber,
@@ -119,8 +119,11 @@ class InvoiceController {
   // Update an invoice by ID
   async updateInvoice(req: Request, res: Response) {
     const { invoiceId } = req.params;
-    const { body } = req;
-    const updatedInvoice = await Invoice.findByIdAndUpdate(invoiceId, body, {
+
+    const { error, data } = validators.updateInvoiceValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
+
+    const updatedInvoice = await Invoice.findByIdAndUpdate(invoiceId, data, {
       new: true,
     });
     if (!updatedInvoice) {

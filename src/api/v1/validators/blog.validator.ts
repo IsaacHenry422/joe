@@ -11,3 +11,13 @@ export const createBlogValidator = (payload: any) => {
 
   return validateRequestBody(schema, payload);
 };
+
+export const updateBlogValidator = (payload: any) => {
+  const schema = z.object({
+    blogType: z.string().optional(),
+    blogTitle: z.string().optional(),
+    blogBody: z.string().optional(),
+  });
+
+  return validateRequestBody(schema, payload);
+};

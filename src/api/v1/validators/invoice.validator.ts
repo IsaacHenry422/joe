@@ -31,3 +31,32 @@ export const createInvoiceValidator = (payload: any) => {
 
   return validateRequestBody(schema, payload);
 };
+
+export const updateInvoiceValidator = (payload: any) => {
+  const schema = z.object({
+    customerName: z.string().optional(),
+    customerMail: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    mediaType: z
+      .enum(["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"], {
+        required_error: "mediaType is required.",
+      })
+      .optional(),
+    state: z.string().optional(),
+    BRTtypes: z.string().optional(),
+    period: z.string().optional(),
+    quantity: z.number().optional(),
+    unitPrice: z.number().optional(),
+    tax: z.string().optional(),
+    dueDate: z.string().optional(),
+    paymentStatus: z
+      .enum(["Pending", "Failed", "Success"], {
+        required_error: "paymentStatus is required.",
+      })
+      .optional(),
+    invoiceNote: z.string().optional(),
+    deletedAt: z.boolean().optional(),
+  });
+
+  return validateRequestBody(schema, payload);
+};

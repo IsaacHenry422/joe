@@ -13,7 +13,6 @@ export interface EmailOptions {
   subject: string;
   template: string;
   variables?: Record<string, any>;
-  link?: string;
   time?: Date;
 }
 

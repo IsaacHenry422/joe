@@ -70,7 +70,7 @@ class WebhookController {
 
       // Create a new transaction record
       const newInvoiceTransaction = new Transaction({
-        userId: savedOrder.userId,
+        adminId: savedOrder.adminId,
         invoiceId: savedOrder._id,
         transactionCustomId: data.reference,
         transactionType: paymentType,
