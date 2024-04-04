@@ -80,7 +80,7 @@ class WebhookController {
         paymentComment: `Using - (${data.authorization.brand})${data.authorization.channel} ****${data.authorization.last4}`,
       });
 
-      // Send invoice notification with authorization URL
+      // Send invoice successful notificatioj
       await successInvoiceNotification({
         email: savedOrder.email,
         period: savedOrder.period,
