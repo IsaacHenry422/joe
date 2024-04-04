@@ -108,10 +108,26 @@ async function expiredOrderNotification({
 async function invoiceNotification({
   email,
   link,
+  mediaType,
+  state,
+  BRTtypes,
+  period,
+  quantity,
+  unitPrice,
+  tax,
+  dueDate,
   ...variables
 }: {
   email: string;
   link: string;
+  mediaType: string;
+  state: string;
+  BRTtypes?: string;
+  period: string;
+  quantity: number;
+  unitPrice: number;
+  tax: string;
+  dueDate: string;
   [key: string]: any;
 }): Promise<void> {
   const options: EmailOptions = {
@@ -119,7 +135,17 @@ async function invoiceNotification({
     subject: "Your Invoice is ready, pay now!",
     template: "new-invoice",
     link,
-    variables,
+    variables: {
+      ...variables,
+      mediaType,
+      state,
+      BRTtypes,
+      period,
+      quantity,
+      unitPrice,
+      tax,
+      dueDate,
+    },
   };
 
   await sendMail(options);
@@ -127,16 +153,30 @@ async function invoiceNotification({
 
 async function successInvoiceNotification({
   email,
+  period,
+  quantity,
+  unitPrice,
+  tax,
   ...variables
 }: {
   email: string;
+  period: string;
+  quantity: number;
+  unitPrice: number;
+  tax: string;
   [key: string]: any;
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice payment is successful",
     template: "success-invoice",
-    variables,
+    variables: {
+      ...variables,
+      period,
+      quantity,
+      unitPrice,
+      tax,
+    },
   };
 
   await sendMail(options);

@@ -94,7 +94,18 @@ class InvoiceController {
     }
 
     // Send invoice notification with authorization URL
-    await invoiceNotification({ email: customerMail, link: response });
+    await invoiceNotification({
+      email: customerMail,
+      link: response,
+      mediaType,
+      state,
+      BRTtypes,
+      period,
+      quantity,
+      unitPrice,
+      tax,
+      dueDate,
+    });
 
     res.created({
       invoice: savedOrder,

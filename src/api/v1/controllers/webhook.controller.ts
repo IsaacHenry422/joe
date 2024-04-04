@@ -5,6 +5,7 @@ dotenv.config();
 import Order from "../../../db/models/order.model";
 import Transaction from "../../../db/models/transaction.model";
 import Invoice from "../../../db/models/invoice.model";
+import { successInvoiceNotification } from "../../../services/email.service";
 
 const secret = process.env.PAYSTACK_SECRET;
 
@@ -77,6 +78,15 @@ class WebhookController {
         status: "Success",
         paymentMethod: "Paystack",
         paymentComment: `Using - (${data.authorization.brand})${data.authorization.channel} ****${data.authorization.last4}`,
+      });
+
+      // Send invoice notification with authorization URL
+      await successInvoiceNotification({
+        email: savedOrder.email,
+        period: savedOrder.period,
+        quantity: savedOrder.quantity,
+        unitPrice: savedOrder.unitPrice,
+        tax: savedOrder.tax,
       });
 
       // Save the transaction record to the database
