@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import Order, { IOrder } from "../../../db/models/order.model";
 // import User from "../../../db/models/user.model";
-
+import notifications from "./notification.controller";
 // import MediaApplication from "../../../db/models/mediaApplication.model";
 import PaystackService from "../../../services/payment.service";
 import {
@@ -108,7 +108,14 @@ class OrderController {
         "INVALID_REQUEST_PARAMETERS"
       );
     }
-
+    const notificationPayload = {
+      userId: req.loggedInAccount._id,
+      title: "Order Status Updated",
+      content: `Order:${savedOrder.orderCustomId}, created successfully`,
+      activityType: "Order",
+      orderId:savedOrder._id,
+    };
+    await notifications.createNotification(notificationPayload);
     return res.ok({
       order: savedOrder,
       message:
