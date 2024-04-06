@@ -2,7 +2,7 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface ITransaction extends Document {
   userId?: mongoose.Types.ObjectId;
-  adminId?: mongoose.Types.ObjectId;
+  adminCustomId?: string;
   orderId?: mongoose.Types.ObjectId;
   invoiceId: mongoose.Types.ObjectId;
   transactionCustomId: string;
@@ -20,11 +20,7 @@ const transactionSchema = new Schema<ITransaction>(
       ref: "User",
       //required: true,
     },
-    adminId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
-      //required: true,
-    },
+    adminCustomId: { type: String },
     //transaction can either be order or invoice
     orderId: {
       type: mongoose.Schema.Types.ObjectId,
