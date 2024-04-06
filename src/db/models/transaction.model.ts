@@ -18,12 +18,12 @@ const transactionSchema = new Schema<ITransaction>(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      //required: true,
     },
     adminId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",
-      required: true,
+      //required: true,
     },
     //transaction can either be order or invoice
     orderId: {

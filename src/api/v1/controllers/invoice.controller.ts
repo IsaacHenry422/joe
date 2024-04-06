@@ -16,6 +16,7 @@ import PaystackService from "../../../services/payment.service";
 
 import { invoiceNotification } from "../../../services/email.service";
 import * as validators from "../validators/invoice.validator";
+import Admin from "../../../db/models/admin.model";
 
 type QueryParams = {
   startDate?: Date;
@@ -28,9 +29,20 @@ class InvoiceController {
   async createInvoice(req: Request, res: Response) {
     const adminId = req.loggedInAccount._id;
 
-    // Create the invoice
+    console.log(adminId);
+
+    // Fetch adminCustomId from Admin model using adminId
+    const adminData = await Admin.findById(adminId);
+    if (!adminData) {
+      throw new ResourceNotFound("Admin not found", "RESOURCE_NOT_FOUND");
+    }
+    const { adminCustomId } = adminData;
+
+    // Validate request body using a validator function
     const { error, data } = validators.createInvoiceValidator(req.body);
-    if (error) throw new BadRequest(error.message, error.code);
+    if (error) {
+      throw new BadRequest(error.message, error.code);
+    }
 
     const {
       customerName,
@@ -52,7 +64,7 @@ class InvoiceController {
 
     // Create the invoice
     const invoice = new Invoice({
-      adminId,
+      adminCustomId,
       customerName,
       customerMail,
       phoneNumber,
@@ -68,15 +80,15 @@ class InvoiceController {
       invoiceNote,
     });
 
-    // Save the order
-    const savedOrder = await invoice.save();
+    // Save the invoice
+    const savedInvoice = await invoice.save();
 
     // Prepare payload for payment service
     const email = customerMail;
     const amount = calculateTotal;
     const metadata = {
       paymentType: "Invoice",
-      savedOrder,
+      savedInvoice,
     };
 
     // Call PaystackService to initiate payment
@@ -108,7 +120,7 @@ class InvoiceController {
     });
 
     res.created({
-      invoice: savedOrder,
+      invoice: savedInvoice,
       authorizationurl: response,
       messageLink: "Invoice payment link created.",
       messageInvoice:
@@ -132,7 +144,7 @@ class InvoiceController {
         "RESOURCE_NOT_FOUND"
       );
     }
-    res.ok(updatedInvoice);
+    res.ok({ updatedInvoice, messageInvoice: "successfully updated" });
   }
 
   // Get all invoices

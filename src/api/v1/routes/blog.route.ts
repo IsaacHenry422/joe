@@ -11,27 +11,27 @@ blogRouter.get("/", controller.getBlogs);
 // Get a specific blog by ID route
 blogRouter.get(
   "/:blogId",
-  auth({ accountType: ["user"] }),
+  auth({ accountType: ["user", "admin"] }),
   controller.getBlogById
 );
 
 // Create a new blog route
 blogRouter.post(
   "/create",
-  auth({ accountType: ["user"] }),
+  auth({ accountType: ["admin"] }),
   controller.createBlog
 );
 
 blogRouter.patch(
   "/upload/image/:blogId",
   upload.single("blogImage"),
-  auth({ accountType: ["user"] }),
+  auth({ accountType: ["admin"] }),
   controller.addBlogImage
 );
 
 blogRouter.patch(
   "/details/:blogId",
-  auth({ accountType: ["user"] }),
+  auth({ accountType: ["admin"] }),
   controller.updateBlog
 );
 

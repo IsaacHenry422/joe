@@ -24,7 +24,7 @@ class WebhookController {
     if (req.body.event !== "charge.success") return res.sendStatus(200);
 
     const { data } = req.body;
-    const { savedOrder, paymentType } = data.metadata;
+    const { savedOrder, paymentType, savedInvoice } = data.metadata;
 
     // Ignore transaction if it has already been logged
     const transaction = await Transaction.findOne({
@@ -61,7 +61,7 @@ class WebhookController {
       //perform Invoice here
       // Update the payment status of the corresponding order
       await Invoice.updateOne(
-        { _id: savedOrder._id },
+        { _id: savedInvoice._id }, // Update Invoice, not Order
         {
           paymentStatus: "Success",
           orderStatus: "Awaiting Confirmation",
@@ -70,8 +70,8 @@ class WebhookController {
 
       // Create a new transaction record
       const newInvoiceTransaction = new Transaction({
-        adminId: savedOrder.adminId,
-        invoiceId: savedOrder._id,
+        adminId: savedInvoice.adminId,
+        invoiceId: savedInvoice._id,
         transactionCustomId: data.reference,
         transactionType: paymentType,
         amount: data.amount / 100,
@@ -82,11 +82,11 @@ class WebhookController {
 
       // Send invoice successful notificatioj
       await successInvoiceNotification({
-        email: savedOrder.email,
-        period: savedOrder.period,
-        quantity: savedOrder.quantity,
-        unitPrice: savedOrder.unitPrice,
-        tax: savedOrder.tax,
+        email: savedInvoice.email,
+        period: savedInvoice.period,
+        quantity: savedInvoice.quantity,
+        unitPrice: savedInvoice.unitPrice,
+        tax: savedInvoice.tax,
       });
 
       // Save the transaction record to the database
