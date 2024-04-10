@@ -4,6 +4,8 @@ import crypto from "crypto";
 dotenv.config();
 import Order from "../../../db/models/order.model";
 import Transaction from "../../../db/models/transaction.model";
+import Invoice from "../../../db/models/invoice.model";
+import { successInvoiceNotification } from "../../../services/email.service";
 
 const secret = process.env.PAYSTACK_SECRET;
 
@@ -22,7 +24,7 @@ class WebhookController {
     if (req.body.event !== "charge.success") return res.sendStatus(200);
 
     const { data } = req.body;
-    const { savedOrder, paymentType } = data.metadata;
+    const { savedOrder, paymentType, savedInvoice } = data.metadata;
 
     // Ignore transaction if it has already been logged
     const transaction = await Transaction.findOne({
@@ -57,6 +59,38 @@ class WebhookController {
       await transaction.save();
     } else if (paymentType === "Invoice") {
       //perform Invoice here
+      // Update the payment status of the corresponding order
+      await Invoice.updateOne(
+        { _id: savedInvoice._id }, // Update Invoice, not Order
+        {
+          paymentStatus: "Success",
+          orderStatus: "Awaiting Confirmation",
+        }
+      );
+
+      // Create a new transaction record
+      const newInvoiceTransaction = new Transaction({
+        adminCustomId: savedInvoice.adminCustomId,
+        invoiceId: savedInvoice._id,
+        transactionCustomId: data.reference,
+        transactionType: paymentType,
+        amount: data.amount / 100,
+        status: "Success",
+        paymentMethod: "Paystack",
+        paymentComment: `Using - (${data.authorization.brand})${data.authorization.channel} ****${data.authorization.last4}`,
+      });
+
+      // Send invoice successful notificatioj
+      await successInvoiceNotification({
+        email: savedInvoice.email,
+        period: savedInvoice.period,
+        quantity: savedInvoice.quantity,
+        unitPrice: savedInvoice.unitPrice,
+        tax: savedInvoice.tax,
+      });
+
+      // Save the transaction record to the database
+      await newInvoiceTransaction.save();
     } else {
       res.sendStatus(200);
     }
