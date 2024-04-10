@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { mailgunClient } from "../../src/config/mailgun.config";
+import { mailgunClient } from "../config/mailgun.config";
 
 import moment from "moment";
 import dotenv from "dotenv";

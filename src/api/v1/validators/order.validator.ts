@@ -26,6 +26,7 @@ export const createOrderValidator = (payload: any) => {
           required_error: "orderType is required.",
         }),
         mediaId: z.string().optional(),
+        // printId: z.string().optional(),
         quantity: z.number().optional(),
         route: z.string().optional(),
         price: z.number({ required_error: "price is required." }),
