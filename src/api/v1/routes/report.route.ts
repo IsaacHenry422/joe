@@ -16,10 +16,4 @@ orderRouter.get(
   reportController.transactionReport
 );
 
-orderRouter.get(
-  "/orders/conversion",
-  auth({ accountType: ["admin"] }),
-  reportController.orderConversion
-);
-
 export default orderRouter;

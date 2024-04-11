@@ -53,7 +53,7 @@ class ReportController {
 
     const totalOrders = await Order.countDocuments(query);
 
-    res.ok(totalOrders, { page, limit, startDate, endDate });
+    res.ok({ totalOrders }, { page, limit, startDate, endDate });
   }
 
   async transactionReport(req: Request, res: Response) {
@@ -83,37 +83,19 @@ class ReportController {
     if (paymentMethod) {
       query.paymentMethod = paymentMethod;
     }
+    const transactions = await Transaction.find(query);
+
     const totalTransactions = await Transaction.countDocuments(query);
 
-    res.ok({ totalTransactions }, { page, limit, startDate, endDate });
-  }
+    let totalTransactionsAmount = 0;
+    transactions.map((transaction) => {
+      totalTransactionsAmount += transaction.amount;
+    });
 
-  async orderConversion(req: Request, res: Response) {
-    const queryParams: QueryParams = req.query;
-    const startDate = getStartDate(queryParams.startDate);
-    const endDate = getEndDate(queryParams.endDate);
-    const limit = getLimit(queryParams.limit);
-    const page = getPage(queryParams.page);
-    const orderStatus = queryParams.orderStatus;
-    const paymentStatus = queryParams.paymentStatus;
-
-    // Construct the query object based on the provided parameters
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = {
-      createdAt: { $gte: startDate, $lte: endDate },
-    };
-
-    if (orderStatus) {
-      query.orderStatus = orderStatus;
-    }
-
-    if (paymentStatus) {
-      query.paymentStatus = paymentStatus;
-    }
-
-    const totalOrders = await Order.countDocuments(query);
-
-    res.ok({ totalOrders }, { page, limit, startDate, endDate });
+    res.ok(
+      { totalTransactionsAmount, totalTransactions },
+      { page, limit, startDate, endDate }
+    );
   }
 }
 
