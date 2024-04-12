@@ -3,8 +3,8 @@ import mongoose, { Document, Model } from "mongoose";
 // Define the interface for the favorite model
 export interface IFavorite extends Document {
   userId: mongoose.Types.ObjectId;
-  mediaId?: number;
-  printId?: string;
+  mediaId?: mongoose.Types.ObjectId;
+  printId?: mongoose.Types.ObjectId;
 }
 
 // Define the schema for the favorite model
