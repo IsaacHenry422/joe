@@ -6,42 +6,50 @@ export interface IPrintMediaApplication extends Document {
   name: string;
   description: string;
   price: string;
-  picture: string;
+  pictures: Array<object>;
   features: Array<string>;
-  prototype: mongoose.Schema.Types.ObjectId;
+  prototypeId: mongoose.Schema.Types.ObjectId;
   createdByAdmin: string;
+  finishingDetails: object;
 }
 
 // Define the Media Application schema
-const printMediaSchema =
-  new mongoose.Schema<IPrintMediaApplication>({
-    name: {
-      type: String,
-      required: true,
+const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: String,
+    required: true,
+  },
+  pictures: [
+    {
+      url: String,
+      id: String,
+      _id: false,
     },
-    description: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: String,
-      required: true,
-    },
-    picture: {
-      type: String,
-      required: true,
-    },
-    prototype: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Prototype"
-    },
-    createdByAdmin: {
-      type: String,
-      required: true,
-    },
-    features:[String],
-  });
+  ],
+  prototypeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  createdByAdmin: {
+    type: String,
+    required: true,
+  },
+  finishingDetails: {
+    eyelets: Boolean,
+    pocketTB: Boolean,
+    pocketLR: Boolean,
+    none: Boolean,
+  },
+  features: [String],
+});
 
 // Define compound text index on all fields
 printMediaSchema.index({ "$**": "text" });
