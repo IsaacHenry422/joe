@@ -10,7 +10,7 @@ export const createPrintPrototype = (payload: any) => {
     }),
     description: z.string({
       required_error: "Product Description is required.",
-    })
+    }),
   });
   return validateRequestBody(schema, payload);
 };
@@ -33,13 +33,19 @@ export const createPrintMediaApplicationValidator = (payload: any) => {
     description: z.string({
       required_error: "Product Description is required.",
     }),
-    prototype: z.string({
+    prototypeId: z.string({
       required_error: "Product prototype is required.",
     }),
     price: z.string({
       required_error: "Product price is required.",
     }),
     features: z.string().array().optional(),
+    finishingDetails: z.object({
+      eyelets: z.boolean().optional(),
+      pocketTB: z.boolean().optional(),
+      pocketLR: z.boolean().optional(),
+      none: z.boolean().optional(),
+    }),
   });
   return validateRequestBody(schema, payload);
 };
@@ -49,9 +55,15 @@ export const updatePrintMediaApplicationValidator = (payload: any) => {
   const schema = z.object({
     name: z.string().optional(),
     description: z.string().optional(),
-    prototype: z.string().optional(),
+    prototypeId: z.string().optional(),
     price: z.string().optional(),
     features: z.string().array().optional(),
+    finishingDetails: z.object({
+      eyelets: z.boolean().optional(),
+      pocketTB: z.boolean().optional(),
+      pocketLR: z.boolean().optional(),
+      none: z.boolean().optional(),
+    }).optional(),
   });
 
   return validateRequestBody(schema, payload);
