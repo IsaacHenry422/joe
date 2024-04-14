@@ -215,6 +215,8 @@ class applicationMediaController {
         });
       })
     );
+    console.log(picArray);
+    
     await PrintMedia.findOneAndUpdate(
       { _id: productId },
       { pictures: picArray },
