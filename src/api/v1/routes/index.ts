@@ -13,6 +13,7 @@ import blogRouter from "./blog.route";
 import transactionRouter from "./transaction.route";
 import reportRouter from "./report.route";
 import notificationRouter from "./notification.route";
+import favouriteRouter from "./favourites.route";
 
 const router = express.Router();
 
@@ -29,6 +30,7 @@ router.use("/webhooks", webhookRouter);
 router.use("/transactions", transactionRouter);
 router.use("/reports", reportRouter);
 router.use("/notifications", notificationRouter);
+router.use("/favourites", favouriteRouter);
 
 router.use("/", sharedRouter);
 

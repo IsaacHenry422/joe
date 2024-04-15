@@ -7,38 +7,50 @@ import { ResourceNotFound, BadRequest } from "../../../errors/httpErrors";
 class FavoriteController {
   async createFavorite(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
-    const { mediaId, printId } = req.params;
+    const { id } = req.params;
+    const { type } = req.body;
 
-    // Check if the media or print exists
-    const mediaExists = await billboardMediaApplication.findById(mediaId);
-    const printExists = await PrintMedia.findById(printId);
+    if (!id) {
+      throw new ResourceNotFound("od is missing.", "RESOURCE_NOT_FOUND");
+    }
 
-    if ((!mediaExists && !printExists) || (mediaExists && printExists)) {
+    let favorite;
+
+    if (!type) {
       throw new BadRequest(
-        "Please provide either mediaId or printId, not both.",
+        "Please provide the type of favorite (media or print).",
         "MISSING_REQUIRED_FIELD"
       );
     }
 
-    // Create the favorite based on the provided input
-    let favorite;
-    if (mediaExists) {
+    if (type === "media") {
+      const mediaExists = await billboardMediaApplication.findById(id);
+      if (!mediaExists) {
+        throw new ResourceNotFound("Media not found", "RESOURCE_NOT_FOUND");
+      }
       favorite = new Favorite({
         userId,
         mediaId: mediaExists._id,
       });
-    } else if (printExists) {
+    } else if (type === "print") {
+      const printExists = await PrintMedia.findById(id);
+      if (!printExists) {
+        throw new ResourceNotFound("Print not found", "RESOURCE_NOT_FOUND");
+      }
       favorite = new Favorite({
         userId,
         printId: printExists._id,
       });
+    } else {
+      throw new BadRequest(
+        "Invalid favorite type. Please provide either 'media' or 'print'.",
+        "INVALID_REQUEST_PARAMETERS"
+      );
     }
 
     // Save the favorite if it's valid
-    if (favorite) {
-      const savedFavorite = await favorite.save();
-      res.created({ favorite: savedFavorite });
-    }
+    const savedFavorite = await favorite.save();
+    res.created({ favorite: savedFavorite });
   }
 
   async getFavoritesByUserId(req: Request, res: Response) {

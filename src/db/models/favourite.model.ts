@@ -18,12 +18,10 @@ const FavoriteSchema = new mongoose.Schema<IFavorite>(
     mediaId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "billboardMediaApplication",
-      required: true,
     },
     printId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "printMediaApplication", // Reference to the user schema
-      required: true,
+      ref: "printMediaApplication",
     },
   },
   { timestamps: true }
