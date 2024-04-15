@@ -6,11 +6,13 @@ export interface IPrintMediaApplication extends Document {
   name: string;
   description: string;
   price: string;
-  picture: string;
+  pictures: Array<object>;
   features: Array<string>;
   favoriteCount: number;
   prototype: mongoose.Schema.Types.ObjectId;
+  prototypeId: mongoose.Schema.Types.ObjectId;
   createdByAdmin: string;
+  finishingDetails: object;
 }
 
 // Define the Media Application schema
@@ -27,22 +29,30 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
     type: String,
     required: true,
   },
-  picture: {
-    type: String,
-    required: true,
-  },
   favoriteCount: {
     type: Number,
     default: 0,
   },
-  prototype: {
+  pictures: [
+    {
+      url: String,
+      id: String,
+      _id: false,
+    },
+  ],
+  prototypeId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Prototype",
   },
   createdByAdmin: {
     type: String,
     required: true,
+  },
+  finishingDetails: {
+    eyelets: Boolean,
+    pocketTB: Boolean,
+    pocketLR: Boolean,
+    none: Boolean,
   },
   features: [String],
 });
