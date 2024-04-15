@@ -66,4 +66,11 @@ mediaApplicationRouter.patch(
   applicationMediaController.updateFavoriteCount
 );
 
+// all media applications and sort them by the highest favorite count
+mediaApplicationRouter.get(
+  "/highest-fovourites",
+  auth({ accountType: ["admin"] }),
+  applicationMediaController.getMediaByHighestFavorites
+);
+
 export default mediaApplicationRouter;

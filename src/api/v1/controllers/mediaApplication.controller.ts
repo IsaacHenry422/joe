@@ -470,6 +470,29 @@ class applicationMediaController {
       data: product,
     });
   }
+
+  async getMediaByHighestFavorites(req: Request, res: Response) {
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
+
+    // Query all media applications and sort them by the highest favorite count
+    const mediaByFavorites = await billboardMediaApplication
+      .find({
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .sort({ favoriteCount: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    // Send the response with the sorted media applications
+    res.ok({
+      message: "Print Media applications sorted by highest favorites count",
+      data: mediaByFavorites,
+    });
+  }
 }
 
 export default new applicationMediaController();

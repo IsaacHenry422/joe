@@ -123,9 +123,10 @@ class applicationMediaController {
     );
     if (error) throw new BadRequest(error.message, error.code);
 
-    const {prototypeId} = data;
-    const prototypeExist = await printPrototype.findOne({_id:prototypeId});
-    if(!prototypeExist) throw new ResourceNotFound("prototype not found","RESOURCE_NOT_FOUND");
+    const { prototypeId } = data;
+    const prototypeExist = await printPrototype.findOne({ _id: prototypeId });
+    if (!prototypeExist)
+      throw new ResourceNotFound("prototype not found", "RESOURCE_NOT_FOUND");
 
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
@@ -216,7 +217,7 @@ class applicationMediaController {
       })
     );
     console.log(picArray);
-    
+
     await PrintMedia.findOneAndUpdate(
       { _id: productId },
       { pictures: picArray },
@@ -379,6 +380,55 @@ class applicationMediaController {
 
     // Send the search results in the response
     res.ok({ searchResults });
+  }
+
+  async updatePrintMediaFavoriteCount(req: Request, res: Response) {
+    const { productId } = req.params; // Get the product ID from request params
+
+    // Find the media application by ID
+    const print = await PrintMedia.findById(productId);
+
+    // Check if the product exists
+    if (!print) {
+      throw new ResourceNotFound(
+        `Product with ID ${productId} not found`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    // Update the favoriteCount field by increasing it by 1
+    print.favoriteCount += 1;
+
+    // Save the updated product
+    await print.save();
+
+    // Send a success response with the updated product
+    res.ok({
+      message: "Favorite count updated successfully",
+      data: print,
+    });
+  }
+
+  async getPrintMediaByHighestFavorites(req: Request, res: Response) {
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
+
+    // Query all print media applications and sort them by the highest favorite count
+    const mediaByFavorites = await PrintMedia.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .sort({ favoriteCount: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    // Send the response with the sorted media applications
+    res.ok({
+      message: "Media applications sorted by highest favorites count",
+      data: mediaByFavorites,
+    });
   }
 }
 
