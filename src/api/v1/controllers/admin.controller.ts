@@ -235,7 +235,7 @@ class AdminController {
     );
     await fsPromises.unlink(uploadedFile.path);
 
-    const key = `${awsBaseUrl}/${profilePictureKey}`;
+    const key = `awsBaseUrl/${profilePictureKey}`;
     const admin = await Admin.findByIdAndUpdate(
       adminId,
       { profilePicture: key, updatedAt: new Date() },
