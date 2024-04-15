@@ -25,6 +25,7 @@ export const adminFields = [
   "firstname",
   "lastname",
   "email",
+  "phoneNumber",
   "role",
   "adminCustomId",
   "profilePicture",
