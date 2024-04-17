@@ -2,13 +2,17 @@ import { Request, Response } from "express";
 import Favorite from "../../../db/models/favourite.model";
 import billboardMediaApplication from "../../../db/models/mediaApplication.model";
 import PrintMedia from "../../../db/models/printMedia.model";
+import * as validators from "../validators/favourites.validator";
 import { ResourceNotFound, BadRequest } from "../../../errors/httpErrors";
 
 class FavoriteController {
   async createFavorite(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
-    const { id } = req.params;
-    const { type } = req.body;
+
+    const { error, data } = validators.createFavouritesValidator(req.query);
+    if (error) throw new BadRequest(error.message, error.code);
+
+    const { type, id } = data;
 
     if (!id) {
       throw new ResourceNotFound("od is missing.", "RESOURCE_NOT_FOUND");
@@ -50,18 +54,31 @@ class FavoriteController {
 
     // Save the favorite if it's valid
     const savedFavorite = await favorite.save();
-    res.created({ favorite: savedFavorite });
+    res.created({
+      favorite: savedFavorite,
+      message: "Favourite created successfully.",
+    });
   }
 
   async getFavoritesByUserId(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
 
-    // Get all favorites for the user and populate mediaId and printId with their respective models
+    // Get all favorites for the user and populate mediaId or printId with their respective models
     const favorites = await Favorite.find({ userId })
       .populate("mediaId")
       .populate("printId");
 
-    res.ok(favorites);
+    if (!favorites) {
+      throw new ResourceNotFound(
+        `user with ${userId} does not have any favourite`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok({
+      favorites,
+      message: `All favourites associated with user ${userId}`,
+    });
   }
 
   async deleteFavorite(req: Request, res: Response) {

@@ -38,7 +38,7 @@ class BlogController {
 
     const newBlog = await blog.save();
 
-    res.created(newBlog);
+    res.created({ blog: newBlog, message: "blog created successfully." });
   }
 
   async addBlogImage(req: Request, res: Response) {

@@ -20,7 +20,7 @@ favouriteRouter.get(
 
 // Create a new favourite route
 favouriteRouter.post(
-  "/create/:id",
+  "/create",
   auth({ accountType: ["admin", "user"] }),
   controller.createFavorite
 );
