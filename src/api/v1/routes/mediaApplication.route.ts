@@ -43,7 +43,8 @@ mediaApplicationRouter.delete(
 
 // Get general media applications
 mediaApplicationRouter.get(
-  "/", applicationMediaController.getMediaApplicationsLandingPage
+  "/",
+  applicationMediaController.getMediaApplicationsLandingPage
 );
 
 // search mediaApplication by keyword
@@ -54,7 +55,22 @@ mediaApplicationRouter.get(
 
 // Get a media application
 mediaApplicationRouter.get(
-  "/one/:productId", applicationMediaController.getMediaApplication
+  "/one/:productId",
+  applicationMediaController.getMediaApplication
+);
+
+// Update the favoriteCount field for a specific media application
+mediaApplicationRouter.patch(
+  "/favourite/:productId",
+  auth({ accountType: ["user"] }),
+  applicationMediaController.updateFavoriteCount
+);
+
+// all media applications and sort them by the highest favorite count
+mediaApplicationRouter.get(
+  "/highest-fovourites",
+  auth({ accountType: ["admin"] }),
+  applicationMediaController.getMediaByHighestFavorites
 );
 
 export default mediaApplicationRouter;
