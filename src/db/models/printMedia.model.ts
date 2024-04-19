@@ -5,7 +5,7 @@ export interface IPrintMediaApplication extends Document {
   // define others here
   name: string;
   description: string;
-  price: number;
+  price: string;
   pictures: Array<object>;
   features: Array<string>;
   prototypeId: mongoose.Schema.Types.ObjectId;
@@ -24,7 +24,7 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
     required: true,
   },
   price: {
-    type: Number,
+    type: String,
     required: true,
   },
   pictures: [

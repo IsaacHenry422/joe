@@ -14,7 +14,7 @@ export interface IBillboardMediaApplication extends Document {
   state: string;
   cityLga: string;
   landmark: string;
-  price: number;
+  price: string;
   googleStreetlink: string;
   pictures: Array<object>;
   dimension: string;
@@ -53,7 +53,7 @@ const billboardMediaApplicationSchema =
       required: true,
     },
     price: {
-      type: Number,
+      type: String,
       required: true,
     },
     cityLga: {
