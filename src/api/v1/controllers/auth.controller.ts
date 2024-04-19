@@ -483,7 +483,7 @@ class AuthController {
     if (error) throw new BadRequest(error.message, error.code);
 
     const { refreshToken, accountType } = data;
-    console.log(data);
+    // console.log(data);
     let payload, accessToken;
     interface result {
       userId?: string;
