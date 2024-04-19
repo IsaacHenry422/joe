@@ -21,6 +21,7 @@ export interface IBillboardMediaApplication extends Document {
   nextAvailable: Date;
   createdByAdmin: string;
   amountAvailable: string;
+  favoriteCount: number;
 
   deletedAt?: Date | null;
   createdAt: Date;
@@ -79,6 +80,10 @@ const billboardMediaApplicationSchema =
         _id: false,
       },
     ],
+    favoriteCount: {
+      type: Number,
+      default: 0,
+    },
 
     // brt media type fields
     brtType: String,

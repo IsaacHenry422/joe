@@ -443,6 +443,56 @@ class applicationMediaController {
   //         NX: true,
   //       }
   //     );
+  // Update the favoriteCount field for a specific media application
+  async updateFavoriteCount(req: Request, res: Response) {
+    const { productId } = req.params; // Get the product ID from request params
+
+    // Find the media application by ID
+    const product = await billboardMediaApplication.findById(productId);
+
+    // Check if the product exists
+    if (!product) {
+      throw new ResourceNotFound(
+        `Product with ID ${productId} not found`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    // Update the favoriteCount field by increasing it by 1
+    product.favoriteCount += 1;
+
+    // Save the updated product
+    await product.save();
+
+    // Send a success response with the updated product
+    res.ok({
+      message: "Favorite count updated successfully",
+      data: product,
+    });
+  }
+
+  async getMediaByHighestFavorites(req: Request, res: Response) {
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
+
+    // Query all media applications and sort them by the highest favorite count
+    const mediaByFavorites = await billboardMediaApplication
+      .find({
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .sort({ favoriteCount: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    // Send the response with the sorted media applications
+    res.ok({
+      message: "Print Media applications sorted by highest favorites count",
+      data: mediaByFavorites,
+    });
+  }
 }
 
 export default new applicationMediaController();

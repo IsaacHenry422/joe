@@ -77,9 +77,7 @@ mediaApplicationRouter.delete(
 );
 
 // Get print media landing page
-mediaApplicationRouter.get(
-  "/", printMediaController.getPrintMediaLandingPage
-);
+mediaApplicationRouter.get("/", printMediaController.getPrintMediaLandingPage);
 
 // search print media by keyword
 mediaApplicationRouter.get(
@@ -87,9 +85,23 @@ mediaApplicationRouter.get(
   printMediaController.searchPrintMediaByKeyword
 );
 
-// Get a print media 
+// Get a print media
 mediaApplicationRouter.get(
-  "/one/:productId", printMediaController.getPrintMedia
+  "/one/:productId",
+  printMediaController.getPrintMedia
+);
+
+mediaApplicationRouter.patch(
+  "/favourite/:productId",
+  auth({ accountType: ["user"] }),
+  printMediaController.updatePrintMediaFavoriteCount
+);
+
+// all media applications and sort them by the highest favorite count
+mediaApplicationRouter.get(
+  "/highest-fovourites",
+  auth({ accountType: ["admin"] }),
+  printMediaController.getPrintMediaByHighestFavorites
 );
 
 export default mediaApplicationRouter;
