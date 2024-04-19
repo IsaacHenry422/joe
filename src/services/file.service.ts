@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import {
   PutObjectCommand,
   DeleteObjectCommand,
-  ObjectCannedACL,
+  // ObjectCannedACL,
 } from "@aws-sdk/client-s3";
 
 import fs from "fs/promises";
@@ -15,10 +15,14 @@ async function uploadPicture(
   folderName: string,
   fileExtension: string
 ): Promise<string> {
+  // Determine Content-Type based on file extension
+  const contentType = fileExtension === ".jpg" ? "image/jpeg" : "image/png";
+
   const bucketParams = {
     Bucket: s3Bucket,
     Key: folderName + "/" + randomUUID() + fileExtension,
-    ACL: "public-read" as ObjectCannedACL,
+    // Set the Content-Type metadata
+    ContentType: contentType,
     Body: await fs.readFile(file),
   };
 
@@ -56,7 +60,7 @@ async function deleteImage(key: string): Promise<void> {
 // Define the function to delete images from S3 (replace with your implementation)
 async function deleteImagesFromStorage(imageUrls: string[]) {
   for (const imageUrl of imageUrls) {
-    // Parse the URL to get the pathname, which represents the object key 
+    // Parse the URL to get the pathname, which represents the object key
     const parsedUrl = url.parse(imageUrl);
     const objectKey = parsedUrl.pathname?.substring(1); // Remove the leading slash
     if (objectKey) {

@@ -17,17 +17,27 @@ export interface IOrder extends Document {
   orderItem: {
     orderSubRef: string;
     orderType: "Media" | "Print";
-    mediaId?: mongoose.Types.ObjectId;
-    // printId?: mongoose.Types.ObjectId;
-    quantity?: number;
-    route?: string;
+    quantity: number;
     price: number;
     subtotal: number;
-    duration: {
-      startDate: Date;
-      endDate: Date;
-      totalDuration: number;
+
+    mediaId?: mongoose.Types.ObjectId;
+    duration?: {
+      startDate?: Date;
+      endDate?: Date;
+      totalDuration?: number;
     };
+    route?: string;
+
+    printId?: mongoose.Types.ObjectId;
+    deliveryMethod?: "Delivery" | "Home delivery" | "Pickup";
+    deliveryAddress?: string;
+    height?: string;
+    width?: string;
+    finishingDetails: object;
+    additionalPrintDesc?: string;
+    designFile?: string;
+
     // media property to the order interface
     media?: {
       _id: mongoose.Types.ObjectId;
@@ -130,19 +140,9 @@ const OrderSchema = new mongoose.Schema<IOrder>(
           required: true,
           enum: ["Media", "Print"],
         },
-        mediaId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "billboardMediaApplication",
-        },
-        // printId: {
-        //   type: mongoose.Schema.Types.ObjectId,
-        //   ref: "printMediaApplication",
-        // },
         quantity: {
           type: Number,
-        },
-        route: {
-          type: String,
+          required: true,
         },
         price: {
           type: Number,
@@ -152,19 +152,56 @@ const OrderSchema = new mongoose.Schema<IOrder>(
           type: Number,
           required: true,
         },
+
+        //media
+        mediaId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "billboardMediaApplication",
+        },
         duration: {
           startDate: {
             type: Date,
-            required: true,
           },
           endDate: {
             type: Date,
-            required: true,
           },
           totalDuration: {
             type: Number,
-            required: true,
           },
+        },
+        route: {
+          type: String,
+        },
+
+        //print
+        printId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "printMediaApplication",
+        },
+        deliveryMethod: {
+          type: String,
+          enum: ["Delivery", "Home delivery", "Pickup"],
+        },
+        deliveryAddress: {
+          type: String,
+        },
+        height: {
+          type: String,
+        },
+        width: {
+          type: String,
+        },
+        finishingDetails: {
+          eyelets: Boolean,
+          pocketTB: Boolean,
+          pocketLR: Boolean,
+          none: Boolean,
+        },
+        additionalPrintDesc: {
+          type: String,
+        },
+        designFile: {
+          type: String,
         },
       },
     ],

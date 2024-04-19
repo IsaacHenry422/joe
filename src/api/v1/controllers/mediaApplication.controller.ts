@@ -168,7 +168,7 @@ class applicationMediaController {
     if (!uploadedImages || uploadedImages.length === 0) {
       throw new BadRequest("No images provided.", "MISSING_REQUIRED_FIELD");
     }
-    const product = await billboardMediaApplication.findOne({ _id:productId });
+    const product = await billboardMediaApplication.findOne({ _id: productId });
     if (!product)
       throw new ResourceNotFound(
         `Product with custom id ${productId} does not exist`,
@@ -193,7 +193,7 @@ class applicationMediaController {
       })
     );
     await billboardMediaApplication.findOneAndUpdate(
-      { _id:productId },
+      { _id: productId },
       { pictures: picArray },
       { new: true, runValidators: true }
     );
@@ -265,7 +265,7 @@ class applicationMediaController {
       amountAvailable,
     };
     const product = await billboardMediaApplication.findOneAndUpdate(
-      { _id:productId },
+      { _id: productId },
       updateFields,
       { new: true, runValidators: true }
     );
@@ -287,7 +287,7 @@ class applicationMediaController {
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
       );
-    const product = await billboardMediaApplication.findOne({ _id:productId });
+    const product = await billboardMediaApplication.findOne({ _id: productId });
     if (!product)
       throw new ResourceNotFound(
         `product with id:${productId} not found`,
@@ -303,7 +303,7 @@ class applicationMediaController {
     console.log(pictureUrls);
 
     await deleteImagesFromStorage(pictureUrls);
-    await billboardMediaApplication.findOneAndDelete({ _id:productId });
+    await billboardMediaApplication.findOneAndDelete({ _id: productId });
     res.noContent();
   }
 
@@ -314,7 +314,7 @@ class applicationMediaController {
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
       );
-    const product = await billboardMediaApplication.findOne({ _id:productId });
+    const product = await billboardMediaApplication.findOne({ _id: productId });
     if (!product)
       throw new ResourceNotFound(
         `product with id:${productId} not found`,
@@ -346,12 +346,10 @@ class applicationMediaController {
     const count = await billboardMediaApplication.countDocuments();
     if (!queryParams.limit) {
       randomSkip = Math.floor(Math.random() * toInteger(count));
-    }
-    else{
-      randomSkip = limit * (page-1);
+    } else {
+      randomSkip = limit * (page - 1);
     }
     console.log(randomSkip);
-    
 
     const randomProducts = await billboardMediaApplication
       .find(filter)

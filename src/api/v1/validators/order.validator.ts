@@ -25,19 +25,33 @@ export const createOrderValidator = (payload: any) => {
         orderType: z.enum(["Media", "Print"], {
           required_error: "orderType is required.",
         }),
-        mediaId: z.string().optional(),
-        // printId: z.string().optional(),
-        quantity: z.number().optional(),
-        route: z.string().optional(),
+        quantity: z.number({ required_error: "Quantity is required." }),
         price: z.number({ required_error: "price is required." }),
         subtotal: z.number({ required_error: "subtotal is required." }),
+
+        //media
+        mediaId: z.string().optional(),
         duration: z.object({
-          startDate: z.string({ required_error: "startDate is required." }),
-          endDate: z.string({ required_error: "endDate is required." }),
-          totalDuration: z.number({
-            required_error: "totalDuration is required.",
-          }),
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+          totalDuration: z.number().optional(),
         }),
+        route: z.string().optional(),
+
+        //print
+        printId: z.string().optional(),
+        deliveryMethod: z.enum(["Delivery", "Home delivery", "Pickup"]),
+        deliveryAddress: z.string().optional(),
+        height: z.string().optional(),
+        width: z.string().optional(),
+        finishingDetails: z.object({
+          eyelets: z.boolean().optional(),
+          pocketTB: z.boolean().optional(),
+          pocketLR: z.boolean().optional(),
+          none: z.boolean().optional(),
+        }),
+        additionalPrintDesc: z.string().optional(),
+        designFile: z.string().optional(),
       })
     ),
   });

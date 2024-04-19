@@ -5,7 +5,7 @@ dotenv.config();
 
 const s3Client = new S3({
   forcePathStyle: false,
-  endpoint: "https://nyc3.digitaloceanspaces.com",
+  // endpoint: "https://nyc3.digitaloceanspaces.com",
   region: process.env.AWS_LOCATIONCONSTRAINT!,
   credentials: {
     accessKeyId: process.env.SPACES_KEY!,

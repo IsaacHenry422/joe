@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
-import Order, { IOrder } from "../../../db/models/order.model";
+// import Order, { IOrder } from "../../../db/models/order.model";
+import Order from "../../../db/models/order.model";
+
 // import User from "../../../db/models/user.model";
 import notifications from "./notification.controller";
 // import MediaApplication from "../../../db/models/mediaApplication.model";
+// import PrintMedia from "../../../db/models/printMedia.model";
+
 import PaystackService from "../../../services/payment.service";
 import {
   getLimit,
@@ -29,6 +33,7 @@ type QueryParams = {
   paymentStatus?: string;
   paymentMethod?: string;
 };
+// const handleOrderValidation from "../utils/orderHelpers"
 
 class OrderController {
   //pay now
@@ -47,35 +52,58 @@ class OrderController {
     }
 
     // Calculate subtotal and generate orderSubRef
-    let subtotal = 0;
+    // let subtotal = 0;
     const uuid = uuidv4();
     const orderCustomId = uuid.replace(/-/g, "").substring(0, 10);
 
-    const orderArray: IOrder["orderItem"] = orderItem.map(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (order: any, index: number) => {
-        const orderSubRef = `${orderCustomId}-${index + 1000}`;
-        subtotal += order.subtotal;
-        return {
-          orderSubRef,
-          orderType: order.orderType,
-          mediaId: order.mediaId,
-          quantity: order.quantity,
-          route: order.route,
-          price: order.price,
-          subtotal: order.subtotal,
-          duration: order.duration,
-        };
-      }
-    );
+    // const orderArray: IOrder["orderItem"] = await Promise.all(
+    //   orderItem.map(
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     async (order: any, index: number) => {
+    //       const orderSubRef = `${orderCustomId}-${index + 1000}`;
+    //       subtotal += order.subtotal;
+
+    //       await handleOrderValidation(order);
+
+    //       return {
+    //         orderSubRef,
+    //         orderType: order.orderType,
+    //         quantity: order.quantity,
+    //         price: order.price,
+    //         subtotal: order.subtotal,
+
+    //         // Additional order details based on orderType
+    //         ...(order.orderType === "Media"
+    //           ? {
+    //             mediaId: order.mediaId,
+    //             duration: order.duration,
+    //             route: order.route,
+    //           }
+    //           : {}),
+    //         ...(order.orderType === "Print"
+    //           ? {
+    //             printId: order.printId,
+    //             deliveryMethod: order.deliveryMethod,
+    //             deliveryAddress: order.deliveryAddress,
+    //             height: order.height,
+    //             width: order.width,
+    //             finishingDetails: order.finishingDetails,
+    //             additionalPrintDesc: order.additionalPrintDesc,
+    //             designFile: order.designFile,
+    //           }
+    //           : {}),
+    //       };
+    //     }
+    //   )
+    // );
 
     // Check if subtotal matches subTotal
-    if (subtotal !== amount.subTotal) {
-      throw new BadRequest(
-        "Subtotal does not match the provided subTotal amount",
-        "INVALID_REQUEST_PARAMETERS"
-      );
-    }
+    // if (subtotal !== amount.subTotal) {
+    //   throw new BadRequest(
+    //     "Subtotal does not match the provided subTotal amount",
+    //     "INVALID_REQUEST_PARAMETERS"
+    //   );
+    // }
 
     // Calculate totalAmount
     const totalAmount = amount.subTotal + amount.vat + amount.delivery;
@@ -96,7 +124,7 @@ class OrderController {
       paymentStatus,
       paymentMethod,
       paymentType,
-      orderItem: orderArray,
+      // orderItem: orderArray,
       orderStatus: "Pending",
     });
 
@@ -113,7 +141,7 @@ class OrderController {
       title: "Order Status Updated",
       content: `Order:${savedOrder.orderCustomId}, created successfully`,
       activityType: "Order",
-      orderId:savedOrder._id,
+      orderId: savedOrder._id,
     };
     await notifications.createNotification(notificationPayload);
     return res.ok({
@@ -141,35 +169,35 @@ class OrderController {
     }
 
     // Calculate subtotal and generate orderSubRef
-    let subtotal = 0;
+    // let subtotal = 0;
     const uuid = uuidv4();
     const orderCustomId = uuid.replace(/-/g, "").substring(0, 10);
 
-    const orderArray: IOrder["orderItem"] = orderItem.map(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (order: any, index: number) => {
-        const orderSubRef = `${orderCustomId}-${index + 1000}`;
-        subtotal += order.subtotal;
-        return {
-          orderSubRef,
-          orderType: order.orderType,
-          mediaId: order.mediaId,
-          quantity: order.quantity,
-          route: order.route,
-          price: order.price,
-          subtotal: order.subtotal,
-          duration: order.duration,
-        };
-      }
-    );
+    // const orderArray: IOrder["orderItem"] = orderItem.map(
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   (order: any, index: number) => {
+    //     const orderSubRef = `${orderCustomId}-${index + 1000}`;
+    //     subtotal += order.subtotal;
+    //     return {
+    //       orderSubRef,
+    //       orderType: order.orderType,
+    //       mediaId: order.mediaId,
+    //       quantity: order.quantity,
+    //       route: order.route,
+    //       price: order.price,
+    //       subtotal: order.subtotal,
+    //       duration: order.duration,
+    //     };
+    //   }
+    // );
 
     // Check if subtotal matches subTotal
-    if (subtotal !== amount.subTotal) {
-      throw new BadRequest(
-        "Subtotal does not match the provided subTotal amount",
-        "INVALID_REQUEST_PARAMETERS"
-      );
-    }
+    // if (subtotal !== amount.subTotal) {
+    //   throw new BadRequest(
+    //     "Subtotal does not match the provided subTotal amount",
+    //     "INVALID_REQUEST_PARAMETERS"
+    //   );
+    // }
 
     // Calculate totalAmount
     const totalAmount = amount.subTotal + amount.vat + amount.delivery;
@@ -190,7 +218,7 @@ class OrderController {
       paymentStatus,
       paymentMethod,
       paymentType,
-      orderItem: orderArray,
+      // orderItem: orderArray,
       orderStatus: "Pending",
     });
 
@@ -318,11 +346,11 @@ class OrderController {
       .populate({
         path: "orderItem.mediaId",
         model: "billboardMediaApplication", // Populate billboard if media is available.
+      })
+      .populate({
+        path: "orderItem.printId",
+        model: "printMediaApplication", // Populate print
       });
-    // .populate({
-    //   path: "orderItem.printId",
-    //   model: "printMediaApplication", // Populate print
-    // });
 
     const totalOrders = await Order.countDocuments(query);
 
@@ -373,11 +401,11 @@ class OrderController {
       .populate({
         path: "orderItem.mediaId",
         model: "billboardMediaApplication", // Populate billboard if media is available.
+      })
+      .populate({
+        path: "orderItem.printId",
+        model: "printMediaApplication", // Populate print
       });
-    // .populate({
-    //   path: "orderItem.printId",
-    //   model: "printMediaApplication", // Populate print
-    // });
 
     const totalOrders = await Order.countDocuments(query);
 
@@ -404,11 +432,11 @@ class OrderController {
       .populate({
         path: "orderItem.mediaId",
         model: "billboardMediaApplication", // Populate billboard if media is available.
+      })
+      .populate({
+        path: "orderItem.printId",
+        model: "printMediaApplication", // Populate print
       });
-    // .populate({
-    //   path: "orderItem.printId",
-    //   model: "printMediaApplication", // Populate print
-    // });
 
     if (!order) {
       throw new ResourceNotFound(
@@ -441,11 +469,11 @@ class OrderController {
       .populate({
         path: "orderItem.mediaId",
         model: "billboardMediaApplication", // Populate billboard if media is available.
+      })
+      .populate({
+        path: "orderItem.printId",
+        model: "printMediaApplication", // Populate print
       });
-    // .populate({
-    //   path: "orderItem.printId",
-    //   model: "printMediaApplication", // Populate print
-    // });
 
     if (!order) {
       throw new ResourceNotFound(
@@ -475,11 +503,11 @@ class OrderController {
       .populate({
         path: "orderItem.mediaId",
         model: "billboardMediaApplication", // Populate billboard if media is available.
+      })
+      .populate({
+        path: "orderItem.printId",
+        model: "printMediaApplication", // Populate print
       });
-    // .populate({
-    //   path: "orderItem.printId",
-    //   model: "printMediaApplication", // Populate print
-    // });
     if (!order) {
       throw new ResourceNotFound(
         `Order with ID ${orderCustomId} not found.`,
