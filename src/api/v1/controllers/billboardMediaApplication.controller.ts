@@ -5,11 +5,11 @@ import { v4 as uuidv4 } from "uuid";
 dotenv.config();
 
 import { BadRequest, ResourceNotFound } from "../../../errors/httpErrors";
-import billboardMediaApplication from "../../../db/models/mediaApplication.model"; // IMediaApplication,
+import billboardMediaApplication from "../../../db/models/billboardMedia.model"; // IMediaApplication,
 import Admin from "../../../db/models/admin.model"; // Admin,
 import helper from "../../../utils/mediaApplicationsHelper";
 
-import * as validators from "../validators/mediaApplication.validator";
+import * as validators from "../validators/billboardMediaApplication.validator";
 
 import {
   getLimit,
@@ -97,7 +97,7 @@ class applicationMediaController {
       const uuid = uuidv4();
 
       // Remove hyphens and extract the first 8 characters to create a shorter UUID
-      const shortUUID = uuid.replace(/-/g, "").substring(0, 10);
+      const shortUUID = uuid.replace(/-/g, "").substring(0, 15);
 
       return shortUUID;
     }
@@ -308,16 +308,16 @@ class applicationMediaController {
   }
 
   async getMediaApplication(req: Request, res: Response) {
-    const { productId } = req.params;
-    if (!productId)
+    const { mediaCustomId } = req.params;
+    if (!mediaCustomId)
       throw new BadRequest(
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
       );
-    const product = await billboardMediaApplication.findOne({ _id: productId });
+    const product = await billboardMediaApplication.findOne({ mediaCustomId });
     if (!product)
       throw new ResourceNotFound(
-        `product with id:${productId} not found`,
+        `product with id:${mediaCustomId} not found`,
         "RESOURCE_NOT_FOUND"
       );
     res.ok({

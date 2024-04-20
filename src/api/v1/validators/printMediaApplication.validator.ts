@@ -36,6 +36,7 @@ export const createPrintMediaApplicationValidator = (payload: any) => {
     prototypeId: z.string({
       required_error: "Product prototype is required.",
     }),
+    mediaCustomId: z.string().optional(),
     price: z.string({
       required_error: "Product price is required.",
     }),

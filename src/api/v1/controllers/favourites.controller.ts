@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Favorite from "../../../db/models/favourite.model";
-import billboardMediaApplication from "../../../db/models/mediaApplication.model";
+import billboardMediaApplication from "../../../db/models/billboardMedia.model";
 import PrintMedia from "../../../db/models/printMedia.model";
 import * as validators from "../validators/favourites.validator";
 import { ResourceNotFound, BadRequest } from "../../../errors/httpErrors";

@@ -5,7 +5,7 @@ import sharedRouter from "../../shared/routes";
 import authRouter from "./auth.route";
 import userRouter from "./user.route";
 import adminRouter from "./admin.route";
-import mediaApplicationRouter from "./mediaApplication.route";
+import mediaApplicationRouter from "./billboardMediaApplication.route";
 import printMediaApplicationRouter from "./printMediaApplication.route";
 import orderRouter from "./order.route";
 import webhookRouter from "./webhook.route";

@@ -1,5 +1,5 @@
 import express from "express";
-import applicationMediaController from "../controllers/mediaApplication.controller";
+import applicationMediaController from "../controllers/billboardMediaApplication.controller";
 import { auth } from "../../middlewares/authMiddleware";
 import upload from "../../middlewares/multerMiddleware";
 
@@ -55,7 +55,7 @@ mediaApplicationRouter.get(
 
 // Get a media application
 mediaApplicationRouter.get(
-  "/one/:productId",
+  "/one/:mediaCustomId",
   applicationMediaController.getMediaApplication
 );
 

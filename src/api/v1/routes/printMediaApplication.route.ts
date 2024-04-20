@@ -87,7 +87,7 @@ mediaApplicationRouter.get(
 
 // Get a print media
 mediaApplicationRouter.get(
-  "/one/:productId",
+  "/one/:mediaCustomId",
   printMediaController.getPrintMedia
 );
 
