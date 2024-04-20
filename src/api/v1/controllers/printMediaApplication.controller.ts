@@ -128,6 +128,17 @@ class applicationMediaController {
     if (!prototypeExist)
       throw new ResourceNotFound("prototype not found", "RESOURCE_NOT_FOUND");
 
+    function generateShortUUID() {
+      // Generate UUID v4
+      const uuid = uuidv4();
+
+      // Remove hyphens and extract the first 8 characters to create a shorter UUID
+      const shortUUID = uuid.replace(/-/g, "").substring(0, 15);
+
+      return shortUUID;
+    }
+
+    const mediaCustomId = generateShortUUID();
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
     console.log(data);
@@ -135,6 +146,7 @@ class applicationMediaController {
     const printMedia = new PrintMedia({
       ...data,
       createdByAdmin,
+      mediaCustomId,
     });
     await printMedia.save();
     res.created(printMedia);
@@ -298,16 +310,16 @@ class applicationMediaController {
   }
 
   async getPrintMedia(req: Request, res: Response) {
-    const { productId } = req.params;
-    if (!productId)
+    const { mediaCustomId } = req.params;
+    if (!mediaCustomId)
       throw new BadRequest(
         "please provide product custom id",
         "MISSING_REQUIRED_FIELD"
       );
-    const product = await PrintMedia.findOne({ _id: productId });
+    const product = await PrintMedia.findOne({ mediaCustomId });
     if (!product)
       throw new ResourceNotFound(
-        `product with id:${productId} not found`,
+        `product with id:${mediaCustomId} not found`,
         "RESOURCE_NOT_FOUND"
       );
     res.ok({

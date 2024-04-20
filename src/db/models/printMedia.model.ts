@@ -5,9 +5,10 @@ export interface IPrintMediaApplication extends Document {
   // define others here
   name: string;
   description: string;
-  price: string;
+  price: number;
   pictures: Array<object>;
   features: Array<string>;
+  mediaCustomId: string;
   favoriteCount: number;
   prototype: mongoose.Schema.Types.ObjectId;
   prototypeId: mongoose.Schema.Types.ObjectId;
@@ -26,7 +27,7 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
     required: true,
   },
   price: {
-    type: String,
+    type: Number,
     required: true,
   },
   favoriteCount: {
@@ -42,6 +43,10 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
   ],
   prototypeId: {
     type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  mediaCustomId: {
+    type: String,
     required: true,
   },
   createdByAdmin: {
