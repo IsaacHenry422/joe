@@ -8,35 +8,38 @@ export const createMediaApplicationValidator = (payload: any) => {
     description: z.string({
       required_error: "Product Description is required.",
     }),
-    mediaType: z.enum(["Static","Led Billboard","BRT Buses","Lampost Billboard"],{
-      required_error: "Producy media type is required.",
-    }),
-    status: z.enum(["Available","Unavailbale"]).default("Available"),
+    mediaType: z.enum(
+      ["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"],
+      {
+        required_error: "Product media type is required.",
+      }
+    ),
+    status: z.enum(["Available", "Unavailbale"]).default("Available"),
     state: z.string({
       required_error: "state is required.",
     }),
     dimension: z.string({
       required_error: "Product dimension is required.",
     }),
-    price: z.string({
+    price: z.number({
       required_error: "Product price is required.",
-    }), 
+    }),
     cityLga: z.string({
-      required_error: "Product city / lga is required"
+      required_error: "Product city / lga is required",
     }),
     nextAvailable: z.string({
-      required_error: "Product next available date is required"
+      required_error: "Product next available date is required",
     }),
-    
+
     address: z.string().optional(),
     googleStreetlink: z.string().optional(),
     listingTitle: z.string().optional(),
     landmark: z.string().optional(),
-    
+
     brtType: z.string().optional(),
     route: z.string().optional(),
     amountAvailable: z.string().optional(),
-    
+
     createdByAdmin: z.string().optional(),
     mediaCustomId: z.string().optional(),
   });

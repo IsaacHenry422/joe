@@ -15,9 +15,7 @@ export const createNotificationValidator = (payload: any) => {
       required_error: "content is required to create a notification",
     }),
     expiresIn: z.string().optional(),
-    read: z.boolean({
-      required_error: "read status of notification is required",
-    }).default(false),
+    read: z.boolean().default(false).optional(),
     activityType: z.enum(["Order", "Transaction", "Invoice"], {
       required_error: "notification activity type is required",
     }),

@@ -22,15 +22,15 @@ export const createOrderValidator = (payload: any) => {
     }),
     orderItem: z.array(
       z.object({
-        orderType: z.enum(["Media", "Print"], {
+        orderType: z.enum(["Billboard", "Print"], {
           required_error: "orderType is required.",
         }),
         quantity: z.number({ required_error: "Quantity is required." }),
         price: z.number({ required_error: "price is required." }),
         subtotal: z.number({ required_error: "subtotal is required." }),
 
-        //media
-        mediaId: z.string().optional(),
+        //billboard
+        billboardId: z.string().optional(),
         duration: z.object({
           startDate: z.string().optional(),
           endDate: z.string().optional(),

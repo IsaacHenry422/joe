@@ -5,6 +5,7 @@ dotenv.config();
 import Order from "../../../db/models/order.model";
 import Transaction from "../../../db/models/transaction.model";
 import Invoice from "../../../db/models/invoice.model";
+import Notification from "./notification.controller";
 import { successInvoiceNotification } from "../../../services/email.service";
 
 const secret = process.env.PAYSTACK_SECRET;
@@ -57,6 +58,17 @@ class WebhookController {
 
       // Save the transaction record to the database
       await transaction.save();
+
+      //notification payload
+      const notificationPayload = {
+        userId: req.loggedInAccount._id,
+        title: "New Transaction",
+        content: `Transaction: ${transaction.transactionCustomId} for Order:${savedOrder.orderCustomId} payment was successful`,
+        activityType: "Transaction",
+        orderId: savedOrder._id,
+        transactionId: transaction._id,
+      };
+      await Notification.createNotification(notificationPayload);
     } else if (paymentType === "Invoice") {
       //perform Invoice here
       // Update the payment status of the corresponding order

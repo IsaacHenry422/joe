@@ -16,12 +16,12 @@ export interface IOrder extends Document {
   paymentType: string;
   orderItem: {
     orderSubRef: string;
-    orderType: "Media" | "Print";
+    orderType: "Billboard" | "Print";
     quantity: number;
     price: number;
     subtotal: number;
 
-    mediaId?: mongoose.Types.ObjectId;
+    billboardId?: mongoose.Types.ObjectId;
     duration?: {
       startDate?: Date;
       endDate?: Date;
@@ -34,19 +34,29 @@ export interface IOrder extends Document {
     deliveryAddress?: string;
     height?: string;
     width?: string;
-    finishingDetails: object;
+    finishingDetails?: object;
     additionalPrintDesc?: string;
     designFile?: string;
 
-    // media property to the order interface
-    media?: {
+    // billboard property to the order interface
+    billboard?: {
       _id: mongoose.Types.ObjectId;
       mediaCustomId: string;
       listingTitle: string;
-      price: string;
+      price: number;
       pictures: Array<object>;
       description?: string;
       address?: string;
+    };
+    // print property to the order interface
+    print?: {
+      _id: mongoose.Types.ObjectId;
+      mediaCustomId: string;
+      name: string;
+      price: number;
+      pictures: Array<object>;
+      description?: string;
+      features?: Array<string>;
     };
   }[];
   createdAt: Date;
@@ -138,7 +148,7 @@ const OrderSchema = new mongoose.Schema<IOrder>(
         orderType: {
           type: String,
           required: true,
-          enum: ["Media", "Print"],
+          enum: ["Billboard", "Print"],
         },
         quantity: {
           type: Number,
@@ -153,8 +163,8 @@ const OrderSchema = new mongoose.Schema<IOrder>(
           required: true,
         },
 
-        //media
-        mediaId: {
+        //billboard
+        billboardId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "billboardMediaApplication",
         },

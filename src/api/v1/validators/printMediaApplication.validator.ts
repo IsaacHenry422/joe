@@ -37,7 +37,7 @@ export const createPrintMediaApplicationValidator = (payload: any) => {
       required_error: "Product prototype is required.",
     }),
     mediaCustomId: z.string().optional(),
-    price: z.string({
+    price: z.number({
       required_error: "Product price is required.",
     }),
     features: z.string().array().optional(),
@@ -59,12 +59,14 @@ export const updatePrintMediaApplicationValidator = (payload: any) => {
     prototypeId: z.string().optional(),
     price: z.string().optional(),
     features: z.string().array().optional(),
-    finishingDetails: z.object({
-      eyelets: z.boolean().optional(),
-      pocketTB: z.boolean().optional(),
-      pocketLR: z.boolean().optional(),
-      none: z.boolean().optional(),
-    }).optional(),
+    finishingDetails: z
+      .object({
+        eyelets: z.boolean().optional(),
+        pocketTB: z.boolean().optional(),
+        pocketLR: z.boolean().optional(),
+        none: z.boolean().optional(),
+      })
+      .optional(),
   });
 
   return validateRequestBody(schema, payload);
