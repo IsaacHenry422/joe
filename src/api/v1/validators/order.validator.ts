@@ -31,25 +31,31 @@ export const createOrderValidator = (payload: any) => {
 
         //billboard
         billboardId: z.string().optional(),
-        duration: z.object({
-          startDate: z.string().optional(),
-          endDate: z.string().optional(),
-          totalDuration: z.number().optional(),
-        }),
+        duration: z
+          .object({
+            startDate: z.string().optional(),
+            endDate: z.string().optional(),
+            totalDuration: z.number().optional(),
+          })
+          .optional(),
         route: z.string().optional(),
 
         //print
         printId: z.string().optional(),
-        deliveryMethod: z.enum(["Delivery", "Home delivery", "Pickup"]),
+        deliveryMethod: z
+          .enum(["Delivery", "Home delivery", "Pickup"])
+          .optional(),
         deliveryAddress: z.string().optional(),
         height: z.string().optional(),
         width: z.string().optional(),
-        finishingDetails: z.object({
-          eyelets: z.boolean().optional(),
-          pocketTB: z.boolean().optional(),
-          pocketLR: z.boolean().optional(),
-          none: z.boolean().optional(),
-        }),
+        finishingDetails: z
+          .object({
+            eyelets: z.boolean().optional(),
+            pocketTB: z.boolean().optional(),
+            pocketLR: z.boolean().optional(),
+            none: z.boolean().optional(),
+          })
+          .optional(),
         additionalPrintDesc: z.string().optional(),
         designFile: z.string().optional(),
       })

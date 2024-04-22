@@ -61,14 +61,17 @@ class WebhookController {
 
       //notification payload
       const notificationPayload = {
-        userId: req.loggedInAccount._id,
+        userId: savedOrder.userId,
         title: "New Transaction",
-        content: `Transaction: ${transaction.transactionCustomId} for Order:${savedOrder.orderCustomId} payment was successful`,
+        content: `Transaction: ${transaction.transactionCustomId} for Order: ${savedOrder.orderCustomId} payment was successful`,
         activityType: "Transaction",
         orderId: savedOrder._id,
         transactionId: transaction._id,
       };
       await Notification.createNotification(notificationPayload);
+
+      //send email to user
+      //update the next availability in media(billboard)
     } else if (paymentType === "Invoice") {
       //perform Invoice here
       // Update the payment status of the corresponding order
@@ -92,7 +95,7 @@ class WebhookController {
         paymentComment: `Using - (${data.authorization.brand})${data.authorization.channel} ****${data.authorization.last4}`,
       });
 
-      // Send invoice successful notificatioj
+      // Send invoice successful email notification
       await successInvoiceNotification({
         email: savedInvoice.email,
         period: savedInvoice.period,
