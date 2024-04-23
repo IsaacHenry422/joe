@@ -51,7 +51,7 @@ class OrderController {
     // Calculate subtotal and generate orderSubRef
     let subtotal = 0;
     const uuid = uuidv4();
-    const orderCustomId = uuid.replace(/-/g, "").substring(0, 10);
+    const orderCustomId = uuid.replace(/-/g, "").substring(0, 15);
 
     const orderArray: IOrder["orderItem"] = await Promise.all(
       orderItem.map(
@@ -138,7 +138,7 @@ class OrderController {
     const notificationPayload = {
       userId: req.loggedInAccount._id,
       title: "New Order",
-      content: `Order:${savedOrder.orderCustomId}, created successfully`,
+      content: `Order: ${savedOrder.orderCustomId}, created successfully`,
       activityType: "Order",
       orderId: savedOrder._id,
     };
@@ -171,7 +171,7 @@ class OrderController {
     // Calculate subtotal and generate orderSubRef
     let subtotal = 0;
     const uuid = uuidv4();
-    const orderCustomId = uuid.replace(/-/g, "").substring(0, 10);
+    const orderCustomId = uuid.replace(/-/g, "").substring(0, 15);
 
     const orderArray: IOrder["orderItem"] = await Promise.all(
       orderItem.map(
@@ -267,7 +267,7 @@ class OrderController {
       orderPaystack.amount,
       orderPaystack.metadata
     );
-    console.log(response);
+    // console.log(response);
     if (!response) {
       throw new ServerError(
         "Initiate payment failed",
@@ -279,7 +279,7 @@ class OrderController {
     const notificationPayload = {
       userId: req.loggedInAccount._id,
       title: "New Order",
-      content: `Order:${savedOrder.orderCustomId}, created successfully`,
+      content: `Order: ${savedOrder.orderCustomId}, created successfully`,
       activityType: "Order",
       orderId: savedOrder._id,
     };
