@@ -1,5 +1,5 @@
 import express from "express";
-import bookingController from "../controllers/booking.controller";
+import bookingController from "../controllers/bookMeeting.controller";
 import { auth } from "../../middlewares/authMiddleware";
 
 const bookingRouter = express.Router();
@@ -13,7 +13,7 @@ bookingRouter.get(
 
 // Get a specific booking by ID
 bookingRouter.get(
-  "/:bookingId",
+  "/:meetingId",
   auth({ accountType: ["admin", "user"] }),
   bookingController.getBookingById
 );
@@ -27,14 +27,14 @@ bookingRouter.post(
 
 // Update a booking by ID route
 bookingRouter.patch(
-  "/update/:bookingId",
+  "/update/:meetingId",
   auth({ accountType: ["admin", "user"] }),
   bookingController.updateBooking
 );
 
 // Delete a booking by ID route
 bookingRouter.delete(
-  "/delete/:bookingId",
+  "/delete/:meetingId",
   auth({ accountType: ["admin", "user"] }),
   bookingController.deleteBookingById
 );

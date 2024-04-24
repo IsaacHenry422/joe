@@ -17,7 +17,7 @@ import notificationRouter from "./notification.route";
 import favouriteRouter from "./favourites.route";
 import contactRouter from "./contactus.route";
 import requestPlanRouter from "./requestPlan.route";
-import bookingRouter from "./booking.route";
+import bookMeetingRouter from "./bookMeeting.route";
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.use("/notifications", notificationRouter);
 router.use("/favourites", favouriteRouter);
 router.use("/contactus", contactRouter);
 router.use("/requestPlan", requestPlanRouter);
-router.use("/booking", bookingRouter);
+router.use("/book-meeting", bookMeetingRouter);
 
 router.use("/", sharedRouter);
 

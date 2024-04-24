@@ -1,7 +1,7 @@
 import mongoose, { Document, Model } from "mongoose";
 
 // Define the interface for the booking model
-export interface IBooking extends Document {
+export interface IBookMeeting extends Document {
   name: string;
   phoneNumber: string;
   email: string;
@@ -15,7 +15,7 @@ export interface IBooking extends Document {
 }
 
 // Define the schema for the booking model
-const BookingSchema = new mongoose.Schema<IBooking>(
+const BookingSchema = new mongoose.Schema<IBookMeeting>(
   {
     name: { type: String, required: true },
     phoneNumber: { type: String, required: true },
@@ -31,8 +31,8 @@ const BookingSchema = new mongoose.Schema<IBooking>(
   { timestamps: true }
 );
 
-const BookingModel: Model<IBooking> = mongoose.model<IBooking>(
-  "Booking",
+const BookingModel: Model<IBookMeeting> = mongoose.model<IBookMeeting>(
+  "BookMeeting",
   BookingSchema
 );
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequest, ResourceNotFound } from "../../../errors/httpErrors";
-import Booking from "../../../db/models/booking.model";
+import BookMeeting from "../../../db/models/bookMeeting.model";
 import * as validators from "../validators/booking.validator";
 import {
   getLimit,
@@ -16,42 +16,46 @@ type QueryParams = {
   page?: string;
 };
 
-class BookingController {
+class BookMeetingController {
   async createBooking(req: Request, res: Response) {
     const { error, data } = validators.createBookingValidator(req.body);
     if (error) {
       throw new BadRequest(error.message, error.code);
     }
 
-    const newBooking = await Booking.create(data);
+    const newBooking = await BookMeeting.create(data);
 
     res.created({
       booking: newBooking,
-      message: "Booking created successfully.",
+      message: "Meeting successfully booked.",
     });
   }
 
   async updateBooking(req: Request, res: Response) {
-    const { bookingId } = req.params;
+    const { meetingId } = req.params;
 
     const { error, data } = validators.updateBookingValidator(req.body);
     if (error) {
       throw new BadRequest(error.message, error.code);
     }
 
-    const updatedBooking = await Booking.findByIdAndUpdate(bookingId, data, {
-      new: true,
-    });
+    const updatedBooking = await BookMeeting.findByIdAndUpdate(
+      meetingId,
+      data,
+      {
+        new: true,
+      }
+    );
     if (!updatedBooking) {
       throw new ResourceNotFound(
-        `Booking with ID ${bookingId} not found.`,
+        `Meeting with ID ${meetingId} not found.`,
         "RESOURCE_NOT_FOUND"
       );
     }
 
     res.ok({
       updatedBooking,
-      message: "Booking updated successfully.",
+      message: "Book meeting details updated successfully.",
     });
   }
 
@@ -62,14 +66,14 @@ class BookingController {
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
 
-    const query = Booking.find({
+    const query = BookMeeting.find({
       createdAt: { $gte: startDate, $lte: endDate },
     })
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
 
-    const totalBookings = Booking.countDocuments(query);
+    const totalBookings = BookMeeting.countDocuments(query);
 
     const [bookings, totalCount] = await Promise.all([
       query.exec(),
@@ -83,16 +87,16 @@ class BookingController {
   }
 
   async getBookingById(req: Request, res: Response) {
-    const { bookingId } = req.params;
-    if (!bookingId) {
-      throw new BadRequest("Booking ID is missing.", "MISSING_REQUIRED_FIELD");
+    const { meetingId } = req.params;
+    if (!meetingId) {
+      throw new BadRequest("Meeting ID is missing.", "MISSING_REQUIRED_FIELD");
     }
 
-    const booking = await Booking.findById(bookingId);
+    const booking = await BookMeeting.findById(meetingId);
 
     if (!booking) {
       throw new ResourceNotFound(
-        `Booking with ID ${bookingId} not found.`,
+        `Meeting with ID ${meetingId} not found.`,
         "RESOURCE_NOT_FOUND"
       );
     }
@@ -101,15 +105,15 @@ class BookingController {
   }
 
   async deleteBookingById(req: Request, res: Response) {
-    const { bookingId } = req.params;
-    if (!bookingId) {
+    const { meetingId } = req.params;
+    if (!meetingId) {
       throw new BadRequest("Booking ID is missing.", "MISSING_REQUIRED_FIELD");
     }
 
-    const deletedBooking = await Booking.findByIdAndDelete(bookingId);
+    const deletedBooking = await BookMeeting.findByIdAndDelete(meetingId);
     if (!deletedBooking) {
       throw new ResourceNotFound(
-        `Booking with ID ${bookingId} not found.`,
+        `Meeting with ID ${meetingId} not found.`,
         "RESOURCE_NOT_FOUND"
       );
     }
@@ -118,4 +122,4 @@ class BookingController {
   }
 }
 
-export default new BookingController();
+export default new BookMeetingController();
