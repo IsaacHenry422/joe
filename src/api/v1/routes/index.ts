@@ -16,6 +16,7 @@ import reportRouter from "./report.route";
 import notificationRouter from "./notification.route";
 import favouriteRouter from "./favourites.route";
 import contactRouter from "./contactus.route";
+import requestPlanRouter from "./requestPlan.route";
 
 const router = express.Router();
 
@@ -35,6 +36,7 @@ router.use("/reports", reportRouter);
 router.use("/notifications", notificationRouter);
 router.use("/favourites", favouriteRouter);
 router.use("/contactus", contactRouter);
+router.use("/requestPlan", requestPlanRouter);
 
 router.use("/", sharedRouter);
 
