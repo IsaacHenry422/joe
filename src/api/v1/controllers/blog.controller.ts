@@ -98,7 +98,10 @@ class BlogController {
         "RESOURCE_NOT_FOUND"
       );
     }
-    res.ok(updatedBlog);
+    res.ok({
+      updatedBlog,
+      message: "blog details updated successfully.",
+    });
   }
 
   async getBlogs(req: Request, res: Response) {
