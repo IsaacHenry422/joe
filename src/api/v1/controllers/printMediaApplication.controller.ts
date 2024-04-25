@@ -24,6 +24,7 @@ import {
   uploadPicture,
   deleteImagesFromStorage,
   reduceImageSize,
+  deleteImage
 } from "../../../services/file.service";
 import { toInteger } from "lodash";
 
@@ -35,7 +36,8 @@ type QueryParams = {
 };
 
 interface Picture {
-  url: string;
+  url: string,
+  id: string;
 }
 
 interface Filter {
@@ -241,7 +243,53 @@ class applicationMediaController {
       imageUrls: product.pictures,
     });
   }
+  async deletePrintMediaImage(req: Request, res: Response) {
+    const { productId, imageId } = req.body;
+    if (!productId)
+      throw new BadRequest(
+        "please provide product custom id",
+        "MISSING_REQUIRED_FIELD"
+      );
+    const product = await PrintMedia.findOne({ _id: productId });
+    if (!product)
+      throw new ResourceNotFound(
+        `product with id:${productId} not found`,
+        "RESOURCE_NOT_FOUND"
+      );
+    let pictureUrl;
+    let index = 0;
+    let pictureIndex = -1;
 
+    // Find the picture and its index in the pictures array
+    for (const picture of product.pictures as Picture[]) {
+      pictureIndex++;
+      if (picture && picture.id === imageId) {
+        pictureUrl = picture.url;
+        index = pictureIndex;
+      }
+    }
+    
+
+    if (!pictureUrl)
+      throw new ResourceNotFound(
+        `Product with id: ${productId} does not have any image with the id provided`,
+        "RESOURCE_NOT_FOUND"
+      );
+
+    // Delete the image from the storage
+    await deleteImage(pictureUrl);
+
+    // Remove the picture object from the pictures array
+    product.pictures.splice(index, 1);
+
+    // Save the updated product back to the database
+    await product.save();
+
+    res.ok({
+      message: "Product image deleted successfully.",
+      imageUrls: product.pictures,
+    });
+  }
   async updatePrintMedia(req: Request, res: Response) {
     const { productId } = req.params;
     const { error, data } = validators.updatePrintMediaApplicationValidator(
