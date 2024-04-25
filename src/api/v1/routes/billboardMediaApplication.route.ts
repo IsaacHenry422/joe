@@ -34,6 +34,13 @@ mediaApplicationRouter.patch(
   applicationMediaController.updateMediaApplication
 );
 
+// delete mediaApplication image
+mediaApplicationRouter.patch(
+  "/admin/one/delete-image",
+  auth({ accountType: ["admin"] }),
+  applicationMediaController.deleteMediaApplicationImage
+);
+
 // delete mediaApplication
 mediaApplicationRouter.delete(
   "/admin/:productId",

@@ -55,6 +55,13 @@ mediaApplicationRouter.patch(
   printMediaController.uploadPrintMediaImages
 );
 
+// delete print media image
+mediaApplicationRouter.patch(
+  "/admin/one/delete-image",
+  auth({ accountType: ["admin"] }),
+  printMediaController.deletePrintMediaImage
+);
+
 // get all print media
 mediaApplicationRouter.get(
   "/admin",
