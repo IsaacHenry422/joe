@@ -71,7 +71,7 @@ async function successOrderNotification({
   await sendMail(options);
 }
 
-async function failedOrderNotification({
+async function pendingOrderNotification({
   email,
   ...variables
 }: {
@@ -80,8 +80,8 @@ async function failedOrderNotification({
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Your order payment Failed",
-    template: "failed-order",
+    subject: "Your order payment is still pending",
+    template: "pending-order-payment",
     variables,
   };
 
@@ -144,7 +144,7 @@ export {
   resetPasswordEmail,
   successChangedPasswordEmail,
   successOrderNotification,
-  failedOrderNotification,
+  pendingOrderNotification,
   expiredOrderNotification,
   invoiceNotification,
   successInvoiceNotification,

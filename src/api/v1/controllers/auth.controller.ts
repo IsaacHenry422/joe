@@ -482,31 +482,30 @@ class AuthController {
     const { error, data } = validators.tokenValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
 
+    //my birthday bug fixed
     const { refreshToken, accountType } = data;
-    // console.log(data);
     let payload, accessToken;
-    interface result {
+    // Define types for token details and verify result
+    interface TokenDetails {
       userId?: string;
       adminId?: string;
-      // ... Other possible properties ...
+      iat: number;
+      exp: number;
     }
 
     // Specify the type of the returned value from verifyRefreshToken
     const result = await verifyRefreshToken(refreshToken, accountType);
 
-    // Cast result to the expected type TokenDetails
-    const tokenDetails = result as result;
-    if (!tokenDetails) {
-      console.log(tokenDetails);
-      throw new Unauthorized("Can't validate Refresh token", "INVALID_TOKEN");
-    }
-
     if (accountType === "User") {
+      const tokenDetails = result.tokenDetails as TokenDetails; // Type assertion
+
       payload = { userId: tokenDetails.userId };
       accessToken = jwt.sign(payload, process.env.JWT_SEC, {
         expiresIn: "24h",
       });
     } else if (accountType === "Admin") {
+      const tokenDetails = result.tokenDetails as TokenDetails; // Type assertion
+
       payload = { adminId: tokenDetails.adminId };
       accessToken = jwt.sign(payload, process.env.JWT_SEC, {
         expiresIn: "1h",
