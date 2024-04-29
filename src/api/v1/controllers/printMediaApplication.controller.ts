@@ -24,7 +24,7 @@ import {
   uploadPicture,
   deleteImagesFromStorage,
   reduceImageSize,
-  deleteImage
+  deleteImage,
 } from "../../../services/file.service";
 import { toInteger } from "lodash";
 
@@ -36,7 +36,7 @@ type QueryParams = {
 };
 
 interface Picture {
-  url: string,
+  url: string;
   id: string;
 }
 
@@ -58,6 +58,12 @@ class applicationMediaController {
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
 
+    const prototypeExist = await printPrototype.find({ name: data.name });
+    if (!prototypeExist)
+      throw new BadRequest(
+        "prototype already exists",
+        "INVALID_REQUEST_PARAMETERS"
+      );
     const prototype = new printPrototype({
       ...data,
       createdByAdmin,
@@ -108,6 +114,12 @@ class applicationMediaController {
       throw new BadRequest(
         "please provide prototype id",
         "MISSING_REQUIRED_FIELD"
+      );
+    const printMediaExist = await PrintMedia.find({ prototypeId });
+    if (printMediaExist)
+      throw new BadRequest(
+        "cannot delete prototype that have printmedia attached to it",
+        "INVALID_REQUEST_PARAMETERS"
       );
     const prototype = await printPrototype.findOneAndDelete({
       _id: prototypeId,
@@ -268,7 +280,6 @@ class applicationMediaController {
         index = pictureIndex;
       }
     }
-    
 
     if (!pictureUrl)
       throw new ResourceNotFound(

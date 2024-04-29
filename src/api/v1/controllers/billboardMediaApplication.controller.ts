@@ -194,11 +194,8 @@ class applicationMediaController {
         });
       })
     );
-    await billboardMediaApplication.findOneAndUpdate(
-      { _id: productId },
-      { pictures: picArray },
-      { new: true, runValidators: true }
-    );
+    product.pictures.push(picArray);
+    await product.save();
 
     res.ok({
       message: "Product images uploaded successfully.",
