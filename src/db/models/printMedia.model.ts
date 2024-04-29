@@ -10,6 +10,8 @@ export interface IPrintMediaApplication extends Document {
   features: Array<string>;
   mediaCustomId: string;
   favoriteCount: number;
+  height: string;
+  width: string;
   prototype: mongoose.Schema.Types.ObjectId;
   prototypeId: mongoose.Schema.Types.ObjectId;
   createdByAdmin: string;
@@ -43,6 +45,14 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
   ],
   prototypeId: {
     type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  height: {
+    type: String,
+    required: true,
+  },
+  width: {
+    type: String,
     required: true,
   },
   mediaCustomId: {

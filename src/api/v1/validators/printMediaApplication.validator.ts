@@ -36,6 +36,12 @@ export const createPrintMediaApplicationValidator = (payload: any) => {
     prototypeId: z.string({
       required_error: "Product prototype is required.",
     }),
+    height: z.string({
+      required_error: "Product height is required.",
+    }),
+    width: z.string({
+      required_error: "Product width is required.",
+    }),
     mediaCustomId: z.string().optional(),
     price: z.number({
       required_error: "Product price is required.",
@@ -58,6 +64,8 @@ export const updatePrintMediaApplicationValidator = (payload: any) => {
     description: z.string().optional(),
     prototypeId: z.string().optional(),
     price: z.string().optional(),
+    height: z.string().optional(),
+    width: z.string().optional(),
     features: z.string().array().optional(),
     finishingDetails: z
       .object({
