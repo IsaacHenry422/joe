@@ -63,7 +63,7 @@ export const updatePrintMediaApplicationValidator = (payload: any) => {
     name: z.string().optional(),
     description: z.string().optional(),
     prototypeId: z.string().optional(),
-    price: z.string().optional(),
+    price: z.number().optional(),
     height: z.string().optional(),
     width: z.string().optional(),
     features: z.string().array().optional(),
