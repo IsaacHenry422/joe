@@ -17,6 +17,8 @@ export const userFields = [
   "country",
   "city",
   "address",
+  "createdAt",
+  "deletedAt"
 ];
 
 // admin field
@@ -32,6 +34,8 @@ export const adminFields = [
   "accountType",
   "adminType",
   "isAdmin",
+  "createdAt",
+  "deletedAt" 
 ];
 
 export const invoiceField = [
