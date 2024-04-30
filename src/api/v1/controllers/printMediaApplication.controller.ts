@@ -224,7 +224,7 @@ class applicationMediaController {
         `Product with custom id ${productId} does not exist`,
         "RESOURCE_NOT_FOUND"
       );
-    const picArray: object[] = [];
+
     await Promise.all(
       uploadedImages.map(async (uploadedFile) => {
         const productPictureExtension = path.extname(uploadedFile.originalname);
@@ -236,20 +236,13 @@ class applicationMediaController {
         );
         await fsPromises.unlink(resizedImagePath);
         const url = `${awsBaseUrl}/${productPictureKey}`;
-        picArray.push({
+        product.pictures.push({
           url,
           id: uuidv4(),
         });
+        await product.save();
       })
     );
-    console.log(picArray);
-
-    await PrintMedia.findOneAndUpdate(
-      { _id: productId },
-      { pictures: picArray },
-      { new: true, runValidators: true }
-    );
-
     res.ok({
       message: "Product images uploaded successfully.",
       imageUrls: product.pictures,
