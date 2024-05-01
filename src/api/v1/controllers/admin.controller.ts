@@ -149,6 +149,35 @@ class AdminController {
     });
   }
 
+  // Update a Admin by ID
+  async updateAdminBySuperAdmin(req: Request, res: Response) {
+    const { adminId } = req.params;
+    if (!adminId) {
+      throw new ResourceNotFound("AdminID is missing.", "RESOURCE_NOT_FOUND");
+    }
+
+    const { error, data } = validators.updateAdminValidator(req.body);
+    if (error) throw new BadRequest(error.message, error.code);
+
+    const admin = await Admin.findByIdAndUpdate(
+      adminId,
+      { ...data, updatedAt: new Date() },
+      { new: true }
+    ).select(adminFields.join(" "));
+
+    if (!admin) {
+      throw new BadRequest(
+        `Admin ${admin!.adminCustomId} not updated.`,
+        "INVALID_REQUEST_PARAMETERS"
+      );
+    }
+
+    res.ok({
+      updated: admin,
+      message: "Your details are updated successfully.",
+    });
+  }
+
   // block a admin by ID
   async blockAdmin(req: Request, res: Response) {
     const { error, data } = validators.blockAdminValidator(req.body);

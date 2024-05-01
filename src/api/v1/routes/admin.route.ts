@@ -27,6 +27,12 @@ adminRouter.get(
 
 adminRouter.put("/", auth({ accountType: ["admin"] }), controller.updateAdmin);
 
+adminRouter.put(
+  "/superadmin/:adminId",
+  auth({ accountType: ["admin"], adminType: ["Super-Admin"] }),
+  controller.updateAdminBySuperAdmin
+);
+
 adminRouter.patch(
   "/dp",
   auth({ accountType: ["admin"] }),

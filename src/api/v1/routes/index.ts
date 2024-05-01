@@ -18,6 +18,7 @@ import favouriteRouter from "./favourites.route";
 import contactRouter from "./contactus.route";
 import requestPlanRouter from "./requestPlan.route";
 import bookMeetingRouter from "./bookMeeting.route";
+import locationRouter from "./location.route";
 
 const router = express.Router();
 
@@ -39,6 +40,7 @@ router.use("/favourites", favouriteRouter);
 router.use("/contactus", contactRouter);
 router.use("/requestPlan", requestPlanRouter);
 router.use("/book-meeting", bookMeetingRouter);
+router.use("/locations", locationRouter);
 
 router.use("/", sharedRouter);
 

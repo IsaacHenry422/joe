@@ -52,10 +52,10 @@ export const loginValidator = (payload: any) => {
 export const createAdminValidator = (payload: any) => {
   const schema = z.object({
     firstname: z.string({
-      required_error: "username is required.",
+      required_error: "firstname is required.",
     }),
     lastname: z.string({
-      required_error: "username is required.",
+      required_error: "lastname is required.",
     }),
     email: z
       .string({
@@ -66,7 +66,7 @@ export const createAdminValidator = (payload: any) => {
       .toLowerCase(),
     password: z
       .string({
-        required_error: "email is required",
+        required_error: "password is required",
       })
       .min(8, "Password must be minimum of 8 characters."),
     adminType: z.enum(["Super-Admin", "Sub-Admin"], {
@@ -179,6 +179,12 @@ export const updateAdminValidator = (payload: any) => {
     lastname: z.string().optional(),
     phoneNumber: z.string().optional(),
     role: z.string().optional(),
+    adminType: z.enum(["Super-Admin", "Sub-Admin"]).optional(),
+    email: z
+      .string()
+      .email("Please provide a valid email address")
+      .toLowerCase()
+      .optional(),
   });
 
   return validateRequestBody(schema, payload);
