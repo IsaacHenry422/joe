@@ -116,7 +116,9 @@ class applicationMediaController {
         "MISSING_REQUIRED_FIELD"
       );
     const printMediaExist = await PrintMedia.find({ prototypeId });
-    if (printMediaExist)
+    console.log(printMediaExist);
+    
+    if (printMediaExist.length >= 1)
       throw new BadRequest(
         "cannot delete prototype that have printmedia attached to it",
         "INVALID_REQUEST_PARAMETERS"
@@ -126,7 +128,9 @@ class applicationMediaController {
     });
     if (!prototype)
       throw new ResourceNotFound("prototype not found", "RESOURCE_NOT_FOUND");
-    res.noContent();
+    res.ok({
+      message:`prototype with id: ${prototypeId} successfully deleted`
+    });
   }
 
   async createPrintMedia(req: Request, res: Response) {
@@ -398,7 +402,7 @@ class applicationMediaController {
       filter.$or = orConditions;
     }
     const count = await PrintMedia.countDocuments();
-    if (!queryParams.limit || toInteger(queryParams.limit) < 8) {
+    if (!queryParams.limit || toInteger(queryParams.limit) < 5) {
       randomSkip = Math.floor(Math.random() * toInteger(count));
     } else {
       randomSkip = limit * (page - 1);
