@@ -3,7 +3,7 @@ type QueryParams = {
   endDate?: Date;
   limit?: string;
   page?: string;
-  prototype?: string;
+  prototypeId?: string;
   price?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -13,8 +13,8 @@ class applicationMediaHelper {
   filter = async (queryParams: QueryParams) => {
     const orConditions = [];
 
-    if (queryParams.prototype) {
-      orConditions.push({ prototype: queryParams.prototype });
+    if (queryParams.prototypeId) {
+      orConditions.push({ prototypeId: queryParams.prototypeId });
     }
     if (queryParams.price) {
       orConditions.push({ price: queryParams.price });
