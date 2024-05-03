@@ -16,4 +16,10 @@ orderRouter.get(
   reportController.transactionReport
 );
 
+orderRouter.get(
+  "/user/statistics",
+  auth({ accountType: ["user"] }),
+  reportController.getUserStatistics
+);
+
 export default orderRouter;

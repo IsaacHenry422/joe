@@ -97,6 +97,41 @@ class ReportController {
       { page, limit, startDate, endDate }
     );
   }
+
+  async getUserStatistics(req: Request, res: Response) {
+    const userId = req.loggedInAccount._id;
+
+    const totalAdSpace = await Order.aggregate([
+      { $match: { userId: userId } },
+      {
+        $group: { _id: null, totalAdSpace: { $sum: { $size: "$orderItem" } } },
+      },
+    ]);
+
+    const totalSpentAggregate = await Order.aggregate([
+      { $match: { userId: userId, paymentStatus: "Success" } },
+      { $unwind: "$orderItem" },
+      { $group: { _id: null, totalSpent: { $sum: "$orderItem.price" } } },
+    ]);
+
+    const totalOngoing = await Order.countDocuments({
+      userId: userId,
+      orderStatus: "In progress",
+    });
+
+    const totalPending = await Order.countDocuments({
+      userId: userId,
+      orderStatus: "Pending",
+    });
+
+    res.ok({
+      totalAdSpace: totalAdSpace.length > 0 ? totalAdSpace[0].totalAdSpace : 0,
+      totalSpent:
+        totalSpentAggregate.length > 0 ? totalSpentAggregate[0].totalSpent : 0,
+      totalOngoing,
+      totalPending,
+    });
+  }
 }
 
 export default new ReportController();
