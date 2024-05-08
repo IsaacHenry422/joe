@@ -151,7 +151,7 @@ class applicationMediaController {
       const uuid = uuidv4();
 
       // Remove hyphens and extract the first 8 characters to create a shorter UUID
-      const shortUUID = uuid.replace(/-/g, "").substring(0, 15);
+      const shortUUID = `vad${uuid.replace(/-/g, "").substring(0, 15)}`;
 
       return shortUUID;
     }
