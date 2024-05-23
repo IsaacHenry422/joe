@@ -14,9 +14,7 @@ mediaApplicationRouter.post(
 
 // get all prototypes
 mediaApplicationRouter.get(
-  "/admin/prototype",
-  auth({ accountType: ["admin"] }),
-  printMediaController.getPrototypes
+  "/prototype",printMediaController.getPrototypes
 );
 
 // get prototype
