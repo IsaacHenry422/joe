@@ -42,7 +42,7 @@ interface Picture {
 
 interface Filter {
   createdAt?: object;
-  $or?: Array<object>;
+  $and?: Array<object>;
 }
 
 const awsBaseUrl = process.env.AWS_BASEURL;
@@ -131,7 +131,7 @@ class applicationMediaController {
     }
     const orConditions = await helper.filter(queryParams);
     if (orConditions.length > 0) {
-      filter.$or = orConditions;
+      filter.$and = orConditions;
     }
 
     // Query the database with the constructed filter
@@ -140,11 +140,12 @@ class applicationMediaController {
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
-
+    const allProducts = await billboardMediaApplication.countDocuments();
     // Send the response
     res.ok(
       {
         products,
+        totalProducts: allProducts,
       },
       { page, limit, startDate, endDate }
     );
@@ -381,7 +382,7 @@ class applicationMediaController {
     }
     const orConditions = await helper.filter(queryParams);
     if (orConditions.length > 0) {
-      filter.$or = orConditions;
+      filter.$and = orConditions;
     }
     const count = await billboardMediaApplication.countDocuments();
     if (!queryParams.limit || toInteger(queryParams.limit) < 5) {
@@ -395,10 +396,11 @@ class applicationMediaController {
       .find(filter)
       .limit(limit)
       .skip(randomSkip);
-
+    const allProducts = await billboardMediaApplication.countDocuments();
     res.ok(
       {
         products: randomProducts,
+        totalProducts: allProducts,
       },
       { page, limit, startDate, endDate }
     );
@@ -413,7 +415,7 @@ class applicationMediaController {
     const filter: Filter = {};
     const orConditions = await helper.filter(queryParams);
     if (orConditions.length > 0) {
-      filter.$or = orConditions;
+      filter.$and = orConditions;
     }
     console.log(filter);
 
@@ -429,9 +431,9 @@ class applicationMediaController {
       .sort({ score: { $meta: "textScore" } })
       .limit(limit)
       .skip(limit * (page - 1)); // Sort by relevance score
-
+    const allProducts = await billboardMediaApplication.countDocuments();
     // Send the search results in the response
-    res.ok({ searchResults });
+    res.ok({ searchResults, totalProducts: allProducts },{limit,page});
   }
 
   // async searchProductsByProductName(req: Request, res: Response) {

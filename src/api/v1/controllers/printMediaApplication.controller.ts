@@ -42,7 +42,7 @@ interface Picture {
 
 interface Filter {
   createdAt?: object;
-  $or?: Array<object>;
+  $and?: Array<object>;
 }
 
 const awsBaseUrl = process.env.AWS_BASEURL;
@@ -73,7 +73,8 @@ class applicationMediaController {
   }
   async getPrototypes(req: Request, res: Response) {
     const prototypes = await printPrototype.find({});
-    res.ok(prototypes);
+    const totalPrototypes = await printPrototype.countDocuments();
+    res.ok(prototypes, { totalPrototypes: totalPrototypes });
   }
 
   async getPrototype(req: Request, res: Response) {
@@ -117,7 +118,7 @@ class applicationMediaController {
       );
     const printMediaExist = await PrintMedia.find({ prototypeId });
     console.log(printMediaExist);
-    
+
     if (printMediaExist.length >= 1)
       throw new BadRequest(
         "cannot delete prototype that have printmedia attached to it",
@@ -129,7 +130,7 @@ class applicationMediaController {
     if (!prototype)
       throw new ResourceNotFound("prototype not found", "RESOURCE_NOT_FOUND");
     res.ok({
-      message:`prototype with id: ${prototypeId} successfully deleted`
+      message: `prototype with id: ${prototypeId} successfully deleted`,
     });
   }
 
@@ -184,7 +185,7 @@ class applicationMediaController {
     }
     const orConditions = await helper.filter(queryParams);
     if (orConditions.length > 0) {
-      filter.$or = orConditions;
+      filter.$and = orConditions;
     }
 
     // Query the database with the constructed filter
@@ -192,11 +193,12 @@ class applicationMediaController {
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
-
+    const allProducts = await PrintMedia.countDocuments();
     // Send the response
     res.ok(
       {
         products,
+        totalProducts: allProducts,
       },
       { page, limit, startDate, endDate }
     );
@@ -399,7 +401,7 @@ class applicationMediaController {
     }
     const orConditions = await helper.filter(queryParams);
     if (orConditions.length > 0) {
-      filter.$or = orConditions;
+      filter.$and = orConditions;
     }
     const count = await PrintMedia.countDocuments();
     if (!queryParams.limit || toInteger(queryParams.limit) < 5) {
@@ -412,10 +414,11 @@ class applicationMediaController {
     const randomProducts = await PrintMedia.find(filter)
       .limit(limit)
       .skip(randomSkip);
-
+    const allProducts = await PrintMedia.countDocuments();
     res.ok(
       {
         products: randomProducts,
+        totalProducts: allProducts,
       },
       { page, limit, startDate, endDate }
     );
@@ -430,7 +433,7 @@ class applicationMediaController {
     const filter: Filter = {};
     const orConditions = await helper.filter(queryParams);
     if (orConditions.length > 0) {
-      filter.$or = orConditions;
+      filter.$and = orConditions;
     }
     console.log(filter);
 
@@ -445,9 +448,13 @@ class applicationMediaController {
       .sort({ score: { $meta: "textScore" } })
       .limit(limit)
       .skip(limit * (page - 1)); // Sort by relevance score
+    const allProducts = await PrintMedia.countDocuments();
 
     // Send the search results in the response
-    res.ok({ searchResults });
+    res.ok(
+      { searchResults, totalProducts: allProducts },
+      { page, limit }
+    );
   }
 
   async updatePrintMediaFavoriteCount(req: Request, res: Response) {
