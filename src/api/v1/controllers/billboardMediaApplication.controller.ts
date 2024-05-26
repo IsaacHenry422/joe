@@ -385,7 +385,7 @@ class applicationMediaController {
       filter.$and = orConditions;
     }
     const count = await billboardMediaApplication.countDocuments();
-    if (!queryParams.limit || toInteger(queryParams.limit) < 5) {
+    if (queryParams.limit && toInteger(queryParams.limit) < 5) {
       randomSkip = Math.floor(Math.random() * toInteger(count));
     } else {
       randomSkip = limit * (page - 1);
