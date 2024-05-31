@@ -156,7 +156,7 @@ class applicationMediaController {
 
       return shortUUID;
     }
-
+    const prototypeName = prototypeExist.name;
     const mediaCustomId = generateShortUUID();
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
@@ -164,6 +164,7 @@ class applicationMediaController {
 
     const printMedia = new PrintMedia({
       ...data,
+      prototypeName,
       createdByAdmin,
       mediaCustomId,
     });
@@ -451,10 +452,7 @@ class applicationMediaController {
     const allProducts = await PrintMedia.countDocuments();
 
     // Send the search results in the response
-    res.ok(
-      { searchResults, totalProducts: allProducts },
-      { page, limit }
-    );
+    res.ok({ searchResults, totalProducts: allProducts }, { page, limit });
   }
 
   async updatePrintMediaFavoriteCount(req: Request, res: Response) {
