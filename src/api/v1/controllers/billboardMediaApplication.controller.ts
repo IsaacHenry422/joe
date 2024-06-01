@@ -57,7 +57,7 @@ class applicationMediaController {
     );
     if (error) throw new BadRequest(error.message, error.code);
     const { mediaType } = data;
-    if (mediaType === "brtBusesBillboard") {
+    if (mediaType === "BRT Buses Billboard") {
       if (!data.route || !data.brtType || !data.amountAvailable) {
         throw new BadRequest(
           "please provide route, brt type and amount available",
