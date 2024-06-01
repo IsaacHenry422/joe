@@ -3,7 +3,7 @@ import mongoose, { Document, Model } from "mongoose";
 // Define the interface for the Media Application document
 export interface IBillboardMediaApplication extends Document {
   // define others here
-  mediaType: "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard";
+  mediaType: "Static Billboard" |"Led Billboard" | "BRT Buses Billboard" | "Lampost Billboard";
   status: "Available" | "Unavailable";
   mediaCustomId: string;
   listingTitle: string;
@@ -33,7 +33,7 @@ const billboardMediaApplicationSchema =
   new mongoose.Schema<IBillboardMediaApplication>({
     mediaType: {
       type: String,
-      enum: ["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"],
+      enum: ["Static Billboard", "Led Billboard", "BRT Buses Billboard", "Lampost Billboard"],
       required: true,
     },
     status: {
