@@ -12,9 +12,11 @@ mediaApplicationRouter.post(
   printMediaController.createPrototype
 );
 
-// get all prototypes
+// get all prototypes admin
 mediaApplicationRouter.get(
-  "/prototype",printMediaController.getPrototypes
+  "/admin/prototype",
+  auth({ accountType: ["admin"] }),
+  printMediaController.AdmingetPrototypes
 );
 
 // get prototype
@@ -37,6 +39,9 @@ mediaApplicationRouter.delete(
   auth({ accountType: ["admin"] }),
   printMediaController.deletePrototype
 );
+
+// get all prototypes
+mediaApplicationRouter.get("/prototype", printMediaController.getPrototypes);
 
 // Create a new print media
 mediaApplicationRouter.post(
