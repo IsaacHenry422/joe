@@ -78,7 +78,7 @@ class applicationMediaController {
   }
 
   async getPrototypes(req: Request, res: Response) {
-    const prototypes = await printPrototype.find({},{name: 1, _id: 0});
+    const prototypes = await printPrototype.find({},{name: 1, _id: 1});
     const totalPrototypes = await printPrototype.countDocuments();
     res.ok(prototypes, { totalPrototypes: totalPrototypes });
   }
