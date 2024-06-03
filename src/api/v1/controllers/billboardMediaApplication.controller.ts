@@ -126,7 +126,7 @@ class applicationMediaController {
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
-    if (startDate && endDate) {
+    if (queryParams.startDate && queryParams.endDate) {
       filter.createdAt = { $gte: startDate, $lte: endDate };
     }
     const orConditions = await helper.filter(queryParams);
