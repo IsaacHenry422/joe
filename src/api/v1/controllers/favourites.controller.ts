@@ -81,6 +81,27 @@ class FavoriteController {
     });
   }
 
+  async getUserFavoritesByAdmin(req: Request, res: Response) {
+    const userId = req.params.userId;
+
+    // Get all favorites for the user and populate mediaId or printId with their respective models
+    const favorites = await Favorite.find({ userId })
+      .populate("mediaId")
+      .populate("printId");
+
+    if (!favorites) {
+      throw new ResourceNotFound(
+        `user with ${userId} does not have any favourite`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok({
+      favorites,
+      message: `All favourites associated with user ${userId}`,
+    });
+  }
+
   async deleteFavorite(req: Request, res: Response) {
     const { favoriteId } = req.params;
     const userId = req.loggedInAccount._id;
