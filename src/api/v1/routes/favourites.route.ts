@@ -4,12 +4,12 @@ import { auth } from "../../middlewares/authMiddleware";
 
 const favouriteRouter = express.Router();
 
-// Get all favourites route
-// favouriteRouter.get(
-//   "/",
-//   auth({ accountType: ["admin"] }),
-//   controller.getFavourites
-// );
+//Get all user favourites by Admin
+favouriteRouter.get(
+  "/admin/:userId",
+  auth({ accountType: ["admin"] }),
+  controller.getUserFavoritesByAdmin
+);
 
 // Get a specific favourite by ID route
 favouriteRouter.get(
