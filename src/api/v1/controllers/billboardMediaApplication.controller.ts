@@ -57,7 +57,7 @@ class applicationMediaController {
     );
     if (error) throw new BadRequest(error.message, error.code);
     const { mediaType } = data;
-    if (mediaType === "brtBusesBillboard") {
+    if (mediaType === "BRT Buses Billboard") {
       if (!data.route || !data.brtType || !data.amountAvailable) {
         throw new BadRequest(
           "please provide route, brt type and amount available",
@@ -126,7 +126,7 @@ class applicationMediaController {
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
-    if (startDate && endDate) {
+    if (queryParams.startDate && queryParams.endDate) {
       filter.createdAt = { $gte: startDate, $lte: endDate };
     }
     const orConditions = await helper.filter(queryParams);
@@ -204,6 +204,7 @@ class applicationMediaController {
   async updateMediaApplication(req: Request, res: Response) {
     const { productId } = req.params;
     const {
+      mediaType,
       status,
       listingTitle,
       description,
@@ -225,6 +226,7 @@ class applicationMediaController {
         "MISSING_REQUIRED_FIELD"
       );
     if (
+      !mediaType &&
       !status &&
       !listingTitle &&
       !description &&
@@ -246,6 +248,7 @@ class applicationMediaController {
       );
     }
     const updateFields = {
+      mediaType,
       status,
       listingTitle,
       description,

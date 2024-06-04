@@ -71,12 +71,6 @@ class transactionController {
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
-    if (transactions.length < 1) {
-      throw new ResourceNotFound(
-        `User ${userId} does not have any transaction`,
-        "RESOURCE_NOT_FOUND"
-      );
-    }
     // Send the response
     res.ok(
       {

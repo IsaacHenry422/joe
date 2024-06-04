@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { validateRequestBody } from "../../../utils/zodHelpers";
 
-export const createFavouritesValidator = (payload: any) => {
+export const createfavoritesValidator = (payload: any) => {
   const schema = z.object({
     id: z.string({ required_error: "id is required." }),
     type: z.enum(["media", "print"], {
