@@ -18,7 +18,7 @@ export const userFields = [
   "city",
   "address",
   "createdAt",
-  "deletedAt"
+  "deletedAt",
 ];
 
 // admin field
@@ -35,7 +35,7 @@ export const adminFields = [
   "adminType",
   "isAdmin",
   "createdAt",
-  "deletedAt" 
+  "deletedAt",
 ];
 
 export const invoiceField = [
@@ -62,3 +62,5 @@ export const blogFields = [
   "blogTitle",
   "blogBody",
 ];
+
+export const favoriteFields = ["_id", "userId", "mediaId", "printId"];
