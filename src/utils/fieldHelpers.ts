@@ -53,6 +53,8 @@ export const invoiceField = [
   "tax",
   "dueDate",
   "invoiceNote",
+  "createdAt",
+  "deletedAt",
 ];
 
 export const blogFields = [
@@ -63,4 +65,11 @@ export const blogFields = [
   "blogBody",
 ];
 
-export const favoriteFields = ["_id", "userId", "mediaId", "printId"];
+export const favoriteFields = [
+  "_id",
+  "userId",
+  "mediaId",
+  "printId",
+  "createdAt",
+  "deletedAt",
+];
