@@ -102,7 +102,7 @@ mediaApplicationRouter.get(
 );
 
 mediaApplicationRouter.patch(
-  "/favourite/:productId",
+  "/favorite/:productId",
   auth({ accountType: ["user"] }),
   printMediaController.updatePrintMediaFavoriteCount
 );
