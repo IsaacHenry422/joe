@@ -1,15 +1,29 @@
 import { Request, Response } from "express";
-import Favorite from "../../../db/models/favourite.model";
+import Favorite from "../../../db/models/favorite.model";
 import billboardMediaApplication from "../../../db/models/billboardMedia.model";
 import PrintMedia from "../../../db/models/printMedia.model";
-import * as validators from "../validators/favourites.validator";
+import * as validators from "../validators/favorites.validator";
 import { ResourceNotFound, BadRequest } from "../../../errors/httpErrors";
+import {
+  getLimit,
+  getPage,
+  getStartDate,
+  getEndDate,
+} from "../../../utils/dataFilters";
+import { favoriteFields } from "../../../utils/fieldHelpers";
+
+type QueryParams = {
+  startDate?: Date;
+  endDate?: Date;
+  limit?: string;
+  page?: string;
+};
 
 class FavoriteController {
   async createFavorite(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
 
-    const { error, data } = validators.createFavouritesValidator(req.query);
+    const { error, data } = validators.createfavoritesValidator(req.query);
     if (error) throw new BadRequest(error.message, error.code);
 
     const { type, id } = data;
@@ -56,7 +70,7 @@ class FavoriteController {
     const savedFavorite = await favorite.save();
     res.created({
       favorite: savedFavorite,
-      message: "Favourite created successfully.",
+      message: "favorite created successfully.",
     });
   }
 
@@ -70,35 +84,51 @@ class FavoriteController {
 
     if (!favorites) {
       throw new ResourceNotFound(
-        `user with ${userId} does not have any favourite`,
+        `user with ${userId} does not have any favorite`,
         "RESOURCE_NOT_FOUND"
       );
     }
 
     res.ok({
       favorites,
-      message: `All favourites associated with user ${userId}`,
+      message: `All favorites associated with user ${userId}`,
     });
   }
 
   async getUserFavoritesByAdmin(req: Request, res: Response) {
     const userId = req.params.userId;
 
-    // Get all favorites for the user and populate mediaId or printId with their respective models
-    const favorites = await Favorite.find({ userId })
-      .populate("mediaId")
-      .populate("printId");
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const limit = getLimit(queryParams.limit);
+    const page = getPage(queryParams.page);
 
-    if (!favorites) {
+    const query = Favorite.find({
+      userId,
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .populate("mediaId")
+      .populate("printId")
+      .sort({ createdAt: 1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    if (!query) {
       throw new ResourceNotFound(
-        `user with ${userId} does not have any favourite`,
+        `User with id ${userId} does not have any favorite`,
         "RESOURCE_NOT_FOUND"
       );
     }
 
+    const totalFavorites = await Favorite.countDocuments(query);
+
+    const favorites = await query.select(favoriteFields.join(" "));
+
     res.ok({
       favorites,
-      message: `All favourites associated with user ${userId}`,
+      totalFavorites,
+      message: `All favorites associated with user ${userId}`,
     });
   }
 

@@ -68,7 +68,7 @@ mediaApplicationRouter.get(
 
 // Update the favoriteCount field for a specific media application
 mediaApplicationRouter.patch(
-  "/favourite/:productId",
+  "/favorite/:productId",
   auth({ accountType: ["user"] }),
   applicationMediaController.updateFavoriteCount
 );

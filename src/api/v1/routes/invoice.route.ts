@@ -6,7 +6,7 @@ const invoiceRouter = express.Router();
 
 // Get all invoices route
 invoiceRouter.get(
-  "/",
+  "/all",
   auth({ accountType: ["admin"] }),
   controller.getInvoices
 );
