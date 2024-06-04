@@ -103,7 +103,7 @@ class transactionController {
     });
   }
   async getAtransactionByCustomId(req: Request, res: Response) {
-    const { transactionCustomId } = req.params;
+    const { transactionCustomId } = req.query;
     if (!transactionCustomId) {
       throw new ResourceNotFound(
         "transactionCustomId is missing.",
