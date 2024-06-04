@@ -39,4 +39,10 @@ transactionRouter.get(
   transactionController.getAtransactionById
 );
 
+//status
+transactionRouter.get(
+  "/status",
+  transactionController.getAtransactionByCustomId
+);
+
 export default transactionRouter;

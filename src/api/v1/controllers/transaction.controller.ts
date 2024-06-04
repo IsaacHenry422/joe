@@ -108,6 +108,27 @@ class transactionController {
       transaction,
     });
   }
+  async getAtransactionByCustomId(req: Request, res: Response) {
+    const { transactionCustomId } = req.params;
+    if (!transactionCustomId) {
+      throw new ResourceNotFound(
+        "transactionCustomId is missing.",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+    const transaction = await Transaction.findOne({ transactionCustomId });
+
+    if (!transaction) {
+      throw new ResourceNotFound(
+        "Transaction not found.",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+    // Send the response
+    res.ok({
+      transaction,
+    });
+  }
 }
 
 export default new transactionController();
