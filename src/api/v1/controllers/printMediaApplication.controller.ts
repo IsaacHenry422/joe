@@ -26,7 +26,7 @@ import {
   reduceImageSize,
   deleteImage,
 } from "../../../services/file.service";
-import { toInteger } from "lodash";
+import { shuffle } from "lodash";
 
 type QueryParams = {
   startDate?: Date;
@@ -78,7 +78,10 @@ class applicationMediaController {
   }
 
   async getPrototypes(req: Request, res: Response) {
-    const prototypes = await printPrototype.find({},{name: 1, _id: 1});
+    const prototypes = await printPrototype.find(
+      {},
+      { name: 1, _id: 1, description: 1 }
+    );
     const totalPrototypes = await printPrototype.countDocuments();
     res.ok(prototypes, { totalPrototypes: totalPrototypes });
   }
@@ -200,7 +203,7 @@ class applicationMediaController {
       .sort({ createdAt: 1 })
       .limit(limit)
       .skip(limit * (page - 1));
-    const allProducts = await PrintMedia.countDocuments();
+    const allProducts = await PrintMedia.countDocuments(filter);
     // Send the response
     res.ok(
       {
@@ -399,7 +402,6 @@ class applicationMediaController {
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
-    let randomSkip: number;
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
@@ -410,18 +412,12 @@ class applicationMediaController {
     if (orConditions.length > 0) {
       filter.$and = orConditions;
     }
-    const count = await PrintMedia.countDocuments();
-    if (queryParams.limit && toInteger(queryParams.limit) < 5) {
-      randomSkip = Math.floor(Math.random() * toInteger(count));
-    } else {
-      randomSkip = limit * (page - 1);
-    }
-    console.log(randomSkip);
-
-    const randomProducts = await PrintMedia.find(filter)
-      .limit(limit)
-      .skip(randomSkip);
-    const allProducts = await PrintMedia.countDocuments();
+    const randomProducts = shuffle(
+      await PrintMedia.find(filter)
+        .limit(limit)
+        .skip(limit * (page - 1))
+    );
+    const allProducts = await PrintMedia.countDocuments(filter);
     res.ok(
       {
         products: randomProducts,
