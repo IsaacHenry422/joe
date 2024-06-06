@@ -405,7 +405,7 @@ class applicationMediaController {
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
-    if (startDate && endDate) {
+    if (queryParams.startDate && queryParams.endDate) {
       filter.createdAt = { $gte: startDate, $lte: endDate };
     }
     const orConditions = await helper.filter(queryParams);
@@ -413,19 +413,16 @@ class applicationMediaController {
       filter.$and = orConditions;
     }
     let randomProducts;
-    const allProducts = await PrintMedia.countDocuments(filter);
-    if (queryParams.limit && parseInt(queryParams.limit) < 5) {
-      randomProducts = shuffle(
-        await PrintMedia.find(filter)
-          .limit(limit)
-          .skip( Math.floor(Math.random() * allProducts))
-      );
+    if (limit < 5) {
+      const products = await PrintMedia.find(filter);
+      randomProducts = shuffle(products).slice(0, limit);
     } else {
       randomProducts = await PrintMedia.find(filter)
         .limit(limit)
         .skip(limit * (page - 1))
         .sort({ createdAt: -1 });
     }
+    const allProducts = await PrintMedia.countDocuments(filter);
     res.ok(
       {
         products: randomProducts,
