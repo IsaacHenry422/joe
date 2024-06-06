@@ -16,6 +16,7 @@ export interface IPrintMediaApplication extends Document {
   prototypeId: mongoose.Schema.Types.ObjectId;
   createdByAdmin: string;
   finishingDetails: object;
+  createdAt: Date;
 }
 
 // Define the Media Application schema
@@ -73,6 +74,10 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
     none: Boolean,
   },
   features: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 // Define compound text index on all fields
