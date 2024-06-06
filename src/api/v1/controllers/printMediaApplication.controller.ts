@@ -190,7 +190,7 @@ class applicationMediaController {
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
-    if (startDate && endDate) {
+    if (queryParams.startDate && queryParams.endDate) {
       filter.createdAt = { $gte: startDate, $lte: endDate };
     }
     const orConditions = await helper.filter(queryParams);
@@ -200,7 +200,7 @@ class applicationMediaController {
 
     // Query the database with the constructed filter
     const products = await PrintMedia.find(filter)
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(limit * (page - 1));
     const allProducts = await PrintMedia.countDocuments(filter);
