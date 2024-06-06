@@ -386,10 +386,21 @@ class applicationMediaController {
     if (orConditions.length > 0) {
       filter.$and = orConditions;
     }
-    const randomProducts = shuffle(await billboardMediaApplication
-      .find(filter)
-      .limit(limit)
-      .skip(limit * (page - 1)));
+    let randomProducts;
+    if (queryParams.limit && parseInt(queryParams.limit) < 5) {
+      randomProducts = shuffle(
+        await billboardMediaApplication
+          .find(filter)
+          .limit(limit)
+          .skip(limit * (page - 1))
+      );
+    } else {
+      randomProducts = await billboardMediaApplication
+        .find(filter)
+        .limit(limit)
+        .skip(limit * (page - 1))
+        .sort({ createdAt: -1 });
+    }
     const allProducts = await billboardMediaApplication.countDocuments(filter);
     res.ok(
       {
@@ -427,7 +438,7 @@ class applicationMediaController {
       .skip(limit * (page - 1)); // Sort by relevance score
     const allProducts = await billboardMediaApplication.countDocuments();
     // Send the search results in the response
-    res.ok({ searchResults, totalProducts: allProducts },{limit,page});
+    res.ok({ searchResults, totalProducts: allProducts }, { limit, page });
   }
 
   // async searchProductsByProductName(req: Request, res: Response) {
