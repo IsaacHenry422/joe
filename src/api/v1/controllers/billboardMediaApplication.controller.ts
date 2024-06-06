@@ -387,12 +387,13 @@ class applicationMediaController {
       filter.$and = orConditions;
     }
     let randomProducts;
+    const allProducts = await billboardMediaApplication.countDocuments(filter);
     if (queryParams.limit && parseInt(queryParams.limit) < 5) {
       randomProducts = shuffle(
         await billboardMediaApplication
           .find(filter)
           .limit(limit)
-          .skip(limit * (page - 1))
+          .skip( Math.floor(Math.random() * allProducts))
       );
     } else {
       randomProducts = await billboardMediaApplication
@@ -401,7 +402,6 @@ class applicationMediaController {
         .skip(limit * (page - 1))
         .sort({ createdAt: -1 });
     }
-    const allProducts = await billboardMediaApplication.countDocuments(filter);
     res.ok(
       {
         products: randomProducts,
