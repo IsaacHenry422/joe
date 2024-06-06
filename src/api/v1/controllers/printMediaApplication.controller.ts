@@ -412,11 +412,19 @@ class applicationMediaController {
     if (orConditions.length > 0) {
       filter.$and = orConditions;
     }
-    const randomProducts = shuffle(
-      await PrintMedia.find(filter)
+    let randomProducts;
+    if (queryParams.limit && parseInt(queryParams.limit) < 5) {
+      randomProducts = shuffle(
+        await PrintMedia.find(filter)
+          .limit(limit)
+          .skip(limit * (page - 1))
+      );
+    } else {
+      randomProducts = await PrintMedia.find(filter)
         .limit(limit)
         .skip(limit * (page - 1))
-    );
+        .sort({ createdAt: -1 });
+    }
     const allProducts = await PrintMedia.countDocuments(filter);
     res.ok(
       {
