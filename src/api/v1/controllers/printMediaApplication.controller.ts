@@ -166,6 +166,7 @@ class applicationMediaController {
       return shortUUID;
     }
     const prototypeName = prototypeExist.name;
+
     const mediaCustomId = generateShortUUID();
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
@@ -333,6 +334,14 @@ class applicationMediaController {
         "please provide at least one field to update",
         "MISSING_REQUIRED_FIELD"
       );
+    if (data.prototypeId) {
+      const prototypeExist = await printPrototype.findOne({
+        _id: data.prototypeId,
+      });
+      if (!prototypeExist)
+        throw new ResourceNotFound("prototype not found", "RESOURCE_NOT_FOUND");
+      data.prototypeName = prototypeExist.name;
+    }
 
     const product = await PrintMedia.findOneAndUpdate(
       { _id: productId },
