@@ -40,7 +40,12 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
     },
     mediaType: {
       type: String,
-      enum: ["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"],
+      enum: [
+        "Static Billboard",
+        "Led Billboard",
+        "BRT Buses Billboard",
+        "Lampost Billboard",
+      ],
       required: true,
     },
     state: {
