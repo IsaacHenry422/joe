@@ -166,6 +166,7 @@ class applicationMediaController {
       return shortUUID;
     }
     const prototypeName = prototypeExist.name;
+
     const mediaCustomId = generateShortUUID();
     const admin = await Admin.findById(adminId);
     const createdByAdmin = admin?.adminCustomId;
@@ -190,7 +191,7 @@ class applicationMediaController {
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
-    if (startDate && endDate) {
+    if (queryParams.startDate && queryParams.endDate) {
       filter.createdAt = { $gte: startDate, $lte: endDate };
     }
     const orConditions = await helper.filter(queryParams);
@@ -200,7 +201,7 @@ class applicationMediaController {
 
     // Query the database with the constructed filter
     const products = await PrintMedia.find(filter)
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(limit * (page - 1));
     const allProducts = await PrintMedia.countDocuments(filter);
@@ -333,6 +334,14 @@ class applicationMediaController {
         "please provide at least one field to update",
         "MISSING_REQUIRED_FIELD"
       );
+    if (data.prototypeId) {
+      const prototypeExist = await printPrototype.findOne({
+        _id: data.prototypeId,
+      });
+      if (!prototypeExist)
+        throw new ResourceNotFound("prototype not found", "RESOURCE_NOT_FOUND");
+      data.prototypeName = prototypeExist.name;
+    }
 
     const product = await PrintMedia.findOneAndUpdate(
       { _id: productId },
@@ -405,7 +414,7 @@ class applicationMediaController {
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
-    if (startDate && endDate) {
+    if (queryParams.startDate && queryParams.endDate) {
       filter.createdAt = { $gte: startDate, $lte: endDate };
     }
     const orConditions = await helper.filter(queryParams);
@@ -413,19 +422,16 @@ class applicationMediaController {
       filter.$and = orConditions;
     }
     let randomProducts;
-    const allProducts = await PrintMedia.countDocuments(filter);
-    if (queryParams.limit && parseInt(queryParams.limit) < 5) {
-      randomProducts = shuffle(
-        await PrintMedia.find(filter)
-          .limit(limit)
-          .skip( Math.floor(Math.random() * allProducts))
-      );
+    if (limit < 5) {
+      const products = await PrintMedia.find(filter);
+      randomProducts = shuffle(products).slice(0, limit);
     } else {
       randomProducts = await PrintMedia.find(filter)
         .limit(limit)
         .skip(limit * (page - 1))
         .sort({ createdAt: -1 });
     }
+    const allProducts = await PrintMedia.countDocuments(filter);
     res.ok(
       {
         products: randomProducts,

@@ -8,7 +8,12 @@ export const createInvoiceValidator = (payload: any) => {
     customerMail: z.string({ required_error: "customerMail is required." }),
     phoneNumber: z.string({ required_error: "phoneNumber is required." }),
     mediaType: z.enum(
-      ["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"],
+      [
+        "Static Billboard",
+        "Led Billboard",
+        "BRT Buses Billboard",
+        "Lampost Billboard",
+      ],
       {
         required_error: "mediaType is required.",
       }
@@ -38,9 +43,17 @@ export const updateInvoiceValidator = (payload: any) => {
     customerMail: z.string().optional(),
     phoneNumber: z.string().optional(),
     mediaType: z
-      .enum(["Static", "Led Billboard", "BRT Buses", "Lampost Billboard"], {
-        required_error: "mediaType is required.",
-      })
+      .enum(
+        [
+          "Static Billboard",
+          "Led Billboard",
+          "BRT Buses Billboard",
+          "Lampost Billboard",
+        ],
+        {
+          required_error: "mediaType is required.",
+        }
+      )
       .optional(),
     state: z.string().optional(),
     BRTtypes: z.string().optional(),
