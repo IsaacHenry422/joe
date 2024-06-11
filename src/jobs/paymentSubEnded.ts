@@ -4,6 +4,7 @@ export default async (): Promise<void> => {
   try {
     // Find orders where the end date has passed the current date
     const expiredOrders = await OrderModel.find({
+      paymentStatus: false,
       "orderItem.duration.endDate": { $lte: new Date() },
       orderStatus: { $ne: "Expired" }, // Only process orders that are not already expired
     });
