@@ -101,17 +101,20 @@ class ReportController {
   async getUserStatistics(req: Request, res: Response) {
     const userId = req.loggedInAccount._id;
 
+    // Count the number of billboards in the orderItem array of the orders
     const totalAdSpace = await Order.aggregate([
       { $match: { userId: userId } },
+      { $unwind: "$orderItem" },
+      { $match: { "orderItem.orderType": "Billboard" } },
       {
-        $group: { _id: null, totalAdSpace: { $sum: { $size: "$orderItem" } } },
+        $group: { _id: null, totalBillboards: { $sum: "$orderItem.quantity" } },
       },
     ]);
 
+    // Calculate the total amount spent by adding all the totalAmount in the order model
     const totalSpentAggregate = await Order.aggregate([
       { $match: { userId: userId, paymentStatus: "Success" } },
-      { $unwind: "$orderItem" },
-      { $group: { _id: null, totalSpent: { $sum: "$orderItem.price" } } },
+      { $group: { _id: null, totalSpent: { $sum: "$amount.totalAmount" } } },
     ]);
 
     const totalOngoing = await Order.countDocuments({
@@ -119,17 +122,18 @@ class ReportController {
       orderStatus: "In progress",
     });
 
-    const totalPending = await Order.countDocuments({
+    const awaitingConfirmation = await Order.countDocuments({
       userId: userId,
-      orderStatus: "Pending",
+      orderStatus: "Awaiting Confirmation",
     });
 
     res.ok({
-      totalAdSpace: totalAdSpace.length > 0 ? totalAdSpace[0].totalAdSpace : 0,
+      totalAdSpace:
+        totalAdSpace.length > 0 ? totalAdSpace[0].totalBillboards : 0,
       totalSpent:
         totalSpentAggregate.length > 0 ? totalSpentAggregate[0].totalSpent : 0,
       totalOngoing,
-      totalPending,
+      awaitingConfirmation,
     });
   }
 }
