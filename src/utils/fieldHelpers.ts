@@ -54,7 +54,7 @@ export const invoiceField = [
   "dueDate",
   "invoiceNote",
   "createdAt",
-  "deletedAt",
+  "updatedAt",
 ];
 
 export const blogFields = [
