@@ -551,6 +551,41 @@ class OrderController {
     res.ok(order);
   }
 
+  // Get the Latest Unpaid Order by User
+  async getLatestUnpaidOrder(req: Request, res: Response) {
+    const userId = req.loggedInAccount._id;
+
+    // Construct the query to find the latest unpaid order
+    const query = {
+      userId,
+      paymentStatus: "Pending",
+    };
+
+    // Find the latest unpaid order
+    const latestUnpaidOrder = await Order.findOne(query)
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order to get the latest order
+      .populate({
+        path: "userId",
+        select: "userCustomId firstname lastname email phoneNumber", // Populate user details
+      })
+      .populate({
+        path: "orderItem.billboardId",
+        model: "billboardMediaApplication", // Populate billboard if available.
+      })
+      .populate({
+        path: "orderItem.printId",
+        model: "printMediaApplication", // Populate print if available.
+      });
+
+    if (!latestUnpaidOrder) {
+      return res
+        .status(404)
+        .json({ message: "No unpaid orders found for the user." });
+    }
+
+    res.ok({ order: latestUnpaidOrder });
+  }
+
   // update Order details By Id: only(payment status)
   async updateOrderdetailsById(req: Request, res: Response) {
     const { orderId } = req.params;

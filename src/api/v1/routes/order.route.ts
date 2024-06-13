@@ -41,6 +41,12 @@ orderRouter.get(
 );
 
 orderRouter.get(
+  "/user/unpaid",
+  auth({ accountType: ["user"] }),
+  orderController.getLatestUnpaidOrder
+);
+
+orderRouter.get(
   "/user/all",
   auth({ accountType: ["user"] }),
   orderController.getAllOrdersUser
