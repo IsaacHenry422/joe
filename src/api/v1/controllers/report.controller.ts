@@ -17,7 +17,6 @@ type QueryParams = {
   endDate?: Date;
   limit?: string;
   page?: string;
-  orderStatus?: string;
   paymentStatus?: string;
 
   status?: string;
@@ -35,17 +34,12 @@ class ReportController {
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
-    const orderStatus = queryParams.orderStatus;
     const paymentStatus = queryParams.paymentStatus;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {
       createdAt: { $gte: startDate, $lte: endDate },
     };
-
-    if (orderStatus) {
-      query.orderStatus = orderStatus;
-    }
 
     if (paymentStatus) {
       query.paymentStatus = paymentStatus;
@@ -117,14 +111,18 @@ class ReportController {
       { $group: { _id: null, totalSpent: { $sum: "$amount.totalAmount" } } },
     ]);
 
+    // Count orders with orderStatus "In progress" or "Out for Delivery" in orderItem
     const totalOngoing = await Order.countDocuments({
       userId: userId,
-      orderStatus: "In progress",
+      "orderItem.orderStatus": { $in: ["In progress", "Out for Delivery"] },
     });
 
+    // Count orders with orderStatus "Awaiting Confirmation" or "Awaiting Shipment" in orderItem
     const awaitingConfirmation = await Order.countDocuments({
       userId: userId,
-      orderStatus: "Awaiting Confirmation",
+      "orderItem.orderStatus": {
+        $in: ["Awaiting Confirmation", "Awaiting Shipment"],
+      },
     });
 
     res.ok({

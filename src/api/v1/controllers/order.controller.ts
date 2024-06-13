@@ -26,7 +26,6 @@ type QueryParams = {
   endDate?: Date;
   limit?: string;
   page?: string;
-  orderStatus?: string;
   paymentStatus?: string;
   paymentMethod?: string;
 };
@@ -57,7 +56,7 @@ class OrderController {
       orderItem.map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async (order: any, index: number) => {
-          const orderSubRef = `${orderCustomId}-${index + 1000}`;
+          const orderSubRef = `${orderCustomId}-${index + 1001}`;
           subtotal += order.subtotal;
 
           await handleOrderValidation(order);
@@ -68,6 +67,7 @@ class OrderController {
             quantity: order.quantity,
             price: order.price,
             subtotal: order.subtotal,
+            orderStatus: "Pending",
 
             // Additional order details based on orderType
             ...(order.orderType === "Billboard"
@@ -122,7 +122,6 @@ class OrderController {
       paymentMethod,
       paymentType,
       orderItem: orderArray,
-      orderStatus: "Pending",
     });
 
     // Save the order
@@ -177,7 +176,7 @@ class OrderController {
       orderItem.map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async (order: any, index: number) => {
-          const orderSubRef = `${orderCustomId}-${index + 1000}`;
+          const orderSubRef = `${orderCustomId}-${index + 1001}`;
           subtotal += order.subtotal;
 
           await handleOrderValidation(order);
@@ -188,6 +187,7 @@ class OrderController {
             quantity: order.quantity,
             price: order.price,
             subtotal: order.subtotal,
+            orderStatus: "Pending",
 
             // Additional order details based on orderType
             ...(order.orderType === "Billboard"
@@ -242,7 +242,6 @@ class OrderController {
       paymentMethod,
       paymentType,
       orderItem: orderArray,
-      orderStatus: "Pending",
     });
 
     // Save the order
@@ -345,7 +344,6 @@ class OrderController {
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
-    const orderStatus = queryParams.orderStatus;
     const paymentStatus = queryParams.paymentStatus;
     const paymentMethod = queryParams.paymentMethod;
 
@@ -354,10 +352,6 @@ class OrderController {
     const query: any = {
       createdAt: { $gte: startDate, $lte: endDate },
     };
-
-    if (orderStatus) {
-      query.orderStatus = orderStatus;
-    }
 
     if (paymentStatus) {
       query.paymentStatus = paymentStatus;
@@ -399,7 +393,6 @@ class OrderController {
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
     const page = getPage(queryParams.page);
-    const orderStatus = queryParams.orderStatus;
     const paymentStatus = queryParams.paymentStatus;
     const paymentMethod = queryParams.paymentMethod;
 
@@ -409,10 +402,6 @@ class OrderController {
       createdAt: { $gte: startDate, $lte: endDate },
       userId,
     };
-
-    if (orderStatus) {
-      query.orderStatus = orderStatus;
-    }
 
     if (paymentStatus) {
       query.paymentStatus = paymentStatus;
@@ -614,30 +603,34 @@ class OrderController {
     });
   }
 
-  // Update Order Status By Id
-  async updateOrderStatusById(req: Request, res: Response) {
-    const { orderId } = req.params;
-    if (!orderId) {
-      throw new ResourceNotFound("orderId is missing.", "RESOURCE_NOT_FOUND");
+  // Update SubOrder By Id
+  async updateSubOrderById(req: Request, res: Response) {
+    const { orderId, orderSubRef } = req.query;
+    if (!orderId || !orderSubRef) {
+      throw new ResourceNotFound(
+        "orderId or orderSubRef is missing.",
+        "RESOURCE_NOT_FOUND"
+      );
     }
-    const { error, data } = validators.updateOrderStatusValidator(req.body);
+
+    const { error, data } = validators.updateSubOrderValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { orderStatus: data.orderStatus },
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: orderId, "orderItem.orderSubRef": orderSubRef },
+      { $set: { "orderItem.$.orderStatus": data.orderStatus } },
       { new: true }
     );
 
     if (!updatedOrder) {
       throw new BadRequest(
-        "order status can not be updated, try again later.",
+        "Sub-order cannot be updated, try again later.",
         "INVALID_REQUEST_PARAMETERS"
       );
     }
 
     return res.ok({
-      message: "Order status updated successfully",
+      message: "Sub-order updated successfully",
       updatedOrder,
     });
   }

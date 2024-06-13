@@ -66,9 +66,9 @@ orderRouter.patch(
 );
 
 orderRouter.patch(
-  "/:orderId/status",
+  "/suborder",
   auth({ accountType: ["admin"] }),
-  orderController.updateOrderStatusById
+  orderController.updateSubOrderById
 );
 
 //delete

@@ -10,7 +10,6 @@ export interface IOrder extends Document {
     delivery: number;
     totalAmount: number;
   };
-  orderStatus: string;
   paymentStatus: string;
   paymentMethod: string;
   paymentType: string;
@@ -20,6 +19,7 @@ export interface IOrder extends Document {
     quantity: number;
     price: number;
     subtotal: number;
+    orderStatus: string;
 
     billboardId?: mongoose.Types.ObjectId;
     duration?: {
@@ -105,23 +105,6 @@ const OrderSchema = new mongoose.Schema<IOrder>(
         required: true,
       },
     },
-    orderStatus: {
-      type: String,
-      enum: [
-        "Pending",
-        "Awaiting Confirmation",
-        "In progress",
-        "Completed",
-        "Awaiting Shipment",
-        "Shipped",
-        "Out for Delivery",
-        "Delivered",
-        "Expired",
-        "Cancelled",
-      ],
-      required: true,
-      default: "Pending",
-    },
     paymentStatus: {
       type: String,
       enum: ["Pending", "Failed", "Success"],
@@ -161,6 +144,25 @@ const OrderSchema = new mongoose.Schema<IOrder>(
         subtotal: {
           type: Number,
           required: true,
+        },
+        orderStatus: {
+          type: String,
+          enum: [
+            "Pending",
+            "Expired",
+            "Cancelled",
+
+            //billboard
+            "Awaiting Confirmation",
+            "In progress",
+            "Completed",
+            //print
+            "Awaiting Shipment",
+            "Shipped",
+            "Out for Delivery",
+            "Delivered",
+          ],
+          default: "Pending",
         },
 
         //billboard

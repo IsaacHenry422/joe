@@ -69,32 +69,32 @@ export const createOrderValidator = (payload: any) => {
 export const updateOrderValidator = (payload: any) => {
   const schema = z.object({
     paymentStatus: z.enum(["Pending", "Failed", "Success"], {
-      required_error: "payment Status is required.",
+      required_error: "Payment Status is required.",
     }),
   });
   return validateRequestBody(schema, payload);
 };
 
 // Define the validation schema for updating the status of an order
-export const updateOrderStatusValidator = (payload: any) => {
+export const updateSubOrderValidator = (payload: any) => {
   const schema = z.object({
-    orderStatus: z.enum(
-      [
+    orderStatus: z
+      .enum([
         "Pending",
+        "Expired",
+        "Cancelled",
+
+        //billboard
         "Awaiting Confirmation",
         "In progress",
         "Completed",
+        //print
         "Awaiting Shipment",
         "Shipped",
         "Out for Delivery",
         "Delivered",
-        "Expired",
-        "Cancelled",
-      ],
-      {
-        required_error: "orderStatus is required.",
-      }
-    ),
+      ])
+      .optional(),
   });
 
   return validateRequestBody(schema, payload);

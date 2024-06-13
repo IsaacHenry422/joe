@@ -36,13 +36,18 @@ class WebhookController {
 
     if (paymentType === "Order") {
       // Update the payment status of the corresponding order
-      await Order.updateOne(
-        { _id: savedOrder._id },
-        {
-          paymentStatus: "Success",
-          orderStatus: "Awaiting Confirmation",
-        }
-      );
+      const order = await Order.findById(savedOrder._id);
+      if (order) {
+        order.paymentStatus = "Success";
+        order.orderItem.forEach((item) => {
+          if (item.orderType === "Billboard") {
+            item.orderStatus = "Awaiting Confirmation";
+          } else if (item.orderType === "Print") {
+            item.orderStatus = "Awaiting Shipment";
+          }
+        });
+        await order.save();
+      }
 
       // Create a new transaction record
       const transaction = new Transaction({
