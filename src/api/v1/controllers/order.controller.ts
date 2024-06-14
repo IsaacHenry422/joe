@@ -567,9 +567,7 @@ class OrderController {
       });
 
     if (!latestUnpaidOrder) {
-      return res
-        .status(404)
-        .json({ message: "No unpaid orders found for the user." });
+      res.ok({ message: "No unpaid orders found for the user." });
     }
 
     res.ok({ order: latestUnpaidOrder });
