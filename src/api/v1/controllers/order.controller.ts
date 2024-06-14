@@ -629,6 +629,18 @@ class OrderController {
       );
     }
 
+    if (data.orderStatus) {
+      //notification payload
+      const notificationPayload = {
+        userId: updatedOrder.userId,
+        title: "Order status",
+        content: `Order- ${orderSubRef} is now ${data.orderStatus}`,
+        activityType: "Order",
+        orderId: updatedOrder._id,
+      };
+      await Notification.createNotification(notificationPayload);
+    }
+
     return res.ok({
       message: "Sub-order updated successfully",
       updatedOrder,
