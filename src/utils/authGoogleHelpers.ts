@@ -65,7 +65,8 @@ class GoogleService {
     try {
       const createdUser = await User.create({
         firstname: payload.given_name || "DefaultFirstName",
-        lastname: payload.family_name || "DefaultLastName", 
+        lastname: payload.family_name || "DefaultLastName",
+        email: payload.email,
         authMethod: "Google",
         accountType: "User",
         userCustomId,
