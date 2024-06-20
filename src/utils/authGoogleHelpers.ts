@@ -60,6 +60,7 @@ class GoogleService {
 
     const user = await this.findUserByEmail(payload.email);
     if (user) return user;
+    console.log(payload);
 
     try {
       const createdUser = await User.create({
