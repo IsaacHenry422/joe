@@ -79,8 +79,11 @@ class GoogleService {
         address: payload.address || "",
         phoneNumber: payload.phone_number || "",
       });
+      console.log(createdUser);
+
       return createdUser;
     } catch (error: any) {
+      console.log(error);
       throw new BadRequest(error.message, "INVALID_REQUEST_PARAMETERS");
     }
   }
