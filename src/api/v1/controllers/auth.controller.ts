@@ -24,13 +24,16 @@ import GeneratorService from "../../../utils/customIdGeneratorHelpers";
 import {
   generateAuthToken,
   verifyRefreshToken,
+  buildSignupUrl,
 } from "../../../utils/authHelpers";
 import { userFields, adminFields } from "../../../utils/fieldHelpers";
 import {
+  verifyEmailNotification,
   welcomeNotification,
   resetPasswordEmail,
 } from "../../../services/email.service";
 
+const EMAIL_TOKEN_EXPIRY = 10; // 10 minutes
 const PASSWORD_TOKEN_EXPIRY = 10; // 10 minutes
 const googleClient = googleHelpers.generateClient();
 
@@ -40,7 +43,7 @@ class AuthController {
     const { error, data } = validators.createUserValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
 
-    const { firstname, lastname, email, password } = data;
+    const { firstname, lastname, email, password, phoneNumber } = data;
 
     const emailExists = await User.findOne({ email });
     if (emailExists) {
@@ -56,31 +59,39 @@ class AuthController {
     // Generate custom user ID
     const userCustomId = await GeneratorService.generateUserCustomId();
 
+    const userTimezone = moment.tz.guess();
+    const now = moment.tz(userTimezone);
+    const expiry = now.add(EMAIL_TOKEN_EXPIRY, "minutes").toDate();
+
     const user = await User.create({
       firstname,
       lastname,
       email,
+      phoneNumber,
       userCustomId,
       accountType,
       authMethod: "Form",
       authType: {
         password: hash,
       },
+      isVerified: false,
+      emailConfirmation: {
+        emailConfirmationToken: uuidv4(),
+        emailConfirmationTokenExpiresAt: expiry,
+      },
     });
 
-    const { accessToken, refreshToken } = await generateAuthToken(
-      user,
-      accountType
-    );
-    await welcomeNotification(user.email, user.firstname);
+    const token = user.emailConfirmation?.emailConfirmationToken;
+
+    const link = buildSignupUrl(token!, user.email);
+
+    await verifyEmailNotification(user.email, user.firstname, link);
 
     const formattedUser = _.pick(user, userFields);
 
     return res.created({
       user: formattedUser,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      message: "Your account was created successfully",
+      message: "Email verification link sent to the email address provided",
     });
   }
 
@@ -137,6 +148,13 @@ class AuthController {
         "ACCESS_DENIED"
       );
     }
+    if (!user.isVerified) {
+      console.log("Your account is not verified.");
+      throw new BadRequest(
+        "Your account is not verified. Kindly request for Email verification link",
+        "EMAIL_NOT_VERIFIED"
+      );
+    }
 
     const { accessToken, refreshToken } = await generateAuthToken(user, "User");
     const formattedUser = _.pick(user, userFields);
@@ -146,6 +164,112 @@ class AuthController {
       accessToken,
       refreshToken,
       message: "You are Logged in successfully",
+    });
+  }
+
+  async formVerifyUniqueString(req: Request, res: Response) {
+    const { uniqueString } = req.query;
+
+    if (!uniqueString) {
+      throw new BadRequest(
+        "Unique string token missing",
+        "MISSING_REQUIRED_FIELD"
+      );
+    }
+
+    const user = await User.findOne({
+      "emailConfirmation.emailConfirmationToken": uniqueString,
+    });
+
+    if (!user) {
+      throw new ResourceNotFound("Invalid Token", "RESOURCE_NOT_FOUND");
+    }
+
+    const userTimezone = moment.tz.guess();
+    const now = moment.tz(userTimezone);
+    const tokenExpired = now.isAfter(
+      user.emailConfirmation?.emailConfirmationTokenExpiresAt
+    );
+
+    if (tokenExpired) {
+      await User.findByIdAndUpdate(user._id, {
+        isVerified: false,
+        "emailConfirmation.emailConfirmationToken": null,
+        "emailConfirmation.emailConfirmationTokenExpiresAt": null,
+      });
+
+      return res.error(
+        400,
+        "Token Expired, Request for a new link",
+        "EXPIRED_TOKEN"
+      );
+    } else {
+      const updatedUser = await User.findByIdAndUpdate(
+        user._id,
+        {
+          isVerified: true,
+          "emailConfirmation.emailConfirmationToken": null,
+          "emailConfirmation.emailConfirmationTokenExpiresAt": null,
+        },
+        { new: true }
+      );
+
+      const { accessToken, refreshToken } = await generateAuthToken(
+        user,
+        user.accountType
+      );
+
+      await welcomeNotification(user.email, user.firstname);
+      const formattedUser = _.pick(updatedUser, userFields);
+
+      return res.ok({
+        updatedUser: formattedUser,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        message: "Email Address Verified Successfully",
+      });
+    }
+  }
+
+  async formEmailVerification(req: Request, res: Response) {
+    let email = req.query.email as string;
+    email = email.toLowerCase();
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new ResourceNotFound(
+        "Your associated account with the email not found",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+    if (user.isVerified) {
+      console.log("Your account is already verified.");
+      throw new BadRequest(
+        "Your account is already verified!. Kindly use the Login link",
+        "EMAIL_ALREADY_VERIFIED"
+      );
+    }
+
+    const userTimezone = moment.tz.guess();
+    const now = moment.tz(userTimezone);
+    const expiry = now.add(EMAIL_TOKEN_EXPIRY, "minutes").toDate();
+
+    const emailConfirmationToken = uuidv4();
+    await User.findByIdAndUpdate(
+      user._id,
+      {
+        "emailConfirmation.emailConfirmationToken": emailConfirmationToken,
+        "emailConfirmation.emailConfirmationTokenExpiresAt": expiry,
+      },
+      { new: true }
+    );
+
+    const link = buildSignupUrl(emailConfirmationToken, user.email);
+
+    await verifyEmailNotification(user.email, user.firstname, link);
+
+    return res.ok({
+      message: "Email verification link sent to the email address provided",
     });
   }
 

@@ -18,6 +18,11 @@ export interface IUser extends Document {
   accountType: AccountType;
   profilePicture?: string;
 
+  isVerified: boolean;
+  emailConfirmation?: {
+    emailConfirmationToken?: string;
+    emailConfirmationTokenExpiresAt?: Date;
+  };
   phoneNumber?: string;
   dateOfBirth?: string;
   country?: string;
@@ -76,6 +81,19 @@ const UserSchema = new mongoose.Schema<IUser>(
       type: String,
       default:
         "https://res.cloudinary.com/duzrrmfci/image/upload/v1703842924/logo.jpg",
+    },
+
+    isVerified: {
+      type: Boolean,
+      required: true,
+    },
+    emailConfirmation: {
+      emailConfirmationToken: {
+        type: String,
+      },
+      emailConfirmationTokenExpiresAt: {
+        type: Date,
+      },
     },
 
     phoneNumber: {

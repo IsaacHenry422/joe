@@ -10,6 +10,7 @@ export const userFields = [
   "profilePicture",
   "authMethod",
   "accountType",
+  "isVerified",
   "finishTourGuide",
   "isAdmin",
   "phoneNumber",

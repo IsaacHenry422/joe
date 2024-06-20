@@ -69,6 +69,7 @@ class GoogleService {
         authMethod: "Google",
         accountType: "User",
         userCustomId,
+        isVerified: true,
         authType: {
           googleUuid: payload.sub,
         },

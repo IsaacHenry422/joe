@@ -8,6 +8,8 @@ const authRouter = express.Router();
 // form Auth buyer
 authRouter.post("/user/register", controller.userFormRegister);
 authRouter.post("/user/login", controller.userFormLogin);
+authRouter.post("/user/verify-token", controller.formVerifyUniqueString);
+authRouter.post("/user/resend-token", controller.formEmailVerification);
 
 // Google Auth buyer/business
 authRouter.get("/google/getauthurl", controller.getGoogleConsentUrl);

@@ -11,6 +11,9 @@ export const createUserValidator = (payload: any) => {
     lastname: z.string({
       required_error: "Last name is required.",
     }),
+    phoneNumber: z.string({
+      required_error: "Phone Number is required.",
+    }),
     email: z
       .string({
         required_error: "Email is required.",

@@ -4,6 +4,23 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+async function verifyEmailNotification(
+  email: string,
+  firstname: string,
+  link: string
+): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "Verify your Email address",
+    template: "signup-users",
+    variables: {
+      name: firstname,
+      link,
+    },
+  };
+  await sendMail(options);
+}
+
 async function welcomeNotification(
   email: string,
   firstname: string
@@ -140,6 +157,7 @@ async function successInvoiceNotification({
 }
 
 export {
+  verifyEmailNotification,
   welcomeNotification,
   resetPasswordEmail,
   successChangedPasswordEmail,

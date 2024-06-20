@@ -104,4 +104,9 @@ const verifyRefreshToken = async (
   }
 };
 
-export { generateAuthToken, verifyRefreshToken };
+const buildSignupUrl = (token: string, email: string) => {
+  // This route is tentative
+  return `${process.env.BASE_URL}/auth/sign-in?token=${token}&email=${email}`;
+};
+
+export { generateAuthToken, verifyRefreshToken, buildSignupUrl };
