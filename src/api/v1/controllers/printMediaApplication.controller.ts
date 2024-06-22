@@ -427,7 +427,7 @@ class applicationMediaController {
       const products = await PrintMedia.find(filter);
       randomProducts = shuffle(products).slice(0, limit);
     } else {
-      if (limit * page > allProducts) {
+      if (limit * (page - 1) > allProducts) {
         page = 1;
       }
       randomProducts = await PrintMedia.find(filter)
