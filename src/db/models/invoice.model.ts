@@ -8,6 +8,7 @@ export interface Invoice extends Document {
   adminCustomId: string;
   customerName: string;
   customerMail: string;
+  invoiceCustomId: string;
   phoneNumber: string;
   mediaType: MediaType;
   state: string;
@@ -15,8 +16,8 @@ export interface Invoice extends Document {
   period: string;
   quantity: number;
   unitPrice: number;
-  total: string;
-  tax: string;
+  total: number;
+  tax: number;
   dueDate: string;
   paymentStatus: PaymentStatus;
   invoiceNote: string;
@@ -37,6 +38,11 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
     phoneNumber: {
       type: String,
       required: true,
+    },
+    invoiceCustomId: {
+      type: String,
+      required: true,
+      unique: true,
     },
     mediaType: {
       type: String,
@@ -68,11 +74,11 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
       required: true,
     },
     total: {
-      type: String,
+      type: Number,
       required: true,
     },
     tax: {
-      type: String,
+      type: Number,
       required: true,
     },
     dueDate: {
