@@ -1,5 +1,6 @@
 import User from "../db/models/user.model";
 import Admin from "../db/models/admin.model";
+import Invoice from "../db/models/invoice.model";
 
 import { BadRequest } from "../errors/httpErrors";
 
@@ -50,6 +51,32 @@ class GeneratorService {
 
       // Format the next ID with leading zeros
       const formattedId = `ADM${nextId.toString().padStart(paddingLength, "0")}`;
+
+      return formattedId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      throw new BadRequest(error.message, "INVALID_REQUEST_PARAMETERS");
+    }
+  }
+
+  async generateInvoiceCustomId(): Promise<string> {
+    try {
+      // Find the last invoice saved in the database
+      const lastInvoice = await Invoice.findOne(
+        {},
+        {},
+        { sort: { createdAt: -1 } }
+      );
+
+      let nextId = 1000001;
+      if (lastInvoice) {
+        // Extract the ID of the last invoice and increment it
+        const lastId = parseInt(lastInvoice.invoiceCustomId.substring(3), 10);
+        nextId = lastId + 1;
+      }
+
+      // Format the next ID
+      const formattedId = `VDI${nextId}`;
 
       return formattedId;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

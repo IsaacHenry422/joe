@@ -23,7 +23,7 @@ export const createInvoiceValidator = (payload: any) => {
     period: z.string({ required_error: "period is required." }),
     quantity: z.number({ required_error: "quantity is required." }),
     unitPrice: z.number({ required_error: "unitPrice is required." }),
-    tax: z.string({ required_error: "tax is required." }),
+    tax: z.number({ required_error: "tax is required." }),
     dueDate: z.string({ required_error: "dueDate is required." }),
     paymentStatus: z
       .enum(["Pending", "Failed", "Success"], {
@@ -60,7 +60,7 @@ export const updateInvoiceValidator = (payload: any) => {
     period: z.string().optional(),
     quantity: z.number().optional(),
     unitPrice: z.number().optional(),
-    tax: z.string().optional(),
+    tax: z.number().optional(),
     dueDate: z.string().optional(),
     paymentStatus: z
       .enum(["Pending", "Failed", "Success"], {
