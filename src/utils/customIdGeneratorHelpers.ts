@@ -58,7 +58,6 @@ class GeneratorService {
       throw new BadRequest(error.message, "INVALID_REQUEST_PARAMETERS");
     }
   }
-
   async generateInvoiceCustomId(): Promise<string> {
     try {
       // Find the last invoice saved in the database
@@ -68,11 +67,15 @@ class GeneratorService {
         { sort: { createdAt: -1 } }
       );
 
-      let nextId = 1000001;
-      if (lastInvoice) {
+      let nextId = 1000001; // Starting from 1000001
+      if (lastInvoice && lastInvoice.invoiceCustomId) {
         // Extract the ID of the last invoice and increment it
         const lastId = parseInt(lastInvoice.invoiceCustomId.substring(3), 10);
-        nextId = lastId + 1;
+        if (!isNaN(lastId)) {
+          nextId = lastId + 1;
+        } else {
+          throw new Error("Invalid last invoice ID format.");
+        }
       }
 
       // Format the next ID
