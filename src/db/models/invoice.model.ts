@@ -13,7 +13,7 @@ export interface Invoice extends Document {
   mediaType: MediaType;
   state: string;
   BRTtypes?: string;
-  period: string;
+  period: number;
   quantity: number;
   unitPrice: number;
   total: number;
@@ -62,7 +62,7 @@ const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
       type: String,
     },
     period: {
-      type: String,
+      type: Number,
       required: true,
     },
     quantity: {

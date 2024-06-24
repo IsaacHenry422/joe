@@ -63,7 +63,7 @@ class InvoiceController {
     } = data;
 
     // Calculate total based on unitPrice, quantity, and tax
-    const subtotal = unitPrice * quantity;
+    const subtotal = unitPrice * quantity * period;
     const taxAmount = subtotal * (tax / 100);
     const calculateTotal = subtotal + taxAmount;
 
@@ -188,6 +188,28 @@ class InvoiceController {
     if (!invoice) {
       throw new ResourceNotFound(
         `Invoice with ID ${invoiceId} not found.`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok(invoice);
+  }
+
+  async getInvoiceByCustomId(req: Request, res: Response) {
+    const { customId } = req.params;
+    if (!customId) {
+      throw new ResourceNotFound(
+        "invoiceCustomId is missing.",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    const invoice = await Invoice.findOne({ invoiceCustomId: customId }).select(
+      invoiceField.join(" ")
+    );
+    if (!invoice) {
+      throw new ResourceNotFound(
+        `Invoice with ID ${customId} not found.`,
         "RESOURCE_NOT_FOUND"
       );
     }
