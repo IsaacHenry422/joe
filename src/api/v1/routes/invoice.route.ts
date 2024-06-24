@@ -17,6 +17,12 @@ invoiceRouter.get(
   auth({ accountType: ["admin"] }),
   controller.getInvoiceById
 );
+// Get a specific invoice by custom ID route
+invoiceRouter.get(
+  "/custom/:customId",
+  auth({ accountType: ["admin"] }),
+  controller.getInvoiceByCustomId
+);
 
 // Create a new invoice route
 invoiceRouter.post(

@@ -45,6 +45,7 @@ export const invoiceField = [
   "customerMail",
   "phoneNumber",
   "mediaType",
+  "invoiceCustomId",
   "state",
   "BRTtypes",
   "period",
