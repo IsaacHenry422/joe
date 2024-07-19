@@ -22,6 +22,7 @@ import {
 } from "../../../utils/dataFilters";
 import { userFields } from "../../../utils/fieldHelpers";
 import * as validators from "../validators/auth.validator";
+import { successChangedPasswordEmail } from "../../../services/email.service";
 
 type QueryParams = {
   startDate?: Date;
@@ -167,6 +168,8 @@ class UserController {
       "authType.password": hash,
       updatedAt: new Date(),
     });
+
+    await successChangedPasswordEmail(user.email, user.firstname);
 
     return res.ok({
       message: "Password successfully changed",

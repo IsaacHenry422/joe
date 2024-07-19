@@ -31,6 +31,7 @@ import {
   verifyEmailNotification,
   welcomeNotification,
   resetPasswordEmail,
+  successChangedPasswordEmail,
 } from "../../../services/email.service";
 
 const EMAIL_TOKEN_EXPIRY = 10; // 10 minutes
@@ -567,6 +568,8 @@ class AuthController {
         passwordRecoveryOtpExpiresAt: undefined,
       };
       await user.save();
+      await successChangedPasswordEmail(user.email, user.firstname);
+
       res.ok({ message: "Your Password has been changed successfully" });
     }
   }

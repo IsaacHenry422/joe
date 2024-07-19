@@ -50,7 +50,7 @@ async function resetPasswordEmail(
     template: "forgot-password",
     variables: {
       name: firstname,
-      link: otp,
+      otp,
       email,
     },
   };
@@ -59,16 +59,14 @@ async function resetPasswordEmail(
 
 async function successChangedPasswordEmail(
   email: string,
-  firstname: string,
-  otp: string
+  firstname: string
 ): Promise<void> {
   const options: EmailOptions = {
     to: email,
     subject: "Your Vaad PIN Has Been Changed Successfully",
     template: "changed-password",
     variables: {
-      firstname,
-      otp,
+      name: firstname,
       email,
     },
   };
