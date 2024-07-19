@@ -46,7 +46,7 @@ async function resetPasswordEmail(
 ): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Reset Password",
+    subject: "Reset Your Vaad Account Password",
     template: "forgot-password",
     variables: {
       name: firstname,
@@ -64,7 +64,7 @@ async function successChangedPasswordEmail(
 ): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Password changed Successfully",
+    subject: "Your Vaad PIN Has Been Changed Successfully",
     template: "changed-password",
     variables: {
       firstname,
