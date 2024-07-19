@@ -11,6 +11,9 @@ export interface ITransaction extends Document {
   status: "Pending" | "Success" | "Failed";
   paymentMethod: "Paystack";
   paymentComment: string;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const transactionSchema = new Schema<ITransaction>(

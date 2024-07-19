@@ -5,8 +5,12 @@ dotenv.config();
 import Order from "../../../db/models/order.model";
 import Transaction from "../../../db/models/transaction.model";
 import Invoice from "../../../db/models/invoice.model";
+import User from "../../../db/models/user.model";
 import Notification from "./notification.controller";
-import { successInvoiceNotification } from "../../../services/email.service";
+import {
+  newTransactionNotification,
+  successInvoiceNotification,
+} from "../../../services/email.service";
 
 const secret = process.env.PAYSTACK_SECRET;
 
@@ -75,7 +79,19 @@ class WebhookController {
       };
       await Notification.createNotification(notificationPayload);
 
-      //send email to user
+      const user = await User.findById(savedOrder.userId);
+
+      //send email to user (Order and Transaction)
+
+      // Send successful transaction email notification
+      await newTransactionNotification({
+        email: savedOrder.email,
+        firstname: user?.firstname,
+        lastname: user?.lastname,
+        amount: transaction.amount,
+        createdAt: transaction.createdAt,
+      });
+
       //update the next availability in media(billboard)
     } else if (paymentType === "Invoice") {
       //perform Invoice here

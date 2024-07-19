@@ -90,6 +90,23 @@ async function successOrderNotification({
   await sendMail(options);
 }
 
+async function newTransactionNotification({
+  email,
+  ...variables
+}: {
+  email: string;
+  [key: string]: any;
+}): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "A new transaction just came in",
+    template: "success-transaction",
+    variables,
+  };
+
+  await sendMail(options);
+}
+
 async function pendingOrderNotification({
   email,
   ...variables
@@ -163,6 +180,7 @@ export {
   welcomeNotification,
   resetPasswordEmail,
   successChangedPasswordEmail,
+  newTransactionNotification,
   successOrderNotification,
   pendingOrderNotification,
   expiredOrderNotification,
