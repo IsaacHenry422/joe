@@ -16,6 +16,7 @@ async function verifyEmailNotification(
     variables: {
       name: firstname,
       link,
+      email,
     },
   };
   await sendMail(options);
@@ -31,6 +32,7 @@ async function welcomeNotification(
     template: "user-welcome",
     variables: {
       name: firstname,
+      email,
     },
   };
 
@@ -49,6 +51,7 @@ async function resetPasswordEmail(
     variables: {
       name: firstname,
       link: otp,
+      email,
     },
   };
   await sendMail(options);
@@ -66,6 +69,7 @@ async function successChangedPasswordEmail(
     variables: {
       firstname,
       otp,
+      email,
     },
   };
   await sendMail(options);
