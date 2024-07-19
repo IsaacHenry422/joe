@@ -14,9 +14,10 @@ import {
 import { invoiceField } from "../../../utils/fieldHelpers";
 import PaystackService from "../../../services/payment.service";
 
-import { invoiceNotification } from "../../../services/email.service";
+//import { invoiceNotification } from "../../../services/email.service";
 import * as validators from "../validators/invoice.validator";
 import Admin from "../../../db/models/admin.model";
+import GeneratorService from "../../../utils/customIdGeneratorHelpers";
 
 type QueryParams = {
   startDate?: Date;
@@ -44,6 +45,8 @@ class InvoiceController {
       throw new BadRequest(error.message, error.code);
     }
 
+    const invoiceCustomId = await GeneratorService.generateInvoiceCustomId();
+
     const {
       customerName,
       customerMail,
@@ -59,8 +62,10 @@ class InvoiceController {
       invoiceNote,
     } = data;
 
-    // Calculate total based on unitPrice and quantity
-    const calculateTotal = unitPrice * quantity;
+    // Calculate total based on unitPrice, quantity, and tax
+    const subtotal = unitPrice * quantity * period;
+    const taxAmount = subtotal * (tax / 100);
+    const calculateTotal = subtotal + taxAmount;
 
     // Create the invoice
     const invoice = new Invoice({
@@ -70,6 +75,7 @@ class InvoiceController {
       phoneNumber,
       mediaType,
       state,
+      invoiceCustomId,
       BRTtypes,
       period,
       quantity,
@@ -106,18 +112,18 @@ class InvoiceController {
     }
 
     // Send invoice notification with authorization URL
-    await invoiceNotification({
-      email: customerMail,
-      link: response,
-      mediaType,
-      state,
-      BRTtypes,
-      period,
-      quantity,
-      unitPrice,
-      tax,
-      dueDate,
-    });
+    // await invoiceNotification({
+    //   email: customerMail,
+    //   link: response,
+    //   mediaType,
+    //   state,
+    //   BRTtypes,
+    //   period,
+    //   quantity,
+    //   unitPrice,
+    //   tax,
+    //   dueDate,
+    // });
 
     res.created({
       invoice: savedInvoice,
@@ -182,6 +188,28 @@ class InvoiceController {
     if (!invoice) {
       throw new ResourceNotFound(
         `Invoice with ID ${invoiceId} not found.`,
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    res.ok(invoice);
+  }
+
+  async getInvoiceByCustomId(req: Request, res: Response) {
+    const { customId } = req.params;
+    if (!customId) {
+      throw new ResourceNotFound(
+        "invoiceCustomId is missing.",
+        "RESOURCE_NOT_FOUND"
+      );
+    }
+
+    const invoice = await Invoice.findOne({ invoiceCustomId: customId }).select(
+      invoiceField.join(" ")
+    );
+    if (!invoice) {
+      throw new ResourceNotFound(
+        `Invoice with ID ${customId} not found.`,
         "RESOURCE_NOT_FOUND"
       );
     }

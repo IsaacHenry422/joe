@@ -375,7 +375,7 @@ class applicationMediaController {
     const startDate = getStartDate(queryParams.startDate);
     const endDate = getEndDate(queryParams.endDate);
     const limit = getLimit(queryParams.limit);
-    const page = getPage(queryParams.page);
+    let page = getPage(queryParams.page);
 
     // Construct the filter based on query parameters
     const filter: Filter = {};
@@ -387,17 +387,20 @@ class applicationMediaController {
       filter.$and = orConditions;
     }
     let randomProducts;
+    const allProducts = await billboardMediaApplication.countDocuments(filter);
     if (limit < 5) {
       const products = await billboardMediaApplication.find(filter);
       randomProducts = shuffle(products).slice(0, limit);
     } else {
+      if (limit * (page - 1) > allProducts) {
+        page = 1;
+      }
       randomProducts = await billboardMediaApplication
         .find(filter)
         .limit(limit)
         .skip(limit * (page - 1))
         .sort({ createdAt: -1 });
     }
-    const allProducts = await billboardMediaApplication.countDocuments(filter);
     res.ok(
       {
         products: randomProducts,
