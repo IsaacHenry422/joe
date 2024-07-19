@@ -80,6 +80,17 @@ class WebhookController {
       await Notification.createNotification(notificationPayload);
 
       const user = await User.findById(savedOrder.userId);
+      // Format the createdAt date
+      const formattedDate = transaction.createdAt
+        ?.toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        })
+        .replace(",", "");
 
       //send email to user (Order and Transaction)
 
@@ -89,7 +100,7 @@ class WebhookController {
         firstname: user?.firstname,
         lastname: user?.lastname,
         amount: transaction.amount,
-        createdAt: transaction.createdAt,
+        createdAt: formattedDate, // Use formatted date
       });
 
       //update the next availability in media(billboard)
