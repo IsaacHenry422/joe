@@ -130,18 +130,34 @@ async function successOrderNotification(
   await sendMail(options);
 }
 
-async function pendingOrderNotification(variables: {
-  email: string;
-  firstname: string;
-  lastname: string;
-  amount: number;
-  createdAt: string;
-}): Promise<void> {
+async function pendingOrderNotification(
+  orderId: string,
+  email: string,
+  firstname: string,
+  date: string,
+  subTotal: number,
+  vat: number,
+  delivery: number,
+  totalAmount: number,
+  paymentMethod: string,
+  paymentComments: string
+): Promise<void> {
   const options: EmailOptions = {
-    to: variables.email,
-    subject: "URGENT: Your have a pending payment to make",
-    template: "pending-order-payment",
-    variables,
+    to: email,
+    subject: "URGENT: You have a pending payment to make",
+    template: "order",
+    variables: {
+      orderId,
+      name: firstname,
+      email,
+      date,
+      subTotal,
+      vat,
+      delivery,
+      totalAmount,
+      paymentMethod,
+      paymentComments,
+    },
     version: "pending-order",
   };
 

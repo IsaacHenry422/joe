@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
 import Order, { IOrder } from "../../../db/models/order.model";
+import User from "../../../db/models/user.model";
 
 // import User from "../../../db/models/user.model";
 import Notification from "./notification.controller";
@@ -30,6 +31,7 @@ type QueryParams = {
   paymentMethod?: string;
 };
 import { handleOrderValidation } from "../../../utils/orderHelpers";
+import { pendingOrderNotification } from "../../../services/email.service";
 
 class OrderController {
   //pay now
@@ -142,6 +144,33 @@ class OrderController {
       orderId: savedOrder._id,
     };
     await Notification.createNotification(notificationPayload);
+
+    const user = await User.findById(savedOrder.userId);
+    // Format the createdAt date
+    const formattedDate = savedOrder.createdAt
+      ?.toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })
+      .replace(",", "");
+
+    // Send successful order email notification
+    await pendingOrderNotification(
+      savedOrder.orderCustomId,
+      user!.email,
+      user!.firstname,
+      formattedDate!, // Use formatted date
+      savedOrder.amount.subTotal,
+      savedOrder.amount.vat,
+      savedOrder.amount.delivery,
+      savedOrder.amount.totalAmount,
+      savedOrder.paymentMethod,
+      "Not Available"
+    );
 
     return res.ok({
       order: savedOrder,
