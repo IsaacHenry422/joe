@@ -9,6 +9,7 @@ import User from "../../../db/models/user.model";
 import Notification from "./notification.controller";
 import {
   newTransactionNotification,
+  successOrderNotification,
   successInvoiceNotification,
 } from "../../../services/email.service";
 
@@ -95,15 +96,29 @@ class WebhookController {
       //send email to user (Order and Transaction)
 
       // Send successful transaction email notification
-      await newTransactionNotification({
-        email: savedOrder.email,
-        firstname: user?.firstname,
-        lastname: user?.lastname,
-        amount: transaction.amount,
-        createdAt: formattedDate, // Use formatted date
-      });
+      await newTransactionNotification(
+        user!.email,
+        user!.firstname,
+        user!.lastname,
+        transaction.amount,
+        formattedDate! // Use formatted date
+      );
 
-      //update the next availability in media(billboard)
+      // Send successful order email notification
+      await successOrderNotification(
+        savedOrder.orderCustomId,
+        user!.email,
+        user!.firstname,
+        formattedDate!, // Use formatted date
+        savedOrder.amount.subTotal,
+        savedOrder.amount.vat,
+        savedOrder.amount.delivery,
+        savedOrder.amount.totalAmount,
+        transaction.paymentMethod,
+        transaction.paymentComment
+      );
+
+      //TODO: update the next availability in media(billboard)
     } else if (paymentType === "Invoice") {
       //perform Invoice here
       // Update the payment status of the corresponding order

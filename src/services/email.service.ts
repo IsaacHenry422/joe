@@ -73,52 +73,76 @@ async function successChangedPasswordEmail(
   await sendMail(options);
 }
 
-async function successOrderNotification({
-  email,
-  ...variables
-}: {
-  email: string;
-  [key: string]: any;
-}): Promise<void> {
+async function newTransactionNotification(
+  email: string,
+  firstname: string,
+  lastname: string,
+  amount: number,
+  createdAt: string
+): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Your order was a success",
-    template: "sucesss-order",
-    variables,
-  };
-
-  await sendMail(options);
-}
-
-async function newTransactionNotification({
-  email,
-  ...variables
-}: {
-  email: string;
-  [key: string]: any;
-}): Promise<void> {
-  const options: EmailOptions = {
-    to: email,
-    subject: "A new transaction just came in",
+    subject: "ALERT: You have a new Transaction",
     template: "success-transaction",
-    variables,
+    variables: {
+      email,
+      firstname,
+      lastname,
+      amount,
+      createdAt,
+    },
   };
 
   await sendMail(options);
 }
 
-async function pendingOrderNotification({
-  email,
-  ...variables
-}: {
-  email: string;
-  [key: string]: any;
-}): Promise<void> {
+async function successOrderNotification(
+  orderId: string,
+  email: string,
+  firstname: string,
+  date: string,
+  subTotal: number,
+  vat: number,
+  delivery: number,
+  totalAmount: number,
+  paymentMethod: string,
+  paymentComments: string
+): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Your order payment is still pending",
+    subject: "ALERT: Your order was a Success",
+    template: "order",
+    variables: {
+      orderId,
+      name: firstname,
+      email,
+      date,
+      subTotal,
+      vat,
+      delivery,
+      totalAmount,
+      paymentMethod,
+      paymentComments,
+    },
+    version: "success-order",
+  };
+
+  await sendMail(options);
+}
+
+async function pendingOrderNotification(variables: {
+  email: string;
+  firstname: string;
+  lastname: string;
+  amount: number;
+  createdAt: string;
+}): Promise<void> {
+  const options: EmailOptions = {
+    to: variables.email,
+    subject: "URGENT: Your have a pending payment to make",
     template: "pending-order-payment",
     variables,
+    version: "pending-order",
   };
 
   await sendMail(options);
@@ -136,6 +160,7 @@ async function expiredOrderNotification({
     subject: "Your order will expire in 48 hours",
     template: "expired-order",
     variables,
+    version: "expired-order",
   };
 
   await sendMail(options);

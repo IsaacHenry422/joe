@@ -14,6 +14,7 @@ export interface EmailOptions {
   template: string;
   variables?: Record<string, any>;
   time?: Date;
+  version?: string;
 }
 
 type MailgunMessageData = {
@@ -25,7 +26,8 @@ type MailgunMessageData = {
   "t:variables"?: string;
   "o:deliverytime"?: string;
 
-  template: string;
+  [key: string]: any; // Index signature to allow additional properties
+  template?: string; // 'template' is optional if needed
 };
 
 //send Mail
@@ -34,6 +36,7 @@ async function sendMail({
   template,
   subject,
   variables = {},
+  version,
 }: EmailOptions): Promise<any> {
   const messageData: MailgunMessageData = {
     from: sender,
@@ -43,6 +46,10 @@ async function sendMail({
     html: "", // Provide a default value for html
     "t:variables": JSON.stringify(variables),
   };
+
+  if (version) {
+    messageData["t:version"] = version;
+  }
 
   return mailgunClient.messages.create(domain, messageData);
 }
