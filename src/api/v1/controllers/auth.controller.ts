@@ -272,6 +272,15 @@ class AuthController {
     return res.ok({
       message: "Email verification link sent to the email address provided",
     });
+
+    // let email = req.query.email as string;
+    // email = email.toLowerCase();
+
+    // await testEmail(email);
+
+    // return res.ok({
+    //   message: "Test email sent",
+    // });
   }
 
   // GOOGLE FOR BOTH user

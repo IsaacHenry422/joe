@@ -192,8 +192,9 @@ async function invoiceNotification({
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice is ready, pay now!",
-    template: "new-invoice",
+    template: "invoice",
     variables,
+    version: "new-invoice",
   };
 
   await sendMail(options);
@@ -209,12 +210,23 @@ async function successInvoiceNotification({
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice payment is successful",
-    template: "success-invoice",
+    template: " invoice",
     variables,
+    version: "success-invoice",
   };
 
   await sendMail(options);
 }
+
+// async function testEmail(email: string) {
+//   const options = {
+//     to: email,
+//     subject: "Accept invitation to attend event",
+//     template: "test",
+//   };
+
+//   await sendMail(options);
+// }
 
 export {
   verifyEmailNotification,
@@ -227,4 +239,5 @@ export {
   expiredOrderNotification,
   invoiceNotification,
   successInvoiceNotification,
+  // testEmail,
 };
