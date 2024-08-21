@@ -11,6 +11,18 @@ orderRouter.get(
 );
 
 orderRouter.get(
+  "/billboards",
+  // auth({ accountType: ["admin"] }),
+  reportController.billboardReport
+);
+
+orderRouter.get(
+  "/prints",
+  // auth({ accountType: ["admin"] }),
+  reportController.printReport
+);
+
+orderRouter.get(
   "/transactions",
   auth({ accountType: ["admin"] }),
   reportController.transactionReport

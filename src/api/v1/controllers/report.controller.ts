@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 
 import Order from "../../../db/models/order.model";
 import Transaction from "../../../db/models/transaction.model";
+import billboardMediaApplication from "../../../db/models/billboardMedia.model";
+import PrintMedia from "../../../db/models/printMedia.model";
 
 import {
   getLimit,
@@ -22,6 +24,8 @@ type QueryParams = {
   status?: string;
   transactionType?: string;
   paymentMethod?: string;
+  mediaType?: string;
+  prototypeId?: string;
 };
 
 // Define PipelineStage type
@@ -48,6 +52,47 @@ class ReportController {
     const totalOrders = await Order.countDocuments(query);
 
     res.ok({ totalOrders }, { page, limit, startDate, endDate });
+  }
+
+  async billboardReport(req: Request, res: Response) {
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const mediaType = queryParams.mediaType;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = {
+      createdAt: { $gte: startDate, $lte: endDate },
+    };
+
+    if (mediaType) {
+      query.mediaType = mediaType;
+    }
+
+    const totalBillboards =
+      await billboardMediaApplication.countDocuments(query);
+
+    res.ok({ totalBillboards }, { startDate, endDate });
+  }
+
+  async printReport(req: Request, res: Response) {
+    const queryParams: QueryParams = req.query;
+    const startDate = getStartDate(queryParams.startDate);
+    const endDate = getEndDate(queryParams.endDate);
+    const prototypeId = queryParams.prototypeId;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = {
+      createdAt: { $gte: startDate, $lte: endDate },
+    };
+
+    if (prototypeId) {
+      query.prototypeId = prototypeId;
+    }
+
+    const totalPrints = await PrintMedia.countDocuments(query);
+
+    res.ok({ totalPrints }, { startDate, endDate });
   }
 
   async transactionReport(req: Request, res: Response) {
