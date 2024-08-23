@@ -205,11 +205,13 @@ class applicationMediaController {
       .limit(limit)
       .skip(limit * (page - 1));
     const allProducts = await PrintMedia.countDocuments(filter);
+    const totalPages = Math.ceil(allProducts/limit);
     // Send the response
     res.ok(
       {
         products,
         totalProducts: allProducts,
+        totalPages: totalPages,
       },
       { page, limit, startDate, endDate }
     );
@@ -328,7 +330,8 @@ class applicationMediaController {
       !data.name &&
       !data.price &&
       !data.prototypeId &&
-      !data.finishingDetails
+      !data.finishingDetails &&
+      !data.vaad_id
     )
       throw new BadRequest(
         "please provide at least one field to update",
@@ -423,6 +426,7 @@ class applicationMediaController {
     }
     let randomProducts;
     const allProducts = await PrintMedia.countDocuments(filter);
+    const totalPages = Math.ceil(allProducts/limit);
     if (limit < 5) {
       const products = await PrintMedia.find(filter);
       randomProducts = shuffle(products).slice(0, limit);
@@ -439,6 +443,7 @@ class applicationMediaController {
       {
         products: randomProducts,
         totalProducts: allProducts,
+        totalPages: totalPages,
       },
       { page, limit, startDate, endDate }
     );
@@ -469,9 +474,10 @@ class applicationMediaController {
       .limit(limit)
       .skip(limit * (page - 1)); // Sort by relevance score
     const allProducts = await PrintMedia.countDocuments();
+    const totalPages = Math.ceil(allProducts/limit);
 
     // Send the search results in the response
-    res.ok({ searchResults, totalProducts: allProducts }, { page, limit });
+    res.ok({ searchResults, totalProducts: allProducts, totalPages: totalPages, }, { page, limit });
   }
 
   async updatePrintMediaFavoriteCount(req: Request, res: Response) {

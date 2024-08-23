@@ -3,11 +3,7 @@ import mongoose, { Document, Model } from "mongoose";
 // Define the interface for the Media Application document
 export interface IBillboardMediaApplication extends Document {
   // define others here
-  mediaType:
-    | "Static Billboard"
-    | "Led Billboard"
-    | "BRT Buses Billboard"
-    | "Lampost Billboard";
+  mediaType: "Static Billboard" | "Led Billboard" | "BRT Bus" | "Lampost";
   status: "Available" | "Unavailable";
   mediaCustomId: string;
   listingTitle: string;
@@ -19,6 +15,7 @@ export interface IBillboardMediaApplication extends Document {
   cityLga: string;
   landmark: string;
   price: number;
+  vaad_id: string;
   googleStreetlink: string;
   pictures: Array<object>;
   dimension: string;
@@ -37,12 +34,7 @@ const billboardMediaApplicationSchema =
   new mongoose.Schema<IBillboardMediaApplication>({
     mediaType: {
       type: String,
-      enum: [
-        "Static Billboard",
-        "Led Billboard",
-        "BRT Buses Billboard",
-        "Lampost Billboard",
-      ],
+      enum: ["Static Billboard", "Led Billboard", "BRT Bus", "Lampost"],
       required: true,
     },
     status: {
@@ -81,6 +73,9 @@ const billboardMediaApplicationSchema =
     createdByAdmin: {
       type: String,
       required: true,
+    },
+    vaad_id: {
+      type: String,
     },
     pictures: [
       {
