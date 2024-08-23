@@ -330,7 +330,8 @@ class applicationMediaController {
       !data.name &&
       !data.price &&
       !data.prototypeId &&
-      !data.finishingDetails
+      !data.finishingDetails &&
+      !data.vaad_id
     )
       throw new BadRequest(
         "please provide at least one field to update",

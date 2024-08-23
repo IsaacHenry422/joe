@@ -38,6 +38,7 @@ export const createMediaApplicationValidator = (payload: any) => {
     amountAvailable: z.string().optional(),
     
     createdByAdmin: z.string().optional(),
+    vaad_id: z.string().optional(),
     mediaCustomId: z.string().optional(),
   });
   return validateRequestBody(schema, payload);

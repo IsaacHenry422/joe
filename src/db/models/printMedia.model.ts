@@ -14,6 +14,7 @@ export interface IPrintMediaApplication extends Document {
   width: string;
   prototypeName: string;
   prototypeId: mongoose.Schema.Types.ObjectId;
+  vaad_id: string;
   createdByAdmin: string;
   finishingDetails: object;
   createdAt: Date;
@@ -50,6 +51,9 @@ const printMediaSchema = new mongoose.Schema<IPrintMediaApplication>({
   prototypeId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+  },
+  vaad_id: {
+    type: String,
   },
   height: {
     type: String,

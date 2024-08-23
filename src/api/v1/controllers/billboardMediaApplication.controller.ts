@@ -221,6 +221,7 @@ class applicationMediaController {
       dimension,
       nextAvailable,
       amountAvailable,
+      vaad_id,
     } = req.body;
     if (!productId)
       throw new BadRequest(
@@ -242,7 +243,8 @@ class applicationMediaController {
       !googleStreetlink &&
       !dimension &&
       !nextAvailable &&
-      !amountAvailable
+      !amountAvailable &&
+      !vaad_id
     ) {
       throw new BadRequest(
         "pleasse provided at least one field to update",
@@ -265,6 +267,7 @@ class applicationMediaController {
       dimension,
       nextAvailable,
       amountAvailable,
+      vaad_id,
     };
     const product = await billboardMediaApplication.findOneAndUpdate(
       { _id: productId },
