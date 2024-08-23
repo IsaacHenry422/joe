@@ -6,8 +6,8 @@ export interface IBillboardMediaApplication extends Document {
   mediaType:
     | "Static Billboard"
     | "Led Billboard"
-    | "BRT Buses Billboard"
-    | "Lampost Billboard";
+    | "BRT Bus"
+    | "Lampost";
   status: "Available" | "Unavailable";
   mediaCustomId: string;
   listingTitle: string;
@@ -40,8 +40,8 @@ const billboardMediaApplicationSchema =
       enum: [
         "Static Billboard",
         "Led Billboard",
-        "BRT Buses Billboard",
-        "Lampost Billboard",
+        "BRT Bus",
+        "Lampost",
       ],
       required: true,
     },

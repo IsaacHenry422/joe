@@ -57,7 +57,7 @@ class applicationMediaController {
     );
     if (error) throw new BadRequest(error.message, error.code);
     const { mediaType } = data;
-    if (mediaType === "BRT Buses Billboard") {
+    if (mediaType === "BRT Bus") {
       if (!data.route || !data.brtType || !data.amountAvailable) {
         throw new BadRequest(
           "please provide route, brt type and amount available",
@@ -141,11 +141,13 @@ class applicationMediaController {
       .limit(limit)
       .skip(limit * (page - 1));
     const allProducts = await billboardMediaApplication.countDocuments(filter);
+    const totalPages = Math.ceil(allProducts/limit);
     // Send the response
     res.ok(
       {
         products,
         totalProducts: allProducts,
+        totalPages: totalPages,
       },
       { page, limit, startDate, endDate }
     );
@@ -388,6 +390,7 @@ class applicationMediaController {
     }
     let randomProducts;
     const allProducts = await billboardMediaApplication.countDocuments(filter);
+    const totalPages = Math.ceil(allProducts/limit);
     if (limit < 5) {
       const products = await billboardMediaApplication.find(filter);
       randomProducts = shuffle(products).slice(0, limit);
@@ -405,6 +408,7 @@ class applicationMediaController {
       {
         products: randomProducts,
         totalProducts: allProducts,
+        totalPages:totalPages,
       },
       { page, limit, startDate, endDate }
     );
@@ -436,8 +440,9 @@ class applicationMediaController {
       .limit(limit)
       .skip(limit * (page - 1)); // Sort by relevance score
     const allProducts = await billboardMediaApplication.countDocuments();
+    const totalPages = Math.ceil(allProducts/limit);
     // Send the search results in the response
-    res.ok({ searchResults, totalProducts: allProducts }, { limit, page });
+    res.ok({ searchResults, totalProducts: allProducts, totalPages:totalPages, }, { limit, page });
   }
 
   // async searchProductsByProductName(req: Request, res: Response) {

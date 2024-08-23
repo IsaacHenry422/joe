@@ -8,7 +8,7 @@ export const createMediaApplicationValidator = (payload: any) => {
     description: z.string({
       required_error: "Product Description is required.",
     }),
-    mediaType: z.enum(["Static Billboard","Led Billboard","BRT Buses Billboard","Lampost Billboard"],{
+    mediaType: z.enum(["Static Billboard","Led Billboard","BRT Bus","Lampost"],{
       required_error: "Producy media type is required.",
     }),
     status: z.enum(["Available","Unavailbale"]).default("Available"),
