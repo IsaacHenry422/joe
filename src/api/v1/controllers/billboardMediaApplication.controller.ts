@@ -137,7 +137,7 @@ class applicationMediaController {
     // Query the database with the constructed filter
     const products = await billboardMediaApplication
       .find(filter)
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(limit * (page - 1));
     const allProducts = await billboardMediaApplication.countDocuments(filter);
