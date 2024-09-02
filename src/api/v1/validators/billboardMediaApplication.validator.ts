@@ -34,6 +34,7 @@ export const createMediaApplicationValidator = (payload: any) => {
     landmark: z.string().optional(),
     
     brtType: z.string().optional(),
+    brtName: z.string().optional(),
     route: z.string().optional(),
     amountAvailable: z.string().optional(),
     
@@ -48,8 +49,6 @@ export const createMediaApplicationValidator = (payload: any) => {
 export const updateMediaApplicationValidator = (payload: any) => {
   const schema = z.object({
     productName: z.string().optional(),
-    // productSlug: z.string().optional(),
-    // productQrCode: z.string().optional(),
     productDescription: z.string().optional(),
     productAmountInStock: z.number().optional(),
     productCategory: z.string().optional(),

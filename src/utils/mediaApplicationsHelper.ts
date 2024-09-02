@@ -3,6 +3,7 @@ type QueryParams = {
   endDate?: Date;
   limit?: string;
   page?: string;
+  brtName?: string;
   brtType?: string;
   mediaType?: string;
   status?: string;
@@ -63,6 +64,9 @@ class applicationMediaHelper {
     }
     if (queryParams.route) {
       orConditions.push({ route: queryParams.route });
+    }
+    if (queryParams.brtName) {
+      orConditions.push({ brtName: queryParams.brtName });
     }
     if (queryParams.state) {
       orConditions.push({ state: queryParams.state });
