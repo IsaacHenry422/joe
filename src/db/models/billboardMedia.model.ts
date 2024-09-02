@@ -8,8 +8,9 @@ export interface IBillboardMediaApplication extends Document {
   mediaCustomId: string;
   listingTitle: string;
   description: string;
-  brtType: string;
+  brtName: string;
   route: string;
+  brtType: string;
   address: string;
   state: string;
   cityLga: string;
@@ -91,6 +92,7 @@ const billboardMediaApplicationSchema =
 
     // brt media type fields
     brtType: String,
+    brtName: String,
     route: String,
     amountAvailable: String,
 

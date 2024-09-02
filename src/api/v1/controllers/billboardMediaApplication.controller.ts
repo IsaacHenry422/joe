@@ -58,7 +58,7 @@ class applicationMediaController {
     if (error) throw new BadRequest(error.message, error.code);
     const { mediaType } = data;
     if (mediaType === "BRT Bus") {
-      if (!data.route || !data.brtType || !data.amountAvailable) {
+      if (!data.route || !data.brtType || !data.amountAvailable || data.brtName) {
         throw new BadRequest(
           "please provide route, brt type and amount available",
           "INVALID_REQUEST_PARAMETERS"
@@ -76,9 +76,9 @@ class applicationMediaController {
         );
       }
     } else {
-      if (data.route || data.brtType || data.amountAvailable) {
+      if (data.route || data.brtType || data.amountAvailable || data.brtName) {
         throw new BadRequest(
-          `${mediaType} cannot have route, brt type or amount available`,
+          `${mediaType} cannot have route, brt type, amount available or brtName`,
           "INVALID_REQUEST_PARAMETERS"
         );
       }
