@@ -42,6 +42,7 @@ export interface IOrder extends Document {
     billboard?: {
       _id: mongoose.Types.ObjectId;
       mediaCustomId: string;
+      vaad_id: string;
       listingTitle: string;
       price: number;
       pictures: Array<object>;

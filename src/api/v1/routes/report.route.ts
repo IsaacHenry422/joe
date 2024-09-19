@@ -12,13 +12,13 @@ orderRouter.get(
 
 orderRouter.get(
   "/billboards",
-  // auth({ accountType: ["admin"] }),
+  auth({ accountType: ["admin"] }),
   reportController.billboardReport
 );
 
 orderRouter.get(
   "/prints",
-  // auth({ accountType: ["admin"] }),
+  auth({ accountType: ["admin"] }),
   reportController.printReport
 );
 

@@ -2,6 +2,12 @@ import { Request, Response } from "express";
 import { BadRequest, ResourceNotFound } from "../../../errors/httpErrors";
 import Contact from "../../../db/models/contactForm.model";
 import * as validators from "../validators/contact.validator";
+import {
+  contactUsUserCopy,
+  contactUsAdminCopy,
+} from "../../../services/email.service";
+import dotenv from "dotenv";
+dotenv.config();
 
 import {
   getLimit,
@@ -122,6 +128,19 @@ class ContactController {
     }
 
     res.noContent();
+  }
+  async contactUs(req: Request, res: Response) {
+    const { error, data } = validators.createContactValidator(req.body);
+    if (error) {
+      throw new BadRequest(error.message, error.code);
+    }
+    const { name, email, phoneNumber, message } = data;
+    const admin = process.env.ADMIN_EMAIL;
+    await contactUsUserCopy(email, name, message);
+    await contactUsAdminCopy(email,admin??"", name, phoneNumber, message);
+    res.ok({
+      message: "message sent to admin and user successfully.",
+    });
   }
 }
 

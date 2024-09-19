@@ -33,14 +33,19 @@ class transactionController {
     const transactions = await Transaction.find({
       createdAt: { $gte: startDate, $lte: endDate },
     })
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(limit * (page - 1));
-
+    const totalTransactions = await Transaction.countDocuments({
+      createdAt: { $gte: startDate, $lte: endDate },
+    });
+    const totalPages = Math.ceil(totalTransactions / limit);
     // Send the response
     res.ok(
       {
         transactions,
+        totalTransactions,
+        totalPages,
       },
       { page, limit, startDate, endDate }
     );
@@ -68,13 +73,20 @@ class transactionController {
       userId,
       createdAt: { $gte: startDate, $lte: endDate },
     })
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(limit * (page - 1));
+    const totalTransactions = await Transaction.countDocuments({
+      userId,
+      createdAt: { $gte: startDate, $lte: endDate },
+    });
+    const totalPages = Math.ceil(totalTransactions / limit);
     // Send the response
     res.ok(
       {
         transactions,
+        totalTransactions,
+        totalPages,
       },
       { page, limit, startDate, endDate }
     );

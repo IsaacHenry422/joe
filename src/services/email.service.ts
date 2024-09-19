@@ -218,6 +218,43 @@ async function successInvoiceNotification({
   await sendMail(options);
 }
 
+async function contactUsUserCopy (
+  email: string,
+  firstname: string,
+  message: string
+): Promise<void> {
+  const options: EmailOptions = {
+    to: email,
+    subject: "Copy of email sent to Vaad",
+    template: "contact-us-admin",
+    variables: {
+      name: firstname,
+      message,
+      email,
+    },
+  };
+  await sendMail(options);
+}
+async function contactUsAdminCopy (
+  email: string,
+  admin: string,
+  firstname: string,
+  phoneNumber: string,
+  message: string
+): Promise<void> {
+  const options: EmailOptions = {
+    to: admin,
+    subject: `Message from ${firstname}`,
+    template: "contact-us-admin-copy",
+    variables: {
+      name: firstname,
+      message,
+      email,
+      phoneNumber,
+    },
+  };
+  await sendMail(options);
+}
 // async function testEmail(email: string) {
 //   const options = {
 //     to: email,
@@ -239,5 +276,7 @@ export {
   expiredOrderNotification,
   invoiceNotification,
   successInvoiceNotification,
+  contactUsUserCopy,
+  contactUsAdminCopy,
   // testEmail,
 };
