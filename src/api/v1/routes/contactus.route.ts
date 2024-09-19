@@ -5,7 +5,7 @@ import controller from "../controllers/contactForm.controller";
 const contactUsRouter = express.Router();
 
 // Create a new contactus entry route
-contactUsRouter.post("/", controller.createContact);
+contactUsRouter.post("/", controller.contactUs);
 
 // Get all contactus entries route
 contactUsRouter.get(
