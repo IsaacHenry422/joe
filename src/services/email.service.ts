@@ -245,13 +245,14 @@ async function contactUsAdminCopy (
   const options: EmailOptions = {
     to: admin,
     subject: `Message from ${firstname}`,
-    template: "contact-us-admin-copy",
+    template: "contact-us-admin",
     variables: {
       name: firstname,
       message,
       email,
       phoneNumber,
     },
+    version: "contact-us-admin-cpoy",
   };
   await sendMail(options);
 }
