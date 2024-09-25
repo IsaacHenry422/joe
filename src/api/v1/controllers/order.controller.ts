@@ -253,6 +253,8 @@ class OrderController {
 
     // Calculate totalAmount
     const totalAmount = amount.subTotal + amount.vat + amount.delivery;
+    console.log("totalAmount", totalAmount);
+    console.log("amount.totalAmount", amount.totalAmount);
 
     // Check if totalAmount matches provided totalAmount
     if (totalAmount !== amount.totalAmount) {
