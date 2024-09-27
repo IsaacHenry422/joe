@@ -13,12 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build the application
-        run: npm run build
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -28,5 +22,6 @@ jobs:
           script: |
             cd /home/ec2-user/vaadbackend
             git pull origin main
-            npm install --production  # Install only production dependencies
+            npm install 
+            npm run build
             pm2 restart vaadbackend  
