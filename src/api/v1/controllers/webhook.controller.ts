@@ -126,7 +126,7 @@ class WebhookController {
         { _id: savedInvoice._id }, // Update Invoice, not Order
         {
           paymentStatus: "Success",
-          orderStatus: "Awaiting Confirmation",
+          // orderStatus: "Awaiting Confirmation",
         }
       );
 
@@ -144,11 +144,18 @@ class WebhookController {
 
       // Send invoice successful email notification
       await successInvoiceNotification({
-        email: savedInvoice.email,
-        period: savedInvoice.period,
+        email: savedInvoice.customerMail,
+        name: savedInvoice.customerName,
+        invoiceCustomId: savedInvoice.invoiceCustomId,
+        createdAt: new Date(),
+        mediaType: savedInvoice.mediaType,
+        BRTtypes: savedInvoice.BRTtypes!,
+        dueDate: savedInvoice.dueDate,
         quantity: savedInvoice.quantity,
         unitPrice: savedInvoice.unitPrice,
         tax: savedInvoice.tax,
+        total: savedInvoice.total,
+        paymentStatus: savedInvoice.paymentStatus,
       });
 
       // Save the transaction record to the database

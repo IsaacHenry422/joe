@@ -13,6 +13,7 @@ import {
 } from "../../../utils/dataFilters";
 import { invoiceField } from "../../../utils/fieldHelpers";
 import PaystackService from "../../../services/payment.service";
+import { invoiceNotification } from "../../../services/email.service";
 
 //import { invoiceNotification } from "../../../services/email.service";
 import * as validators from "../validators/invoice.validator";
@@ -112,18 +113,21 @@ class InvoiceController {
     }
 
     // Send invoice notification with authorization URL
-    // await invoiceNotification({
-    //   email: customerMail,
-    //   link: response,
-    //   mediaType,
-    //   state,
-    //   BRTtypes,
-    //   period,
-    //   quantity,
-    //   unitPrice,
-    //   tax,
-    //   dueDate,
-    // });
+    await invoiceNotification({
+      email: customerMail,
+      name: customerName,
+      link: response,
+      invoiceCustomId,
+      createdAt: new Date(),
+      mediaType,
+      BRTtypes: BRTtypes!,
+      dueDate,
+      quantity,
+      unitPrice,
+      tax,
+      total: calculateTotal,
+      paymentStatus: "Pending",
+    });
 
     res.created({
       invoice: savedInvoice,
