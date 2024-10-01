@@ -184,41 +184,110 @@ async function expiredOrderNotification({
 
 async function invoiceNotification({
   email,
-  ...variables
+  name,
+  link,
+  invoiceCustomId,
+  createdAt,
+  mediaType,
+  BRTtypes,
+  dueDate,
+  quantity,
+  unitPrice,
+  tax,
+  total,
+  paymentStatus,
 }: {
   email: string;
-  [key: string]: any;
+  name: string;
+  link: string;
+  invoiceCustomId: string;
+  createdAt: Date;
+  mediaType: string;
+  BRTtypes: string;
+  dueDate: string;
+  quantity: number;
+  unitPrice: number;
+  tax: number;
+  total: number;
+  paymentStatus: string;
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
     subject: "Your Invoice is ready, pay now!",
     template: "invoice",
-    variables,
-    version: "new-invoice",
+    variables: {
+      name,
+      link,
+      invoiceCustomId,
+      createdAt,
+      mediaType,
+      BRTtypes,
+      dueDate,
+      quantity,
+      unitPrice: unitPrice.toFixed(2),
+      tax: tax.toFixed(2),
+      total: total.toFixed(2), // Format total to 2 decimal places
+      paymentStatus,
+    },
+    version: "invoice-creation",
   };
 
   await sendMail(options);
 }
-
 async function successInvoiceNotification({
   email,
-  ...variables
+  name,
+  link,
+  invoiceCustomId,
+  createdAt,
+  mediaType,
+  BRTtypes,
+  dueDate,
+  quantity,
+  unitPrice,
+  tax,
+  total,
+  paymentStatus,
 }: {
   email: string;
-  [key: string]: any;
+  name: string;
+  link: string;
+  invoiceCustomId: string;
+  createdAt: Date;
+  mediaType: string;
+  BRTtypes: string;
+  dueDate: string;
+  quantity: number;
+  unitPrice: number;
+  tax: number;
+  total: number;
+  paymentStatus: string;
 }): Promise<void> {
   const options: EmailOptions = {
     to: email,
-    subject: "Your Invoice payment is successful",
+    subject: "Your Invoice payment was successful",
     template: " invoice",
-    variables,
+    variables: {
+      name,
+      link,
+      invoiceCustomId,
+      createdAt,
+      mediaType,
+      BRTtypes,
+      dueDate,
+      quantity,
+      unitPrice: unitPrice.toFixed(2),
+      tax: tax.toFixed(2),
+      total: total.toFixed(2), // Format total to 2 decimal places
+      paymentStatus,
+    },
     version: "success-invoice",
   };
 
   await sendMail(options);
 }
 
-async function contactUsUserCopy (
+async function contactUsUserCopy(
   email: string,
   firstname: string,
   message: string
@@ -235,7 +304,7 @@ async function contactUsUserCopy (
   };
   await sendMail(options);
 }
-async function contactUsAdminCopy (
+async function contactUsAdminCopy(
   email: string,
   admin: string,
   firstname: string,
