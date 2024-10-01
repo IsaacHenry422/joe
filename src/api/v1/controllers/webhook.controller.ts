@@ -144,7 +144,7 @@ class WebhookController {
 
       // Send invoice successful email notification
       await successInvoiceNotification({
-        email: savedInvoice.email,
+        email: savedInvoice.customerMail,
         name: savedInvoice.customerName,
         invoiceCustomId: savedInvoice.invoiceCustomId,
         createdAt: new Date(),
