@@ -273,9 +273,9 @@ async function successInvoiceNotification({
       BRTtypes,
       dueDate,
       quantity,
-      unitPrice: unitPrice.toFixed(2),
-      tax: tax.toFixed(2),
-      total: total.toFixed(2), // Format total to 2 decimal places
+      unitPrice: unitPrice,
+      tax: tax,
+      total: total, // Format total to 2 decimal places
       paymentStatus,
     },
     version: "success-invoice",
