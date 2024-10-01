@@ -148,11 +148,13 @@ class WebhookController {
         name: savedInvoice.customerName,
         invoiceCustomId: savedInvoice.invoiceCustomId,
         createdAt: new Date(),
+        mediaType: savedInvoice.mediaType,
         BRTtypes: savedInvoice.BRTtypes!,
         dueDate: savedInvoice.dueDate,
         quantity: savedInvoice.quantity,
         unitPrice: savedInvoice.unitPrice,
         tax: savedInvoice.tax,
+        total: savedInvoice.total,
         paymentStatus: savedInvoice.paymentStatus,
       });
 

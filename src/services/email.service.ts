@@ -237,7 +237,6 @@ async function invoiceNotification({
 async function successInvoiceNotification({
   email,
   name,
-  link,
   invoiceCustomId,
   createdAt,
   mediaType,
@@ -251,7 +250,6 @@ async function successInvoiceNotification({
 }: {
   email: string;
   name: string;
-  link: string;
   invoiceCustomId: string;
   createdAt: Date;
   mediaType: string;
@@ -269,7 +267,6 @@ async function successInvoiceNotification({
     template: " invoice",
     variables: {
       name,
-      link,
       invoiceCustomId,
       createdAt,
       mediaType,
