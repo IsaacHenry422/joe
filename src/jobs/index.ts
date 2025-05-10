@@ -1,5 +1,5 @@
 // jobs/index.ts
-import paymentSubEnded from "./paymentSubEnded";
+// import paymentSubEnded from "./paymentSubEnded";
 
 interface Job {
   name: string;
@@ -9,11 +9,11 @@ interface Job {
 
 const jobs: Job[] = [
   // Every 1 minute
-  {
-    name: "payment-sub-ended",
-    cron: "*/5 * * * *",
-    handler: paymentSubEnded,
-  },
+  // {
+  //   name: "payment-sub-ended",
+  //   cron: "*/5 * * * *",
+  //   handler: paymentSubEnded,
+  // },
 ];
 
 export default jobs;

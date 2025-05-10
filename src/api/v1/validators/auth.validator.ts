@@ -5,11 +5,8 @@ import { validateRequestBody } from "../../../utils/zodHelpers";
 // eslint-disable-next-line
 export const createUserValidator = (payload: any) => {
   const schema = z.object({
-    firstname: z.string({
-      required_error: "First name is required.",
-    }),
-    lastname: z.string({
-      required_error: "Last name is required.",
+    fullname: z.string({
+      required_error: "Full name is required.",
     }),
     phoneNumber: z.string({
       required_error: "Phone Number is required.",
@@ -142,8 +139,10 @@ export const verifyUserOtpAndChangePasswordValidator = (payload: any) => {
     newPassword: z.string({
       required_error: "new Password is required.",
     }),
+    accountType: z.enum(["Seller", "User"], {
+      required_error: "Account Type is required.",
+    }),
   });
-
   return validateRequestBody(schema, payload);
 };
 

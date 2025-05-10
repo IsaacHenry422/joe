@@ -15,7 +15,7 @@ authRouter.post("/user/resend-token", controller.formEmailVerification);
 authRouter.get("/google/getauthurl", controller.getGoogleConsentUrl);
 authRouter.post("/google/callback", controller.googleVerification);
 
-//password reset and regenerate verify email token for users/owners
+//password reset and regenerate verify email token for users/sellers
 authRouter.post(
   "/resetpassword/send-token",
   controller.sendTokenToForgetPassword
@@ -42,7 +42,7 @@ authRouter.post("/admin/login", controller.adminLogin);
 authRouter.post("/refresh-token", controller.refreshToken);
 authRouter.patch("/logout", controller.logout);
 
-// get loggedin user/owner/admin
+// get loggedin user/seller/admin
 authRouter.get("/me", auth(), controller.loggedInAccount);
 
 export default authRouter;

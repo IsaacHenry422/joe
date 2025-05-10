@@ -3,8 +3,7 @@
 // user field
 export const userFields = [
   "_id",
-  "firstname",
-  "lastname",
+  "fullname",
   "email",
   "userCustomId",
   "profilePicture",

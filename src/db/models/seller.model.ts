@@ -3,7 +3,7 @@ import mongoose, { Document, Model } from "mongoose";
 type AccountType = "Admin" | "User" | "Seller";
 type authMethod = "Form" | "Google";
 
-export interface IUser extends Document {
+export interface ISeller extends Document {
   fullname: string;
   email: string;
   customId: string;
@@ -37,7 +37,7 @@ export interface IUser extends Document {
   deletedAt?: boolean;
 }
 
-const UserSchema = new mongoose.Schema<IUser>(
+const SellerSchema = new mongoose.Schema<ISeller>(
   {
     fullname: {
       type: String,
@@ -133,6 +133,6 @@ const UserSchema = new mongoose.Schema<IUser>(
   { timestamps: true }
 );
 
-const UserModel: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
+const SellerModel: Model<ISeller> = mongoose.model<ISeller>("Seller", SellerSchema);
 
-export default UserModel;
+export default SellerModel;

@@ -1,111 +1,94 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+ // src/db/models/invoice.model.ts
 
-type MediaType = "Static" | "Led Billboard" | "BRT Buses" | "Lampost Billboard";
+import mongoose, { Schema, Document } from 'mongoose';
 
-type PaymentStatus = "Pending" | "Failed" | "Success";
-
-export interface Invoice extends Document {
-  adminCustomId: string;
-  customerName: string;
-  customerMail: string;
-  invoiceCustomId: string;
-  phoneNumber: string;
-  mediaType: MediaType;
-  state: string;
-  BRTtypes?: string;
-  period: number;
+export interface InvoiceItem {
+  productId: mongoose.Types.ObjectId;
+  name: string;
   quantity: number;
-  unitPrice: number;
-  total: number;
-  tax: number;
-  dueDate: string;
-  paymentStatus: PaymentStatus;
-  invoiceNote: string;
-  deletedAt?: Date | null;
+  price: number;
 }
 
-const InvoiceSchema: Schema<Invoice> = new Schema<Invoice>(
+export interface Invoice extends Document {
+  orderId: mongoose.Types.ObjectId;
+  customerId: mongoose.Types.ObjectId;
+  invoiceNumber: string;
+  invoiceCustomId?: string; // Added invoiceCustomId
+  invoiceDate: Date;
+  dueDate?: Date;
+  items: InvoiceItem[];
+  subtotal: number;
+  taxRate?: number;
+  taxAmount?: number;
+  totalAmount: number;
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentDate?: Date;
+  shippingAddress?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  billingAddress?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const InvoiceItemSchema: Schema = new Schema({
+  productId: { type: Schema.Types.ObjectId, required: true, ref: 'Product' }, // Assuming you have a Product model
+  name: { type: String, required: true },
+  quantity: { type: Number, required: true, min: 1 },
+  price: { type: Number, required: true, min: 0 },
+});
+
+const InvoiceSchema: Schema = new Schema(
   {
-    adminCustomId: { type: String, required: true },
-    customerName: {
-      type: String,
-      required: true,
-    },
-    customerMail: {
-      type: String,
-      required: true,
-    },
-    phoneNumber: {
-      type: String,
-      required: true,
-    },
-    invoiceCustomId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    mediaType: {
-      type: String,
-      enum: [
-        "Static Billboard",
-        "Led Billboard",
-        "BRT Buses Billboard",
-        "Lampost Billboard",
-      ],
-      required: true,
-    },
-    state: {
-      type: String,
-      required: true,
-    },
-    BRTtypes: {
-      type: String,
-    },
-    period: {
-      type: Number,
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-    },
-    unitPrice: {
-      type: Number,
-      required: true,
-    },
-    total: {
-      type: Number,
-      required: true,
-    },
-    tax: {
-      type: Number,
-      required: true,
-    },
-    dueDate: {
-      type: String,
-      required: true,
-    },
+    orderId: { type: Schema.Types.ObjectId, required: true, ref: 'Order', unique: true }, // Link to the order
+    customerId: { type: Schema.Types.ObjectId, required: true, ref: 'User' }, // Link to the customer
+    invoiceNumber: { type: String, required: true, unique: true },
+    invoiceCustomId: { type: String, unique: true },  // Added invoiceCustomId
+    invoiceDate: { type: Date, required: true, default: Date.now },
+    dueDate: { type: Date },
+    items: [InvoiceItemSchema],
+    subtotal: { type: Number, required: true, min: 0 },
+    taxRate: { type: Number, min: 0 },
+    taxAmount: { type: Number, min: 0 },
+    totalAmount: { type: Number, required: true, min: 0 },
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Failed", "Success"],
-      default: "Pending",
-      required: true,
+      enum: ['pending', 'paid', 'failed', 'refunded'],
+      default: 'pending',
     },
-    invoiceNote: {
-      type: String,
-      required: true,
+    paymentDate: { type: Date },
+    shippingAddress: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
     },
-    deletedAt: {
-      type: Boolean,
-      default: false,
+    billingAddress: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
     },
+    notes: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+  }
 );
 
-const InvoiceModel: Model<Invoice> = mongoose.model<Invoice>(
-  "Invoice",
-  InvoiceSchema
-);
+const InvoiceModel = mongoose.model<Invoice>('Invoice', InvoiceSchema);
 
 export default InvoiceModel;

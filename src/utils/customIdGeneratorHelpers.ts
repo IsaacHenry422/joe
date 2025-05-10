@@ -13,7 +13,7 @@ class GeneratorService {
       let nextId = 1;
       if (lastUser) {
         // Extract the ID of the last user and increment it
-        const lastId = parseInt(lastUser.userCustomId.substring(2), 10);
+        const lastId = parseInt(lastUser.customId.substring(2), 10);
         nextId = lastId + 1;
       }
 

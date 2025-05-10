@@ -92,7 +92,7 @@ class UserController {
 
     if (!user) {
       throw new BadRequest(
-        `User ${user!.userCustomId} not updated.`,
+        `User ${user!.customId} not updated.`,
         "INVALID_REQUEST_PARAMETERS"
       );
     }
@@ -169,7 +169,7 @@ class UserController {
       updatedAt: new Date(),
     });
 
-    await successChangedPasswordEmail(user.email, user.firstname);
+    await successChangedPasswordEmail(user.email, user.fullname);
 
     return res.ok({
       message: "Password successfully changed",

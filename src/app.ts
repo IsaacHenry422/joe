@@ -12,8 +12,6 @@ import { conditionalMiddleware } from "./utils/expressHelpers";
 const app = express();
 const whitelist = [
   "http://localhost:3000",
-  "https://vaadmedia.vercel.app",
-  "https://vaad.com.ng",
 ];
 
 // Middlewares

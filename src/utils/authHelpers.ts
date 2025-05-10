@@ -2,6 +2,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import User, { IUser } from "../db/models/user.model";
+import Seller, { ISeller } from "../db/models/seller.model";
 import Admin, { IAdmin } from "../db/models/admin.model";
 
 import jwt from "jsonwebtoken";
@@ -15,7 +16,7 @@ type AccountDetails = IUser | IAdmin;
 
 const generateAuthToken = async (
   accountDetails: AccountDetails,
-  accountType: "User" | "Admin"
+  accountType: "User" | "Seller"| "Admin"
 ) => {
   try {
     let payload, accessToken, refreshToken;
@@ -31,6 +32,20 @@ const generateAuthToken = async (
       });
 
       await User.findOneAndUpdate(
+        { _id: accountDetails._id },
+        { refreshToken, updatedAt: new Date() },
+        { new: true }
+      );
+    }  else if (accountType === "Seller") {
+      payload = { sellerId: accountDetails._id };
+      accessToken = jwt.sign(payload, process.env.JWT_SEC!, {
+        expiresIn: "1h",
+      });
+      refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN!, {
+        expiresIn: "1d",
+      });
+
+      await Seller.findOneAndUpdate(
         { _id: accountDetails._id },
         { refreshToken, updatedAt: new Date() },
         { new: true }
@@ -61,7 +76,7 @@ const generateAuthToken = async (
 
 const verifyRefreshToken = async (
   refreshToken: string,
-  accountType: "User" | "Admin"
+  accountType: "User" | "Seller" |"Admin"
 ) => {
   const privateKey = process.env.REFRESH_TOKEN!;
 
@@ -70,7 +85,11 @@ const verifyRefreshToken = async (
 
     if (accountType === "User") {
       doc = await User.findOne({ refreshToken });
-    } else if (accountType === "Admin") {
+    } 
+    else if (accountType === "Seller") {
+      doc = await Seller.findOne({ refreshToken });
+    }
+    else if (accountType === "Admin") {
       doc = await Admin.findOne({ refreshToken });
     } else {
       throw new Error("Invalid account type provided");

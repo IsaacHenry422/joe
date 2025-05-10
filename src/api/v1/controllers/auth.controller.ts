@@ -17,9 +17,11 @@ import {
 } from "../../../errors/httpErrors";
 import Admin from "../../../db/models/admin.model";
 import User, { IUser } from "../../../db/models/user.model";
+import Seller, { ISeller } from "../../../db/models/seller.model";
 import * as validators from "../validators/auth.validator";
 import googleHelpers from "../../../utils/authGoogleHelpers";
 import GeneratorService from "../../../utils/customIdGeneratorHelpers";
+// import moment from 'moment-timezone';
 
 import {
   generateAuthToken,
@@ -44,7 +46,7 @@ class AuthController {
     const { error, data } = validators.createUserValidator(req.body);
     if (error) throw new BadRequest(error.message, error.code);
 
-    const { firstname, lastname, email, password, phoneNumber } = data;
+    const { fullname, email, password, phoneNumber } = data;
 
     const emailExists = await User.findOne({ email });
     if (emailExists) {
@@ -58,18 +60,17 @@ class AuthController {
     const hash = await bcrypt.hash(password, 10);
 
     // Generate custom user ID
-    const userCustomId = await GeneratorService.generateUserCustomId();
+    const customId = await GeneratorService.generateUserCustomId();
 
     const userTimezone = moment.tz.guess();
     const now = moment.tz(userTimezone);
     const expiry = now.add(EMAIL_TOKEN_EXPIRY, "minutes").toDate();
 
     const user = await User.create({
-      firstname,
-      lastname,
+      fullname,
       email,
       phoneNumber,
-      userCustomId,
+      customId,
       accountType,
       authMethod: "Form",
       authType: {
@@ -86,7 +87,7 @@ class AuthController {
 
     const link = buildSignupUrl(token!, user.email);
 
-    await verifyEmailNotification(user.email, user.firstname, link);
+    // await verifyEmailNotification(user.email, user.fullname, link);
 
     const formattedUser = _.pick(user, userFields);
 
@@ -220,7 +221,7 @@ class AuthController {
         user.accountType
       );
 
-      await welcomeNotification(user.email, user.firstname);
+      // await welcomeNotification(user.email, user.fullname);
       const formattedUser = _.pick(updatedUser, userFields);
 
       return res.ok({
@@ -267,7 +268,7 @@ class AuthController {
 
     const link = buildSignupUrl(emailConfirmationToken, user.email);
 
-    await verifyEmailNotification(user.email, user.firstname, link);
+    //await verifyEmailNotification(user.email, user.fullname, link);
 
     return res.ok({
       message: "Email verification link sent to the email address provided",
@@ -330,7 +331,7 @@ class AuthController {
         payload
       );
 
-      await welcomeNotification(account!.email, account!.firstname);
+      await welcomeNotification(account!.email, account!.fullname);
 
       authProcessType = "signup";
     } else {
@@ -497,8 +498,8 @@ class AuthController {
 
     const otp = user.passwordRecovery.passwordRecoveryOtp;
 
-    if (otp && user.firstname && email) {
-      await resetPasswordEmail(user.email, user.firstname, otp);
+    if (otp && user.fullname && email) {
+      // await resetPasswordEmail(user.email, user.fullname, otp);
     }
 
     res.ok({ message: `New reset password Otp sent to ${email}` });
@@ -546,9 +547,10 @@ class AuthController {
       req.body
     );
     if (error) throw new BadRequest(error.message, error.code);
-    const { otp, newPassword } = data;
+    const { otp, newPassword, accountType } = data;
 
-    const user = await User.findOne({
+    if(accountType === "User"){
+      const user = await User.findOne({
       "passwordRecovery.passwordRecoveryOtp": otp,
     });
 
@@ -577,9 +579,44 @@ class AuthController {
         passwordRecoveryOtpExpiresAt: undefined,
       };
       await user.save();
-      await successChangedPasswordEmail(user.email, user.firstname);
+      // await successChangedPasswordEmail(user.email, user.fullname);
 
       res.ok({ message: "Your Password has been changed successfully" });
+    }
+    }else if(accountType==="Seller"){
+       const seller = await Seller.findOne({
+      "passwordRecovery.passwordRecoveryOtp": otp,
+       });
+
+    if (!seller)
+      throw new BadRequest("Invalid OTP", "INVALID_REQUEST_PARAMETERS");
+
+    const sellerTimezone = moment.tz.guess();
+    const now = moment.tz(sellerTimezone);
+    const otpExpired = now.isAfter(
+      seller?.passwordRecovery?.passwordRecoveryOtpExpiresAt
+    );
+
+    // Handle expired OTP
+    if (otpExpired) {
+      seller.passwordRecovery = {
+        passwordRecoveryOtp: undefined,
+        passwordRecoveryOtpExpiresAt: undefined,
+      };
+      await seller.save();
+      return res.error(400, "OTP Expired, request a new one", "EXPIRED_TOKEN");
+    } else {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      seller.authType.password = hashedPassword;
+      seller.passwordRecovery = {
+        passwordRecoveryOtp: undefined,
+        passwordRecoveryOtpExpiresAt: undefined,
+      };
+      await seller.save();
+      // await successChangedPasswordEmail(seller.email, seller.fullname);
+
+      res.ok({ message: "Your Password has been changed successfully" });
+    }
     }
   }
 
