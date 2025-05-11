@@ -1,24 +1,45 @@
-import dotenv from "dotenv";
+ import dotenv from "dotenv";
 dotenv.config();
 import app from "./app";
 import connectDB from "./db";
 import "./env";
 import { startJobs } from "./config/agenda.config";
 
+// Increase Node.js heap memory limit
+import v8 from "v8";
+v8.setFlagsFromString("--max-old-space-size=8192");
+
 process.on("uncaughtException", (err) => {
-  console.log(err);
-  process.exit(1);
-});
-process.on("unhandledRejection", (err) => {
-  console.log(err);
+  console.error("Uncaught Exception:", err);
   process.exit(1);
 });
 
-const port = process.env.PORT || "8080";
-app.listen(port, async () => {
-  console.log(`Listening for requests on port ${port} ...`);
-  await connectDB();
-  console.log("Successfully connected to mongodb");
-  await startJobs();
-  console.log("Agenda started successfully");
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err);
+  process.exit(1);
 });
+
+const port = parseInt(process.env.PORT || "8080", 10);  // Convert to number
+
+async function startServer() {
+  try {
+    // First connect to DB
+    await connectDB();
+    console.log("Successfully connected to MongoDB");
+    
+    // Then start Agenda jobs
+    await startJobs();
+    console.log("Agenda started successfully");
+    
+    // Only then start the server
+    app.listen(port, "0.0.0.0", () => {
+      console.log(`Server running on port ${port}`);
+    });
+    
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
