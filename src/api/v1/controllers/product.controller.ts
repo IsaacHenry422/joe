@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequest, ResourceNotFound } from "../../../errors/httpErrors";
-import Product from "../../../db/models/product.model"; // Changed from ProductBooking
+import Product from "../../../db/models/product"; // Changed from ProductBooking
 import {
   createProductValidator,
   updateProductValidator,
