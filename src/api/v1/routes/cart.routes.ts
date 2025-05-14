@@ -1,31 +1,64 @@
+// import { Router } from 'express';
+// import { authenticate } from '../middleware/authenticationMiddleware';
+// import { validate } from '../middleware/validationMiddleware';
+// import {
+//   addItemToCart,
+//   getUserCart,
+//   updateCartItem,
+//   removeCartItem
+// } from '../controllers/cartController';
+// import validateCart from '../../validators/cart.validator';
+// const router = Router();
+
+// router.use(authenticate);
+
+// router.post('/items', validate([
+//     body('productId').isMongoId(),
+//     body('quantity').isInt({ min: 1 })
+// ]), addItemToCart);
+
+// router.get('/', getUserCart);
+
+// router.put('/items/:cartItemId', validate([
+//     param('cartItemId').isMongoId(),
+//     body('quantity').isInt({ min: 1 })
+// ]), updateCartItem);
+
+// router.delete('/items/:cartItemId', validate([
+//     param('cartItemId').isMongoId()
+// ]), removeCartItem);
+
+// // export default router;
 import { Router } from 'express';
-import { authenticate } from '../middleware/authenticationMiddleware';
-import { validate } from '../middleware/validationMiddleware';
+import { body, param } from 'express-validator'; // Make sure to import body and param
+import { authenticate } from '../../middleware/authenticationMiddleware';
+import { validate } from '../../middleware/validationMiddleware';
 import {
   addItemToCart,
   getUserCart,
   updateCartItem,
   removeCartItem
-} from '../controllers/cartController';
+} from '../../controllers/cartController';
+import validateCart from '../../validators/cart.validator';
 
 const router = Router();
 
 router.use(authenticate);
 
 router.post('/items', validate([
-    body('productId').isMongoId(),
-    body('quantity').isInt({ min: 1 })
+  body('productId').isMongoId(),
+  body('quantity').isInt({ min: 1 })
 ]), addItemToCart);
 
 router.get('/', getUserCart);
 
 router.put('/items/:cartItemId', validate([
-    param('cartItemId').isMongoId(),
-    body('quantity').isInt({ min: 1 })
+  param('cartItemId').isMongoId(),
+  body('quantity').isInt({ min: 1 })
 ]), updateCartItem);
 
 router.delete('/items/:cartItemId', validate([
-    param('cartItemId').isMongoId()
+  param('cartItemId').isMongoId()
 ]), removeCartItem);
 
 export default router;

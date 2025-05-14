@@ -6,7 +6,7 @@ import { envSchema } from "../env";
 import { IUser } from "../db/models/user.model";
 import { IAdmin } from "../db/models/admin.model";
 import { IProduct } from "../db/models/product"; // NEW
-import { ICategory } from "../db/models/category.model"; // NEW
+import { ICategory } from "../db/models/category"; // NEW
 
 declare global {
   namespace Express {
