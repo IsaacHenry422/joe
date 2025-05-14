@@ -67,7 +67,7 @@
 //       next(error);
 //     }
 //   }
-// ];
+// ]; 
 import { Request, Response, NextFunction } from 'express';
 import { auth } from '../../middlewares/authMiddleware';
 import { Cart, ICartItem } from '../../../db/models/cart.model'; // Import ICartItem as well
