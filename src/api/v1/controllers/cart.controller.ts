@@ -70,7 +70,7 @@
 // ];
 import { Request, Response, NextFunction } from 'express';
 import { auth } from '../../middlewares/authMiddleware';
-import { Cart, ICartItem } from '../../../db/models/Cart.model'; // Import ICartItem as well
+import { Cart, ICartItem } from '../../../db/models/cart.model'; // Import ICartItem as well
 
 // Example: Get the current user's cart
 export const getCart = [
