@@ -29,15 +29,59 @@
 // }
 
 // export { agenda, startJobs };
+// import Agenda, { Job, JobAttributesData } from "agenda";
+// import * as allJobs from "../jobs"; // Assuming this imports the array you just showed
+// import * as dotenv from "dotenv";
+
+// dotenv.config();
+
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// const connectionOpts: any = {
+//   db: { address: process.env.MONGODB_URI, collection: "agendaJobs" },
+// };
+
+// const agenda = new Agenda(connectionOpts);
+
+// async function startJobs(): Promise<void> {
+//   await agenda.start();
+
+//   const jobs = allJobs.default as {
+//     name: string;
+//     schedule?: string; // Use schedule here
+//     concurrency?: number;
+//     handler: (job: Job<JobAttributesData>) => Promise<void>;
+//   }[];
+
+//   for (const job of jobs) {
+//     const handler = job.handler as (
+//       job: Job<JobAttributesData>
+//     ) => Promise<void>;
+//     agenda.define(job.name, { concurrency: job.concurrency }, handler);
+
+//     // Schedule job if it has a schedule
+//     if (job.schedule) {
+//       await agenda.every(job.schedule, job.name); // Use job.schedule here
+//     }
+//   }
+// } export { agenda, startJobs };
+	
 import Agenda, { Job, JobAttributesData } from "agenda";
-import * as allJobs from "../jobs"; // Assuming this imports the array you just showed
+import * as allJobs from "../jobs";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// ✅ Use TLS and unified MongoDB options to avoid connection issues
 const connectionOpts: any = {
-  db: { address: process.env.MONGODB_URI, collection: "agendaJobs" },
+  db: {
+    address: process.env.MONGODB_URI,
+    collection: "agendaJobs",
+    options: {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      tls: true, // Enables SSL for MongoDB Atlas
+    },
+  },
 };
 
 const agenda = new Agenda(connectionOpts);
@@ -47,7 +91,7 @@ async function startJobs(): Promise<void> {
 
   const jobs = allJobs.default as {
     name: string;
-    schedule?: string; // Use schedule here
+    schedule?: string;
     concurrency?: number;
     handler: (job: Job<JobAttributesData>) => Promise<void>;
   }[];
@@ -56,11 +100,11 @@ async function startJobs(): Promise<void> {
     const handler = job.handler as (
       job: Job<JobAttributesData>
     ) => Promise<void>;
+
     agenda.define(job.name, { concurrency: job.concurrency }, handler);
 
-    // Schedule job if it has a schedule
     if (job.schedule) {
-      await agenda.every(job.schedule, job.name); // Use job.schedule here
+      await agenda.every(job.schedule, job.name);
     }
   }
 }
