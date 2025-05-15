@@ -60,7 +60,7 @@
 //   res.error(404, "Resource not found", "UNKNOWN_ENDPOINT");
 // });
 
-// export default app;
+// export default app; 
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
@@ -85,7 +85,7 @@ const whitelist = [
   ...(process.env.NODE_ENV === "development"
     ? ["http://localhost:3000", "http://localhost:3001"]
     : []),
-].filter(Boolean) as string[];
+].filter(Boolean);
 
 app.use(
   cors({
@@ -130,7 +130,17 @@ app.use(morgan("dev"));
 // ======================
 // Routes
 // ======================
-// Health Check
+// Root route for health checks/probes
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "running",
+    version: "1.0.0",
+    dbStatus: mongoose.connection.readyState,
+    timestamp: new Date()
+  });
+});
+
+// Health Check endpoint (more detailed)
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "OK",
@@ -145,10 +155,16 @@ app.use("/api/v1", v1Router);
 // ======================
 // Error Handling
 // ======================
+// Handle favicon requests
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
+// Error logger
 app.use(errorMiddlewares.errorLogger);
+
+// Main error handler
 app.use(errorMiddlewares.errorHandler);
 
-// 404 Handler
+// Final 404 Handler (catches all unhandled routes)
 app.use((req, res) => {
   res.error(404, "Resource not found", "UNKNOWN_ENDPOINT");
 });
