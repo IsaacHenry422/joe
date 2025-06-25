@@ -16,10 +16,10 @@ import locationRouter from "./location.route";
 
 // E-commerce specific routes
 import productRouter from "./product.route";
-// import cartRouter from "./cart.route";
+ import cartRouter from "./cart.routes";
 // import wishlistRouter from "./wishlist.route";
 // import reviewRouter from "./review.route";
-// import categoryRouter from "./category.route";
+ import categoryRouter from "./categoryRoutes";
 // import couponRouter from "./coupon.route";
 // import shippingRouter from "./shipping.route";
 
@@ -36,10 +36,11 @@ router.use("/shared", sharedRouter);
 
 // E-commerce routes
 router.use("/products", productRouter);
-// router.use("/cart", cartRouter);
+router.use("/cart", cartRouter);
 // router.use("/wishlist", wishlistRouter);
 // router.use("/reviews", reviewRouter);
-// router.use("/categories", categoryRouter);
+router.use("/categories", categoryRouter);
+
 // router.use("/coupons", couponRouter);
 // router.use("/shipping", shippingRouter);
 
