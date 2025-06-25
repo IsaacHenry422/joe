@@ -107,7 +107,11 @@ app.use("/api/v1/categories", categoryRoutes);
 //     credentials: true,
 //   })
 // );
-app.use(cors());
+app.use(
+  cors({
+    origin: '*'
+  })
+);
 // ======================
 // Database Connection
 // ======================
