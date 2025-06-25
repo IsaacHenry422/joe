@@ -13,6 +13,7 @@ import transactionRouter from "./transaction.route";
 import notificationRouter from "./notification.route";
 import contactRouter from "./contactus.route";
 import locationRouter from "./location.route";
+import landingRouter from "./landing.route";
 
 // E-commerce specific routes
 import productRouter from "./product.route";
@@ -20,6 +21,7 @@ import productRouter from "./product.route";
 // import wishlistRouter from "./wishlist.route";
 // import reviewRouter from "./review.route";
  import categoryRouter from "./categoryRoutes";
+ 
 // import couponRouter from "./coupon.route";
 // import shippingRouter from "./shipping.route";
 
@@ -35,6 +37,7 @@ router.use("/admins", adminRouter);
 router.use("/shared", sharedRouter);
 
 // E-commerce routes
+router.use("/landing", landingRouter);
 router.use("/products", productRouter);
 router.use("/cart", cartRouter);
 // router.use("/wishlist", wishlistRouter);
