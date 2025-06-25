@@ -17,7 +17,7 @@ import landingRouter from "./landing.route";
 
 // E-commerce specific routes
 import productRouter from "./product.route";
- import cartRouter from "./cart.routes";
+ //import cartRouter from "./cart.routes";
 // import wishlistRouter from "./wishlist.route";
 // import reviewRouter from "./review.route";
  import categoryRouter from "./categoryRoutes";
@@ -39,7 +39,7 @@ router.use("/shared", sharedRouter);
 // E-commerce routes
 router.use("/landing", landingRouter);
 router.use("/products", productRouter);
-router.use("/cart", cartRouter);
+//router.use("/cart", cartRouter);
 // router.use("/wishlist", wishlistRouter);
 // router.use("/reviews", reviewRouter);
 router.use("/categories", categoryRouter);
