@@ -1,6 +1,6 @@
 //  import { Agenda } from 'agenda';
-// // import { IProduct } from '../models/Product';
-// // TODO: Uncomment and fix the path when the Product model is available
+// import { IProduct } from '../models/product';
+//  //TODO: Uncomment and fix the path when the Product model is available
 // interface IProduct {
 //   // Define the properties of IProduct here as a temporary fix
 //   // Example:
@@ -60,7 +60,7 @@
 // }
 
 // export type { EcommerceJobData };
-// export default scheduledJobs;
+//export default scheduledJobs;
 import { Agenda, Job } from 'agenda';
 
 // Temporary IProduct definition

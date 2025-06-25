@@ -218,7 +218,7 @@ class AuthController {
 
       const { accessToken, refreshToken } = await generateAuthToken(
         user,
-        user.accountType
+        "User"
       );
 
       // await welcomeNotification(user.email, user.fullname);
@@ -352,9 +352,14 @@ class AuthController {
       );
     }
 
+    // Ensure only allowed account types are passed
+    const allowedAccountTypes = ["User", "Seller", "Admin"] as const;
+    const safeAccountType = allowedAccountTypes.includes(account.accountType as any)
+      ? (account.accountType as "User" | "Seller" | "Admin")
+      : "User";
     const { accessToken, refreshToken } = await generateAuthToken(
       account,
-      account.accountType
+      safeAccountType
     );
 
     let formattedAccount: Partial<IUser> | null = null;

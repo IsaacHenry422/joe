@@ -1,4 +1,4 @@
-import express from "express";
+ import express from "express";
 import transactionController from "../controllers/transaction.controller";
 import { auth } from "../../middlewares/authMiddleware";
 
@@ -39,10 +39,18 @@ transactionRouter.get(
   transactionController.getAtransactionById
 );
 
-//status
+// status (public or add auth if needed)
 transactionRouter.get(
   "/status",
   transactionController.getAtransactionByCustomId
+);
+
+// NEW route: complete/create transaction
+// Protect this route by auth for users who can create transactions (e.g., user and seller)
+transactionRouter.post(
+  "/complete",
+  auth({ accountType: ["user", "seller"] }),
+  transactionController.completeTransaction
 );
 
 export default transactionRouter;

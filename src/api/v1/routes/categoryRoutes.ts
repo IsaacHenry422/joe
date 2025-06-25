@@ -1,9 +1,9 @@
- // Current code is 100% okay as-is
-import express from 'express';
-import { getCategories, getProductsByCategory } from '../controllers/categoryController';
+import { Router } from "express";
+import { addCategory, getCategories, getProductsByCategory } from "../controllers/categoryController";
 
-const router = express.Router();
+const router = Router();
 
+router.post("/", addCategory); // POST /api/v1/categories
 router.get('/', getCategories);
 router.get('/:slug/products', getProductsByCategory);
 

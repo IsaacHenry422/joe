@@ -69,6 +69,10 @@ import { config } from "dotenv";
 import * as errorMiddlewares from "./api/middlewares/errorMiddlewares";
 import responseUtilities from "./api/middlewares/responseUtilities";
 import v1Router from "./api/v1/routes";
+import landingRoutes from "./api/v1/routes/landing.route";
+import categoryRoutes from "./api/v1/routes/categoryRoutes";
+
+
 
 // Load environment variables
 config({ path: `.env.${process.env.NODE_ENV || "development"}` });
@@ -76,31 +80,34 @@ config({ path: `.env.${process.env.NODE_ENV || "development"}` });
 // Initialize Express
 const app = express();
 
+app.use("/api/v1/landing", landingRoutes);
+app.use("/api/v1/categories", categoryRoutes);
+
 // ======================
 // CORS Configuration
 // ======================
-const whitelist = [
-  process.env.FRONTEND_URL,
-  "https://crownlist-staging.vercel.app",
-  ...(process.env.NODE_ENV === "development"
-    ? ["http://localhost:3000", "http://localhost:3001"]
-    : []),
-].filter(Boolean);
+// const whitelist = [
+//   process.env.FRONTEND_URL,
+//   "https://crownlist-staging.vercel.app",
+//   ...(process.env.NODE_ENV === "development"
+//     ? ["http://localhost:3000", "http://localhost:3001"]
+//     : []),
+// ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin '${origin}' not allowed by CORS`));
-      }
-    },
-    exposedHeaders: ["X-API-TOKEN", "X-Total-Count"],
-    credentials: true,
-  })
-);
-
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (!origin || whitelist.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error(`Origin '${origin}' not allowed by CORS`));
+//       }
+//     },
+//     exposedHeaders: ["X-API-TOKEN", "X-Total-Count"],
+//     credentials: true,
+//   })
+// );
+app.use(cors());
 // ======================
 // Database Connection
 // ======================
